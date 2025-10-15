@@ -1,0 +1,76 @@
+# ========================
+# Common ignores
+# ========================
+# Ignore all node_modules directories, regardless of location
+**/node_modules/
+
+
+# Ignore all build output folders
+**/build/
+**/dist/
+**/dist-ssr/
+
+# Ignore editor and environment-specific folders/files anywhere
+.env*
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.local
+
+# ========================
+# Logs
+# ========================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ========================
+# Front-end (React) specific
+# ========================
+# Ignore Yarn and NPM lock files
+package-lock.json
+yarn.lock
+
+# Ignore React test coverage output
+**/coverage/
+
+# ========================
+# Back-end (Python/Flask) specific
+# ========================
+# Ignore Python virtual environments
+**/venv/
+.venv/
+
+# Ignore Python bytecode files
+**/__pycache__/
+*.py[cod]
+
+# Ignore Flask instance folder
+**/instance/
+
+# Ignore pytest cache and test coverage artifacts
+**/.pytest_cache/
+.coverage
+htmlcov/
+
+# Ignore Python packaging artifacts
+dist/
+build/
+*.egg-info/
+
+# ========================
+# Specific IDE/Editor exclusions
+# ========================
+# Keep extensions.json in VS Code settings to share recommended extensions
+.vscode/*
+!.vscode/extensions.json
