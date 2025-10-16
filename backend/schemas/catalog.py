@@ -6,11 +6,13 @@ from models.catalog import Product, Category, Inventory, Review
 
 
 class CategorySchema(BaseSchema):
+    '''Schema for reading and writing Category data'''
     class Meta:
         model = Category
 
 
 class ProductSchema(BaseSchema):
+    '''Schema for reading and writing Product data'''
     class Meta:
         model = Product
 
@@ -19,11 +21,13 @@ class ProductSchema(BaseSchema):
 
 
 class InventorySchema(BaseSchema):
+    '''Schema for reading and writing Inventory data'''
     class Meta:
         model = Inventory
 
 
 class ReviewSchema(BaseSchema):
+    '''Schema for reading and writing Review data'''
     class Meta:
         model = Review
 
@@ -37,6 +41,7 @@ class ReviewSchema(BaseSchema):
 
 
 class ProductCreateSchema(BaseSchema):
+    '''Schema for creating Product data'''
     class Meta:
         model = Product
         exclude = ('id', 'categories', 'reviews')
@@ -51,4 +56,5 @@ class ProductCreateSchema(BaseSchema):
 
 
 class ProductUpdateSchema(ProductCreateSchema):
+    '''Schema for updating Product data'''
     pass

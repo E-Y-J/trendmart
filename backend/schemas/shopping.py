@@ -1,11 +1,12 @@
 from marshmallow import fields
 from extensions import BaseSchema
-from models.shopping import Cart, CartItem, Order, OrderItem, Payment
+from models.shopping import Cart, CartItem, Order, OrderItem
 
 # -------Read and Write Schemas------- #
 
 
 class CartItemSchema(BaseSchema):
+    '''Schema for reading and writing CartItem data'''
     class Meta:
         model = CartItem
         include_fk = True
@@ -14,6 +15,7 @@ class CartItemSchema(BaseSchema):
 
 
 class CartSchema(BaseSchema):
+    '''Schema for reading and writing Cart data'''
     class Meta:
         model = Cart
         include_fk = True
@@ -22,6 +24,7 @@ class CartSchema(BaseSchema):
 
 
 class OrderItemSchema(BaseSchema):
+    '''Schema for reading and writing OrderItem data'''
     class Meta:
         model = OrderItem
         include_fk = True
@@ -31,6 +34,7 @@ class OrderItemSchema(BaseSchema):
 
 
 class OrderSchema(BaseSchema):
+    '''Schema for reading and writing Order data'''
     class Meta:
         model = Order
         include_fk = True
@@ -43,22 +47,11 @@ class OrderSchema(BaseSchema):
     placed_at = fields.DateTime(dump_only=True)
 
 
-class PaymentSchema(BaseSchema):
-    class Meta:
-        model = Payment
-        include_fk = True
-    order_id = fields.Int(required=True)
-    amount = fields.Float(required=True)
-    currency = fields.Str(required=True)
-    payment_method = fields.Str(required=True)
-    status = fields.Str(dump_only=True)
-    paid_at = fields.DateTime(dump_only=True)
-    updated_at = fields.DateTime(dump_only=True)
-
 # -------Input Schemas------- #
 
 
 class CartCreateSchema(BaseSchema):
+    '''Schema for creating a new Cart'''
     class Meta:
         model = Cart
         exclude = ('id', 'created_at', 'updated_at', 'items')
@@ -66,6 +59,7 @@ class CartCreateSchema(BaseSchema):
 
 
 class CartItemCreateSchema(BaseSchema):
+    '''Schema for creating a new CartItem'''
     class Meta:
         model = CartItem
         exclude = ('id', 'cart_id', 'created_at', 'updated_at')
@@ -75,6 +69,7 @@ class CartItemCreateSchema(BaseSchema):
 
 
 class OrderCreateSchema(BaseSchema):
+    '''Schema for creating a new Order'''
     class Meta:
         model = Order
         exclude = ('id', 'created_at', 'updated_at', 'status',
@@ -83,29 +78,10 @@ class OrderCreateSchema(BaseSchema):
 
 
 class OrderItemCreateSchema(BaseSchema):
+    '''Schema for creating a new OrderItem'''
     class Meta:
         model = OrderItem
         exclude = ('id', 'order_id', 'created_at', 'updated_at')
     product_id = fields.Int(required=True)
     quantity = fields.Int(required=True, validate=lambda n: n > 0)
     price_per_unit = fields.Float(required=True, validate=lambda p: p >= 0)
-
-
-class PaymentCreateSchema(BaseSchema):
-    class Meta:
-        model = Payment
-        exclude = ('id', 'created_at', 'updated_at', 'status', 'paid_at')
-    order_id = fields.Int(required=True)
-    total_amount = fields.Float(required=True, validate=lambda p: p >= 0)
-    currency = fields.Str(required=True)
-    payment_method = fields.Str(required=True)
-    stripe_payment_intent_id = fields.Str()
-
-
-class PaymentUpdateSchema(BaseSchema):
-    class Meta:
-        model = Payment
-        exclude = ('id', 'created_at', 'order_id', 'total_amount',
-                   'currency', 'payment_method', 'paid_at')
-    status = fields.Str(required=True)
-    updated_at = fields.DateTime(dump_only=True)

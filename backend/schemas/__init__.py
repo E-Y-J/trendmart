@@ -2,6 +2,7 @@ from catalog import CatalogSchemas
 from registration import RegistrationSchemas
 from shopping import ShoppingSchemas
 from auth import AuthSchemas
+from payment import PaymentSchemas
 from marshmallow import validate
 
 PASSWORD_REGEX = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).+$'
@@ -16,5 +17,6 @@ __all__ = [
     'RegistrationSchemas',
     'ShoppingSchemas',
     'AuthSchemas',
+    'PaymentSchemas',
     'PASSWORD_VALIDATOR'
 ]

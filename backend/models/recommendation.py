@@ -3,6 +3,7 @@ from extensions import db
 
 
 class Recommendation(db.Model):
+    '''Schema for reading and writing Recommendation data'''
     __tablename__ = 'recommendations'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -22,6 +23,7 @@ class Recommendation(db.Model):
 
 
 class Reviews(db.Model):
+    '''Schema for reading and writing Reviews data'''
     __tablename__ = 'reviews'
 
     id = db.Column(db.Integer, primary_key=True)

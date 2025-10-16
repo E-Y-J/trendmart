@@ -63,16 +63,3 @@ class OrderItem(db.Model):
 
     order = db.relationship('Order', back_populates='items')
     product = db.relationship('Product', back_populates='order_items')
-
-
-class Payment(db.Model):
-    __tablename__ = 'payments'
-
-    id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey(
-        'orders.id', ondelete='CASCADE'), nullable=False, unique=True)
-    status = db.Column(db.String(32), nullable=False, default='pending')
-    total_amount = db.Column(db.Float, nullable=False)
-    paid_at = db.Column(db.DateTime)
-
-    order = db.relationship('Order', back_populates='payment')

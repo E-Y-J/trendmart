@@ -3,9 +3,10 @@ from extensions import db
 
 
 class User(db.Model):
+    '''Schema for reading and writing User data'''
     __tablename__ = 'users'
 
-    id = db.Column(db.Interger, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(125), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(50), default='customer')
@@ -14,6 +15,7 @@ class User(db.Model):
 
 
 class CustomerProfile(db.Model):
+    '''Schema for reading and writing CustomerProfile data'''
     __tablename__ = 'customer_profiles'
 
     user_id = db.Column(db.Integer, db.ForeignKey(
@@ -26,6 +28,7 @@ class CustomerProfile(db.Model):
 
 
 class Address(db.Model):
+    '''Schema for reading and writing Address data'''
     __tablename__ = 'adresses'
 
     id = db.Column(db.Integer, primary_key=True)

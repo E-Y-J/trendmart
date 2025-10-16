@@ -1,16 +1,20 @@
+from wsgiref import validate
 from marshmallow import fields
 from extensions import BaseSchema
 from models.registration import User, CustomerProfile, Address
+from __init__ import PASSWORD_VALIDATOR
 
 # -------Read and Write Schemas------- #
 
 
 class AddressSchema(BaseSchema):
+    '''Schema for reading and writing Address data'''
     class Meta:
         model = Address
 
 
 class CustomerProfileSchema(BaseSchema):
+    '''Schema for reading and writing CustomerProfile data'''
     class Meta:
         model = CustomerProfile
 
@@ -18,6 +22,7 @@ class CustomerProfileSchema(BaseSchema):
 
 
 class UserSchema(BaseSchema):
+    '''Schema for reading and writing User data'''
     class Meta:
         model = User
         exclude = ("password_hash",)
@@ -29,17 +34,25 @@ class UserSchema(BaseSchema):
 
 
 class UserRegistrationSchema(BaseSchema):
+    '''Schema for registering a new User'''
     class Meta:
         model = User
         exclude = ('id', 'created_at', 'active', 'role',
                    'customer profile', 'addresses')
 
-    password = fields.String(load_only=True, required=True)
+    password = fields.String(
+        required=True,
+        validate=[
+            validate.Length(min=8, max=50),
+            PASSWORD_VALIDATOR
+        ]
+    )
     role = fields.String(dump_only=True, default='customer')
     email = fields.Email(required=True)
 
 
 class CustomerProfileInputSchema(BaseSchema):
+    '''Schema for creating or updating CustomerProfile data'''
     class Meta:
         model = CustomerProfile
         exclude = ('id', 'user_id', 'default_address', 'user', 'addresses')
