@@ -1,16 +1,3 @@
-"""
-Catalog Models
-
-This module contains all database models related to the product catalog system.
-Includes categories, products, inventory, and reviews functionality.
-
-Models:
-    - Category: Product categorization
-    - Product: Core product information
-    - Inventory: Stock management per product
-    - Review: Customer product reviews and ratings
-"""
-
 from extensions import db
 from sqlalchemy import CheckConstraint, UniqueConstraint
 

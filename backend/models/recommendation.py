@@ -1,13 +1,3 @@
-"""
-Product Recommendation Model
-
-This module contains models for the recommendation engine.
-Stores personalized product recommendations for users based on ML algorithms.
-
-Models:
-    - Recommendation: ML-generated product recommendations for users
-"""
-
 from sqlalchemy import CheckConstraint, UniqueConstraint
 from extensions import db
 

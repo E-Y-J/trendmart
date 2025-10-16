@@ -1,13 +1,3 @@
-"""
-Payment Processing Model
-
-This module contains the payment model for handling transaction records.
-Integrates with payment processors like Stripe for secure payment processing.
-
-Models:
-    - Payment: Payment transaction records linked to orders
-"""
-
 from extensions import db
 
 

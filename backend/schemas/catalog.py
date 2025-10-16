@@ -1,20 +1,3 @@
-"""
-Catalog Schemas
-
-Marshmallow schemas for serialization/deserialization and validation 
-of catalog-related models (Product, Category, Inventory, Review).
-
-Provides separate schemas for:
-- Read/Write operations (full model serialization)
-- Input validation (create/update operations with validation rules)
-
-Best Practices Implemented:
-- Separate input schemas for create/update operations
-- Field-level validation for business rules
-- Nested relationships for API responses
-- dump_only fields for read-only data
-"""
-
 from marshmallow import Schema, fields, validate, validates, ValidationError
 from extensions import BaseSchema
 from models.catalog import Product, Category, Inventory, Review

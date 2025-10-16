@@ -1,15 +1,3 @@
-"""
-User Registration and Profile Models
-
-This module contains all database models related to user management.
-Includes user accounts, customer profiles, and address management.
-
-Models:
-    - User: Core user authentication and account data
-    - CustomerProfile: Extended customer information (one-to-one with User)
-    - Address: User shipping/billing addresses (one-to-many with User)
-"""
-
 from datetime import datetime
 from extensions import db
 

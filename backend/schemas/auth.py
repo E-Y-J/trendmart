@@ -1,15 +1,3 @@
-"""
-Authentication Schemas
-
-Marshmallow schemas for user authentication endpoints.
-Handles login/logout request validation and JWT token responses.
-
-Security Features:
-- Password complexity validation via regex
-- Email format validation
-- Token response standardization
-"""
-
 from marshmallow import fields, validate
 from extensions import BaseSchema
 from models.registration import User

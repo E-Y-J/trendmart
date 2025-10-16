@@ -1,16 +1,3 @@
-"""
-Shopping Cart and Order Models
-
-This module contains all database models related to the shopping experience.
-Includes cart management, order processing, and order history.
-
-Models:
-    - Cart: User's active shopping cart (one per user)
-    - CartItem: Individual products in a cart with quantities
-    - Order: Completed purchase orders
-    - OrderItem: Individual products in an order with pricing
-"""
-
 from extensions import db
 from sqlalchemy import UniqueConstraint
 
