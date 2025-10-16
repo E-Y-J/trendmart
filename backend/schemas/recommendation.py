@@ -1,16 +1,3 @@
-"""
-Product Recommendation Schemas
-
-Marshmallow schemas for ML-generated product recommendations.
-Handles personalized product suggestion data for users.
-
-Features:
-- Recommendation scoring system
-- User-product recommendation mapping
-- ML algorithm integration support
-- Confidence score validation
-"""
-
 from extensions import BaseSchema
 from models.recommendation import Recommendation
 from marshmallow import fields

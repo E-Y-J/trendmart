@@ -1,8 +1,3 @@
-"""
-Models package for TrendMart application.
-Contains all database model definitions.
-"""
-
 from .registration import User, CustomerProfile, Address
 from .catalog import Category, Product, Inventory, Review, product_categories
 from .shopping import Cart, CartItem, Order, OrderItem

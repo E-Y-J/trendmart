@@ -1,23 +1,3 @@
-"""
-Shopping Cart and Order Schemas
-
-Marshmallow schemas for e-commerce shopping functionality.
-Handles cart management, order processing, and transaction data.
-
-Business Features:
-- Shopping cart persistence
-- Order history and tracking
-- Price snapshot preservation
-- Quantity validation
-- Order status management
-
-Provides schemas for:
-- Active shopping carts (CartSchema, CartItemSchema)
-- Completed orders (OrderSchema, OrderItemSchema) 
-- Input validation for cart/order operations
-- Historical transaction data
-"""
-
 from marshmallow import fields
 from extensions import BaseSchema
 from models.shopping import Cart, CartItem, Order, OrderItem

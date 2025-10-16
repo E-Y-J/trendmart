@@ -1,21 +1,3 @@
-"""
-Payment Processing Schemas
-
-Marshmallow schemas for serialization/deserialization and validation 
-of payment-related models. Handles payment transaction data with 
-integration support for payment processors like Stripe.
-
-Provides separate schemas for:
-- Full payment data serialization (PaymentSchema)
-- Payment creation with validation (PaymentCreateSchema) 
-- Payment status updates (PaymentUpdateSchema)
-
-Security Features:
-- Amount validation (no negative payments)
-- Status tracking for transaction states
-- Integration with external payment processors
-"""
-
 from marshmallow import fields
 from extensions import BaseSchema
 from models.payment import Payment

@@ -1,22 +1,3 @@
-"""
-User Registration and Profile Schemas
-
-Marshmallow schemas for user management, authentication, and profile data.
-Handles user registration, customer profiles, and address management.
-
-Security Features:
-- Password complexity validation via regex
-- Secure password hashing (excludes password_hash from serialization)
-- Email format validation
-- Input sanitization and validation
-
-Provides schemas for:
-- User account data (UserSchema)
-- User registration with validation (UserRegistrationSchema)
-- Customer profile information (CustomerProfileSchema)
-- Address management (AddressSchema)
-"""
-
 from marshmallow import fields, validate
 from extensions import BaseSchema
 from models.registration import User, CustomerProfile, Address

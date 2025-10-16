@@ -42,7 +42,7 @@ class TokenResponseSchema(BaseSchema):
         required=True, dump_only=True)  # JWT refresh token
     token_type = fields.String(
         required=True, dump_only=True, default='Bearer')  # Token type
-    # Token lifetime in seconds
+    # Token lifetime in seconds for testing purposes
     expires_in = fields.Integer(required=True, dump_only=True)
 
 
