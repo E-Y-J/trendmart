@@ -1,12 +1,39 @@
+"""
+Shopping Cart and Order Schemas
+
+Marshmallow schemas for e-commerce shopping functionality.
+Handles cart management, order processing, and transaction data.
+
+Business Features:
+- Shopping cart persistence
+- Order history and tracking
+- Price snapshot preservation
+- Quantity validation
+- Order status management
+
+Provides schemas for:
+- Active shopping carts (CartSchema, CartItemSchema)
+- Completed orders (OrderSchema, OrderItemSchema) 
+- Input validation for cart/order operations
+- Historical transaction data
+"""
+
 from marshmallow import fields
 from extensions import BaseSchema
 from models.shopping import Cart, CartItem, Order, OrderItem
 
-# -------Read and Write Schemas------- #
-
 
 class CartItemSchema(BaseSchema):
-    '''Schema for reading and writing CartItem data'''
+    """
+    Cart Item Schema for products in shopping cart.
+
+    Handles individual products within a user's cart with quantity validation.
+    Ensures positive quantities and maintains cart integrity.
+
+    Validation Rules:
+    - Quantity must be greater than 0
+    - Product ID required for cart item identification
+    """
     class Meta:
         model = CartItem
         include_fk = True
@@ -15,7 +42,17 @@ class CartItemSchema(BaseSchema):
 
 
 class CartSchema(BaseSchema):
-    '''Schema for reading and writing Cart data'''
+    """
+    Shopping Cart Schema for user cart management.
+
+    Handles user shopping cart data with nested cart items.
+    Maintains cart state between user sessions.
+
+    Features:
+    - Nested cart items for complete cart view
+    - User association for cart ownership
+    - Cart persistence across sessions
+    """
     class Meta:
         model = Cart
         include_fk = True
@@ -24,7 +61,17 @@ class CartSchema(BaseSchema):
 
 
 class OrderItemSchema(BaseSchema):
-    '''Schema for reading and writing OrderItem data'''
+    """
+    Order Item Schema for completed order products.
+
+    Handles individual products within completed orders.
+    Preserves historical pricing and quantity data for accounting.
+
+    Historical Data:
+    - Price snapshot at time of order
+    - Quantity purchased (immutable)
+    - Product reference (nullable for deleted products)
+    """
     class Meta:
         model = OrderItem
         include_fk = True
@@ -34,7 +81,22 @@ class OrderItemSchema(BaseSchema):
 
 
 class OrderSchema(BaseSchema):
-    '''Schema for reading and writing Order data'''
+    """
+    Order Schema for completed purchase orders.
+
+    Handles order data with pricing snapshots and status tracking.
+    Provides immutable historical record of transactions.
+
+    Financial Data:
+    - Subtotal, tax, and final total (frozen at order time)
+    - Order status for fulfillment tracking
+    - Nested order items with historical pricing
+
+    Features:
+    - Order history preservation
+    - Status tracking (pending, processing, shipped, etc.)
+    - Complete order details for customer service
+    """
     class Meta:
         model = Order
         include_fk = True
@@ -47,11 +109,18 @@ class OrderSchema(BaseSchema):
     placed_at = fields.DateTime(dump_only=True)
 
 
-# -------Input Schemas------- #
-
-
 class CartCreateSchema(BaseSchema):
-    '''Schema for creating a new Cart'''
+    """
+    Cart Creation Schema for new user carts.
+
+    Used when initializing a new shopping cart for a user.
+    Excludes auto-generated fields and cart items.
+
+    Typically used during:
+    - User registration (auto-cart creation)
+    - First-time cart access
+    - Cart reset operations
+    """
     class Meta:
         model = Cart
         exclude = ('id', 'created_at', 'updated_at', 'items')
@@ -59,7 +128,21 @@ class CartCreateSchema(BaseSchema):
 
 
 class CartItemCreateSchema(BaseSchema):
-    '''Schema for creating a new CartItem'''
+    """
+    Cart Item Creation Schema for adding products to cart.
+
+    Handles adding new products to user's shopping cart with validation.
+    Captures price snapshot for consistency during checkout.
+
+    Validation Rules:
+    - Quantity must be positive (> 0)
+    - Price must be non-negative (>= 0)
+    - Product ID required for item identification
+
+    Business Logic:
+    - Price snapshot prevents checkout discrepancies
+    - Quantity validation ensures valid cart state
+    """
     class Meta:
         model = CartItem
         exclude = ('id', 'cart_id', 'created_at', 'updated_at')
@@ -69,7 +152,21 @@ class CartItemCreateSchema(BaseSchema):
 
 
 class OrderCreateSchema(BaseSchema):
-    '''Schema for creating a new Order'''
+    """
+    Order Creation Schema for converting cart to order.
+
+    Used when user proceeds to checkout and converts cart to order.
+    Excludes calculated fields that are computed during order processing.
+
+    Order Processing:
+    - Financial calculations handled by business logic
+    - Status automatically set to 'pending'
+    - Timestamps auto-generated
+    - Order items created separately from cart items
+
+    Required Fields:
+    - user_id: Associates order with user account
+    """
     class Meta:
         model = Order
         exclude = ('id', 'created_at', 'updated_at', 'status',
@@ -78,7 +175,22 @@ class OrderCreateSchema(BaseSchema):
 
 
 class OrderItemCreateSchema(BaseSchema):
-    '''Schema for creating a new OrderItem'''
+    """
+    Order Item Creation Schema for order line items.
+
+    Used during order processing to create individual order items.
+    Captures historical pricing and product information for accounting.
+
+    Validation Rules:
+    - Quantity must be positive (> 0)
+    - Price must be non-negative (>= 0) 
+    - Product ID required for item identification
+
+    Historical Preservation:
+    - Price snapshot preserves exact amount paid
+    - Quantity records exact units purchased
+    - Immutable once order is placed
+    """
     class Meta:
         model = OrderItem
         exclude = ('id', 'order_id', 'created_at', 'updated_at')

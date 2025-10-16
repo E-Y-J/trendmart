@@ -1,8 +1,9 @@
-from catalog import CatalogSchemas
-from registration import RegistrationSchemas
-from shopping import ShoppingSchemas
-from auth import AuthSchemas
-from payment import PaymentSchemas
+from .catalog import *
+from .registration import *
+from .shopping import *
+from .auth import *
+from .payment import *
+from .recommendation import *
 from marshmallow import validate
 
 PASSWORD_REGEX = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).+$'
@@ -13,10 +14,5 @@ PASSWORD_VALIDATOR = validate.Regexp(
 
 
 __all__ = [
-    'CatalogSchemas',
-    'RegistrationSchemas',
-    'ShoppingSchemas',
-    'AuthSchemas',
-    'PaymentSchemas',
     'PASSWORD_VALIDATOR'
 ]

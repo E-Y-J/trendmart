@@ -1,20 +1,51 @@
-from wsgiref import validate
-from marshmallow import fields
+"""
+User Registration and Profile Schemas
+
+Marshmallow schemas for user management, authentication, and profile data.
+Handles user registration, customer profiles, and address management.
+
+Security Features:
+- Password complexity validation via regex
+- Secure password hashing (excludes password_hash from serialization)
+- Email format validation
+- Input sanitization and validation
+
+Provides schemas for:
+- User account data (UserSchema)
+- User registration with validation (UserRegistrationSchema)
+- Customer profile information (CustomerProfileSchema)
+- Address management (AddressSchema)
+"""
+
+from marshmallow import fields, validate
 from extensions import BaseSchema
 from models.registration import User, CustomerProfile, Address
-from __init__ import PASSWORD_VALIDATOR
-
-# -------Read and Write Schemas------- #
+from . import PASSWORD_VALIDATOR
 
 
 class AddressSchema(BaseSchema):
-    '''Schema for reading and writing Address data'''
+    """
+    Address Schema for shipping and billing addresses.
+
+    Handles user address data for orders and customer profiles.
+    Includes all address components with proper validation.
+    """
     class Meta:
         model = Address
 
 
 class CustomerProfileSchema(BaseSchema):
-    '''Schema for reading and writing CustomerProfile data'''
+    """
+    Customer Profile Schema for extended user information.
+
+    Handles customer-specific data beyond basic user account info.
+    Includes nested address relationships and profile details.
+
+    Used for:
+    - Customer account management
+    - Order processing (name, contact info)
+    - Profile customization and preferences
+    """
     class Meta:
         model = CustomerProfile
 
@@ -22,7 +53,17 @@ class CustomerProfileSchema(BaseSchema):
 
 
 class UserSchema(BaseSchema):
-    '''Schema for reading and writing User data'''
+    """
+    User Account Schema for authentication and user data.
+
+    Handles core user account information with security considerations.
+    Excludes sensitive password hash from serialization for security.
+
+    Security Features:
+    - Password hash exclusion from API responses
+    - Nested customer profile and address data
+    - Role-based access control support
+    """
     class Meta:
         model = User
         exclude = ("password_hash",)
@@ -30,11 +71,24 @@ class UserSchema(BaseSchema):
     customer_profile = fields.Nested(CustomerProfileSchema, dump_only=True)
     addresses = fields.Nested(AddressSchema, many=True, dump_only=True)
 
-# -------Input Schemas------- #
-
 
 class UserRegistrationSchema(BaseSchema):
-    '''Schema for registering a new User'''
+    """
+    User Registration Schema with security validation.
+
+    Handles new user account creation with comprehensive validation.
+    Enforces strong password requirements and secure registration process.
+
+    Validation Rules:
+    - Password: 8-50 characters with complexity requirements
+    - Email: Valid email format required
+    - Role: Automatically set to 'customer' for security
+
+    Security Features:
+    - Complex password validation (uppercase, lowercase, numbers, symbols)
+    - Email format validation
+    - Excludes sensitive fields from input
+    """
     class Meta:
         model = User
         exclude = ('id', 'created_at', 'active', 'role',
@@ -52,7 +106,18 @@ class UserRegistrationSchema(BaseSchema):
 
 
 class CustomerProfileInputSchema(BaseSchema):
-    '''Schema for creating or updating CustomerProfile data'''
+    """
+    Customer Profile Input Schema for profile creation/updates.
+
+    Handles customer profile data input with validation.
+    Used for creating and updating customer-specific information.
+
+    Required Fields:
+    - first_name: Customer's first name (required for orders)
+    - last_name: Customer's last name (required for orders)
+
+    Excludes relationship fields that are managed separately.
+    """
     class Meta:
         model = CustomerProfile
         exclude = ('id', 'user_id', 'default_address', 'user', 'addresses')

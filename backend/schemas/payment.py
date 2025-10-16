@@ -1,12 +1,33 @@
+"""
+Payment Processing Schemas
+
+Marshmallow schemas for serialization/deserialization and validation 
+of payment-related models. Handles payment transaction data with 
+integration support for payment processors like Stripe.
+
+Provides separate schemas for:
+- Full payment data serialization (PaymentSchema)
+- Payment creation with validation (PaymentCreateSchema) 
+- Payment status updates (PaymentUpdateSchema)
+
+Security Features:
+- Amount validation (no negative payments)
+- Status tracking for transaction states
+- Integration with external payment processors
+"""
+
 from marshmallow import fields
 from extensions import BaseSchema
 from models.payment import Payment
 
-# -------Read and Write Schemas------- #
-
 
 class PaymentSchema(BaseSchema):
-    '''Schema for reading and writing Payment data'''
+    """
+    Payment Schema for API serialization/deserialization.
+
+    Used for reading payment data and API responses.
+    Includes all payment fields with proper validation.
+    """
     class Meta:
         model = Payment
         include_fk = True
@@ -20,11 +41,19 @@ class PaymentSchema(BaseSchema):
     created_at = fields.DateTime(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
 
-# -------Input Schemas------- #
-
 
 class PaymentCreateSchema(BaseSchema):
-    '''Schema for creating a new Payment'''
+    """
+    Payment Creation Schema with validation rules.
+
+    Used for creating new payment records with business validation.
+    Excludes auto-generated fields and enforces payment amount validation.
+
+    Validation Rules:
+    - Total amount must be non-negative
+    - Required fields: order_id, total_amount, currency, payment_method
+    - Optional: stripe_payment_intent_id for processor integration
+    """
     class Meta:
         model = Payment
         exclude = ('id', 'created_at', 'updated_at', 'status', 'paid_at')
@@ -37,7 +66,17 @@ class PaymentCreateSchema(BaseSchema):
 
 
 class PaymentUpdateSchema(BaseSchema):
-    '''Schema for updating Payment status'''
+    """
+    Payment Status Update Schema.
+
+    Used for updating payment status after processing.
+    Only allows status updates, excludes financial data for security.
+
+    Use Cases:
+    - Mark payment as completed after successful processing
+    - Update status to failed for declined transactions
+    - Set status to refunded for refund processing
+    """
     class Meta:
         model = Payment
         exclude = ('id', 'created_at', 'order_id', 'total_amount',
@@ -47,15 +86,9 @@ class PaymentUpdateSchema(BaseSchema):
     updated_at = fields.DateTime(dump_only=True)
 
 
-# -------Container Class------- #
-
-
 class PaymentSchemas:
     """Container class for all payment schemas"""
 
-    # Read/Write schemas
     PaymentSchema = PaymentSchema
-
-    # Input schemas
     PaymentCreateSchema = PaymentCreateSchema
     PaymentUpdateSchema = PaymentUpdateSchema
