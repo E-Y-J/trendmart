@@ -8,7 +8,7 @@ from datetime import datetime
 
 class PaymentService:
     """
-    Handles all the Stripe payment stuff for our e-commerce app.
+    Handles all the Stripe payment for our e-commerce app.
 
     This class basically wraps all the Stripe API calls and manages our 
     payment records in the database. I tried to keep it simple but still 
