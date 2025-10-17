@@ -74,3 +74,40 @@ class PaymentSchemas:
     PaymentSchema = PaymentSchema
     PaymentCreateSchema = PaymentCreateSchema
     PaymentUpdateSchema = PaymentUpdateSchema
+
+
+class PaymentIntentCreateSchema(BaseSchema):
+    """
+    Schema for creating Stripe PaymentIntent requests.
+
+    Used when frontend requests to create a payment intent.
+    Validates required fields for payment processing.
+    """
+    order_id = fields.Int(required=True)
+    # Amount in cents
+    amount = fields.Int(required=True, validate=lambda x: x > 0)
+    currency = fields.Str(missing='usd', validate=lambda x: len(x) == 3)
+    metadata = fields.Dict(missing=dict)
+
+
+class PaymentIntentResponseSchema(BaseSchema):
+    """
+    Schema for PaymentIntent creation responses.
+
+    Returns the client_secret needed by frontend Stripe.js
+    """
+    client_secret = fields.Str(required=True)
+    payment_intent_id = fields.Str(required=True)
+    payment_id = fields.Int(required=True)
+
+
+class WebhookEventSchema(BaseSchema):
+    """
+    Schema for processing Stripe webhook events.
+
+    Validates incoming webhook payloads from Stripe.
+    """
+    id = fields.Str(required=True)
+    type = fields.Str(required=True)
+    data = fields.Dict(required=True)
+    created = fields.Int(required=True)
