@@ -1,9 +1,11 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_marshmallow import Marshmallow
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 import stripe
 
 db = SQLAlchemy()
+ma = Marshmallow()
 migrate = Migrate()
 
 
