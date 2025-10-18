@@ -1,5 +1,5 @@
 from flask import Flask
-from extensions import db, ma
+from extensions import db, ma, init_stripe
 from config import Config
 
 
@@ -10,9 +10,13 @@ def create_app():
     db.init_app(app)
     ma.init_app(app)
 
+    init_stripe(app)
+
     @app.route('/')
     def home():
         return "Welcome to the Trendmart API"
+
+    return app
 
 
 if __name__ == '__main__':
