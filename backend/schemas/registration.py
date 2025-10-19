@@ -73,16 +73,17 @@ class UserRegistrationSchema(BaseSchema):
     class Meta:
         model = User
         exclude = ('id', 'created_at', 'active', 'role',
-                   'customer profile', 'addresses')
+                   'customer_profile', 'addresses', 'password_hash')
 
-    password = fields.String(
+    password = fields.String(   
         required=True,
         validate=[
             validate.Length(min=8, max=50),
             PASSWORD_VALIDATOR
         ]
     )
-    role = fields.String(dump_only=True, default='customer')
+    # role = fields.String(dump_only=True, default='customer')
+    role = fields.String(dump_only=True)
     email = fields.Email(required=True)
 
 

@@ -1,10 +1,10 @@
 from marshmallow import fields, validate
-from extensions import BaseSchema
+from extensions import ValidationSchema
 from models.registration import User
 from . import PASSWORD_VALIDATOR
 
 
-class LoginSchema(BaseSchema):
+class LoginSchema(ValidationSchema):
     """
     User Login Schema
 
@@ -16,7 +16,7 @@ class LoginSchema(BaseSchema):
     password = fields.String(required=True, validate=PASSWORD_VALIDATOR)
 
 
-class TokenResponseSchema(BaseSchema):
+class TokenResponseSchema(ValidationSchema):
     """
     JWT Token Response Schema
 
@@ -28,15 +28,17 @@ class TokenResponseSchema(BaseSchema):
     refresh_token = fields.String(
         required=True, dump_only=True)
     token_type = fields.String(
-        required=True, dump_only=True, default='Bearer')
+        # required=True, dump_only=True, default='Bearer')
+        required=True, dump_only=True)
     # Token lifetime in seconds for testing purposes
     expires_in = fields.Integer(required=True, dump_only=True)
 
 
-class LogoutSchema(BaseSchema):
+class LogoutSchema(ValidationSchema):
     """
     Logout Response Schema
 
     Simple success message for logout operations.
     """
-    message = fields.String(dump_only=True, default='Logout successful')
+    # message = fields.String(dump_only=True, default='Logout successful')
+    message = fields.String(dump_only=True)
