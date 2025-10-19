@@ -38,7 +38,6 @@ lerna-debug.log*
 # Front-end (React) specific
 # ========================
 # Ignore Yarn and NPM lock files
-package-lock.json
 yarn.lock
 
 # Ignore React test coverage output
