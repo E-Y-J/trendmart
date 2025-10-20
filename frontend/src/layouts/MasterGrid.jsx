@@ -4,12 +4,12 @@ import ProductCategories from '../products/ProductCategories.jsx';
 import FeaturedProducts from '../products/FeaturedProducts.jsx';
 import RecommendedProducts from '../products/RecommendedProducts.jsx';
 
-function GridLayout() {
+function MasterGrid() {
   return (
     <div className='w-100 m-0' >
       <Row className='w-100 bg-primary justify-content-between m-0 p-0' style={{minHeight: '75vh'}} >
         <Col id='category' md={2} className='bg-info alignjustify-content-evenly gap-2 m-0 p-0'>
-          <ProductCategories />
+          <ProductCategories categories={[1,2,3,4]}/>
         </Col>
         <Col id='products' md={10} className='bg-secondary align-content-stretch m-0 p-0'>
           <Row className='bg-warning m-0 p-0 d-flex justify-content-center align-items-center'>
@@ -32,4 +32,4 @@ function GridLayout() {
   )
 }
 
-export default GridLayout;
+export default MasterGrid;
