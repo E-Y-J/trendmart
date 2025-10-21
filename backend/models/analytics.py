@@ -32,8 +32,9 @@ class UserSession(db.Model):
     @property
     def session_duration(self):
         """Calculate duration of the session in seconds"""
-        if self.session_end and self.session_start:
-            return int((self.updated_at - self.created_at).total_seconds())
+        if self.session_end:
+            return (self.session_end - self.session_start).total_seconds()
+        return (datetime.utcnow() - self.session_start).total_seconds()
 
     # Relationships
     user = db.relationship('User', back_populates='sessions')
