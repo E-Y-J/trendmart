@@ -23,12 +23,25 @@ class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(
         'users.id', ondelete='CASCADE'), nullable=False, unique=True)
+    cart_created_at = db.Column(
+        db.DateTime, default=db.func.now(), nullable=False)
+    abandoned_flag = db.Column(db.Boolean, default=False, nullable=False)
+    last_updated_at = db.Column(
+        db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
     # Relationships
     user = db.relationship('User', back_populates='cart')
     # One-to-many: cart can contain multiple items
     items = db.relationship('CartItem', back_populates='cart',
                             cascade='all, delete-orphan')
+
+    # Calculate total value of items in cart
+    @property
+    def cart_total_value(self):
+        '''Calculates the total of all the items in the User's cart'''
+        if not self.items:
+            return 0.0
+        return sum(item.price_per_unit * item.quantity for item in self.items)
 
 
 class CartItem(db.Model):
