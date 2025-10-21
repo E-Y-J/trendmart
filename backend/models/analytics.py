@@ -37,3 +37,36 @@ class UserSession(db.Model):
 
     # Relationships
     user = db.relationship('User', back_populates='sessions')
+
+
+class ProductView(db.Model):
+    """
+    Product View Model
+
+    Tracks user views of products for analytics and personalization.
+    Records view timestamps, user information, and session details.
+
+    Attributes:
+        id (int): Primary key, unique view identifier
+        product_id (int): Foreign key to Product being viewed
+        user_id (int): Foreign key to User who viewed the product
+        session_id (str): Foreign key to UserSession during which the product was viewed
+        view_time (datetime): Timestamp when the product was viewed
+        viewed_at (datetime): Timestamp when the view record was created
+        added_to_cart (bool): Flag indicating if the product was added to cart
+    """
+    __tablename__ = 'product_views'
+
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey(
+        'products.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    session_id = db.Column(db.String(255), db.ForeignKey(
+        'user_sessions.id'), nullable=True)
+    view_time = db.Column(db.DateTime, default=0, nullable=False)
+    viewed_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)
+    added_to_cart = db.Column(db.Boolean, default=False, nullable=False)
+
+    # Relationships
+    product = db.relationship('Product', back_populates='views')
+    user = db.relationship('User', back_populates='product_views')
