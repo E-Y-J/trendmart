@@ -48,4 +48,4 @@ COPY . .
 EXPOSE 8000
 
 # Run the application.
-CMD gunicorn 'venv.Lib.site-packages.werkzeug.wsgi' --bind=0.0.0.0:8000
+CMD gunicorn 'app:create_app()' --bind=0.0.0.0:8000

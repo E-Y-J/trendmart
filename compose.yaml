@@ -7,20 +7,14 @@
 # You can add other services your application may depend on here, such as a
 # database or a cache. For examples, see the Awesome Compose repository:
 # https://github.com/docker/awesome-compose
-version: '3.8'
 
 services:
-  frontend:
-    build: ./frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
-
   backend:
     build: ./backend
     ports:
-      - "3001:3000"
+      - "3001:8000"
+    env_file:
+      - ./backend/.env
     depends_on:
       - database
 
@@ -31,7 +25,7 @@ services:
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: fullstack_db
+      POSTGRES_DB: trendmart_db
 
 volumes:
   db_data:

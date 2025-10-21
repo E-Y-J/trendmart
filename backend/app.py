@@ -28,6 +28,15 @@ def create_app():
 
     init_stripe(app)
 
+
+    with app.app_context():
+        try:
+            db.create_all()
+            print("Database tables created successfully!")
+        except Exception as e:
+            print(f"Database initialization error: {e}")
+           
+
     # Register blueprints
     app.register_blueprint(auth_bp)
     app.register_blueprint(swaggerui_blueprint)
@@ -45,11 +54,6 @@ def create_app():
 
 
 if __name__ == '__main__':
+    # For local development only (not used in Docker)
     app = create_app()
-
-    with app.app_context():
-        # db.drop_all()
-        db.create_all()
-        print("Database tables created!")
-
     app.run(debug=True)
