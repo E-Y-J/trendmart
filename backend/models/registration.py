@@ -30,6 +30,7 @@ class User(db.Model):
     role = db.Column(db.String(50), default='customer')
     active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # User login authentication tracking
     logins_count = db.Column(db.Integer, default=0, nullable=False)
     last_login_at = db.Column(db.DateTime)
     failed_logins = db.Column(db.Integer, default=0, nullable=False)
