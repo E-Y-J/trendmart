@@ -59,9 +59,14 @@ class User(db.Model):
     # One-to-many: User gets personalized product recommendations
     recommendations = db.relationship(
         'Recommendation', back_populates='user', cascade='all, delete-orphan')
-    # One-to-many: User can have multiple sessions
+
+    # One-to-many: User can have multiple sessions for analytics
     sessions = db.relationship(
         'UserSession', back_populates='user', cascade='all, delete-orphan')
+
+    # One-to-many: User can have multiple product views for analytics
+    product_views = db.relationship(
+        'ProductView', back_populates='user', cascade='all, delete-orphan')
 
 
 class CustomerProfile(db.Model):
