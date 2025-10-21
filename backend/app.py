@@ -1,5 +1,5 @@
 from flask import Flask, send_from_directory
-from extensions import db, ma, jwt, init_stripe
+from extensions import db, ma, jwt, cors, init_stripe
 from config import Config
 from routes import auth_bp
 import models
@@ -22,12 +22,21 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
+    # Initialize extensions
     db.init_app(app)
     ma.init_app(app)
     jwt.init_app(app)
+    
+    # This line is to allow CORS for all domains
+    cors.init_app(app, resources={
+        r"/api/*": {
+            "origins": "*",
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"]
+        }
+    })
 
     init_stripe(app)
-
 
     with app.app_context():
         try:
