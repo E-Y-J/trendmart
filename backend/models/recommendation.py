@@ -40,6 +40,12 @@ class Recommendation(db.Model):
     score = db.Column(db.Float, nullable=False, default=0.0)
     generated_on = db.Column(
         db.DateTime, default=db.func.now(), nullable=False)
+    clicked_recommendation = db.Column(
+        db.Boolean, default=False, nullable=False)
+    added_to_cart_from_rec = db.Column(
+        db.Boolean, default=False, nullable=False)
+    clicked_at = db.Column(db.DateTime, nullable=True)
+    added_to_cart_at = db.Column(db.DateTime, nullable=True)
 
     __table_args__ = (UniqueConstraint(
         'user_id', 'product_id', name='uq_recommendation_user_product'),)
