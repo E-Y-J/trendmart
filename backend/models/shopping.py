@@ -4,19 +4,33 @@ from sqlalchemy import UniqueConstraint
 
 class Cart(db.Model):
     """
-    Shopping Cart Model
+    Shopping Cart Model with Analytics Tracking
 
-    Represents a user's active shopping cart.
+    Represents a user's active shopping cart with comprehensive analytics.
     Each user has exactly one cart that persists between sessions.
 
     Attributes:
         id (int): Primary key, unique cart identifier
         user_id (int): Foreign key to User, unique (one cart per user)
 
+        # Cart Analytics (Must-Have Requirements)
+        cart_created_at (datetime): Timestamp when cart was first created
+        abandoned_flag (bool): Flag indicating if cart has been abandoned
+        last_updated_at (datetime): Timestamp of last cart modification
+
+        # Computed Properties
+        cart_total_value (property): Calculated total value of all cart items
+
+    Analytics Features:
+        - Track cart creation and abandonment patterns
+        - Monitor cart lifecycle and conversion rates
+        - Calculate real-time cart value for business metrics
+
     Business Rules:
         - One cart per user (enforced by unique constraint)
         - Cart persists until explicitly cleared or converted to order
         - Items cascade delete when cart is deleted
+        - Analytics data helps identify abandonment patterns
     """
     __tablename__ = 'carts'
 
