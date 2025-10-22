@@ -16,7 +16,7 @@ RUN npm ci
 COPY . .
 
 # Expose the Vite development server port
-EXPOSE 5173
+EXPOSE 3000
 
 # Run Vite dev server (fast refresh enabled)
-CMD ["npm", "run", "dev"]
+CMD ["npm", "start"]
