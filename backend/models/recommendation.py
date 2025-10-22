@@ -33,9 +33,9 @@ class Recommendation(db.Model):
 
     # Foreign keys
     user_id = db.Column(db.Integer, db.ForeignKey(
-        'users.id'), ondelete='CASCADE', nullable=False)
+        'users.id', ondelete='CASCADE'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey(
-        'products.id'), ondelete='CASCADE', nullable=False, index=True)
+        'products.id', ondelete='CASCADE'), nullable=False, index=True)
 
     score = db.Column(db.Float, nullable=False, default=0.0)
     generated_on = db.Column(
