@@ -1,25 +1,28 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1.7-labs
+# ^ BuildKit syntax (enables mount caching & parallel layer builds)
 
-# Comments are provided throughout this file to help you get started.
-# If you need more help, visit the Dockerfile reference guide at
-# https://docs.docker.com/go/dockerfile-reference/
-
-# Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
-
+# ------------------------------------------------------------
+# Stage 1: Base configuration and dependency install
+# ------------------------------------------------------------
 ARG PYTHON_VERSION=3.12
-FROM python:${PYTHON_VERSION}-slim as base
+FROM python:${PYTHON_VERSION}-slim AS base
 
-# Prevents Python from writing pyc files.
-ENV PYTHONDONTWRITEBYTECODE=1
+# System settings
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
 
-# Keeps Python from buffering stdout and stderr to avoid situations where
-# the application crashes without emitting any logs due to buffering.
-ENV PYTHONUNBUFFERED=1
+WORKDIR /
 
-WORKDIR /app
+# Install system deps for building common Python packages faster
+# (includes build-essential and git for shared dev environments)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
 
-# Create a non-privileged user that the app will run under.
-# See https://docs.docker.com/go/dockerfile-user-best-practices/
+# Create a non-privileged user
 ARG UID=10001
 RUN adduser \
     --disabled-password \
@@ -30,22 +33,42 @@ RUN adduser \
     --uid "${UID}" \
     appuser
 
-# Download dependencies as a separate step to take advantage of Docker's caching.
-# Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.
-# Leverage a bind mount to requirements.txt to avoid having to copy them into
-# into this layer.
+# ------------------------------------------------------------
+# Stage 2: Install dependencies with caching
+# ------------------------------------------------------------
+FROM base AS deps
+
+# Use BuildKit mounts for caching and bind-mounting requirements.txt
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
-    python -m pip install -r requirements.txt
+    pip install -r requirements.txt
 
-# Switch to the non-privileged user to run the application.
-USER appuser
+# ------------------------------------------------------------
+# Stage 3: Final runtime image
+# ------------------------------------------------------------
+FROM base AS final
 
-# Copy the source code into the container.
+WORKDIR /app
+
+# Copy installed site-packages from deps layer for speed
+COPY --from=deps /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=deps /usr/local/bin /usr/local/bin
+
+# Copy app code
 COPY . .
 
-# Expose the port that the application listens on.
+# Switch to non-root user for safety
+USER appuser
+
+# Expose port 8000 for app access
 EXPOSE 8000
 
-# Run the application.
-CMD gunicorn 'venv.Lib.site-packages.werkzeug.wsgi' --bind=0.0.0.0:8000
+# ------------------------------------------------------------
+# CMD for development
+# ------------------------------------------------------------
+
+# --- For Flask ---
+# CMD ["flask", "run", "--host=0.0.0.0", "--port=8000"]
+
+# --- For Gunicorn (production-style dev) ---
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
