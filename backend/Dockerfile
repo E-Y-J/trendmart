@@ -63,6 +63,8 @@ USER appuser
 # Expose port 8000 for app access
 EXPOSE 8000
 
+RUN mkdir -p /app/instance && chown -R appuser:appuser /app
+
 # ------------------------------------------------------------
 # CMD for development
 # ------------------------------------------------------------
