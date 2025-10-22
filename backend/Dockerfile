@@ -71,4 +71,4 @@ EXPOSE 8000
 # CMD ["flask", "run", "--host=0.0.0.0", "--port=8000"]
 
 # --- For Gunicorn (production-style dev) ---
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:create_app()"]
