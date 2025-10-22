@@ -1,62 +1,38 @@
-version: '3.9'
+# Comments are provided throughout this file to help you get started.
+# If you need more help, visit the Docker Compose reference guide at
+# https://docs.docker.com/go/compose-spec-reference/
+
+# Here the instructions define your application as a service called "server".
+# This service is built from the Dockerfile in the current directory.
+# You can add other services your application may depend on here, such as a
+# database or a cache. For examples, see the Awesome Compose repository:
+# https://github.com/docker/awesome-compose
+
+version: '3.8'
 
 services:
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    build: ./frontend
     ports:
-      # Expose Vite's dev server on localhost:3000
       - "3000:5173"
-    working_dir: /main
-    volumes:
-      # Mount the frontend source for live reload
-      - ./frontend:/main
-      # Persist node_modules cache to speed up installs
-      - frontend_node_modules:/node_modules
-    environment:
-      # Enables file watching in Docker for Vite
-      - CHOKIDAR_USEPOLLING=true
-      # Backend API URL inside container network
-      - VITE_API_URL=http://backend:8000
-    command: npm run dev
     depends_on:
       - backend
 
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    build: ./backend
     ports:
-      # Expose backend on port 8000 for external access
       - "8000:8000"
-    working_dir: /app
-    volumes:
-      # Mount backend code (excluding venv)
-      - ./backend:/app
-      # Cache pip dependencies between builds
-      - /root/.cache/pip
-    environment:
-      # Postgres connection
-      - DATABASE_URL=postgresql://dev:test1234@database:5432/fullstack_db
-      # Python environment optimizations
-      - PYTHONUNBUFFERED=1
-      - PYTHONDONTWRITEBYTECODE=1
-    command: gunicorn --bind 0.0.0.0:8000 app:app
     depends_on:
       - database
 
   database:
     image: postgres:16-alpine
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: dev
-      POSTGRES_PASSWORD: trend1234
-      POSTGRES_DB: fullstack_db
     volumes:
       - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: fullstack_db
 
 volumes:
   db_data:
-  frontend_node_modules:
