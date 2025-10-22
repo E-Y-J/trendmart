@@ -42,7 +42,7 @@ services:
       # Python environment optimizations
       - PYTHONUNBUFFERED=1
       - PYTHONDONTWRITEBYTECODE=1
-    command: gunicorn --workers 4 --threads 2 --bind 0.0.0.0:8000 trendmart:app
+    command: gunicorn --bind 0.0.0.0:8000 app:app
     depends_on:
       - database
 

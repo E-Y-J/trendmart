@@ -12,7 +12,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
 
-WORKDIR /app
+WORKDIR /
 
 # Install system deps for building common Python packages faster
 # (includes build-essential and git for shared dev environments)
@@ -71,4 +71,4 @@ EXPOSE 8000
 # CMD ["flask", "run", "--host=0.0.0.0", "--port=8000"]
 
 # --- For Gunicorn (production-style dev) ---
-CMD ["gunicorn", "--workers", "4", "--threads", "2", "--bind", "0.0.0.0:8000", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
