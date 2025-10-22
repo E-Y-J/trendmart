@@ -57,6 +57,9 @@ COPY --from=deps /usr/local/bin /usr/local/bin
 # Copy app code
 COPY . .
 
+# Ensure appuser owns the application files and instance directory
+RUN mkdir -p /app/instance && chown -R appuser:appuser /app
+
 # Switch to non-root user for safety
 USER appuser
 
@@ -71,4 +74,4 @@ EXPOSE 8000
 # CMD ["flask", "run", "--host=0.0.0.0", "--port=8000"]
 
 # --- For Gunicorn (production-style dev) ---
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:create_app()"]
