@@ -1,35 +1,129 @@
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 import ProductCategories from '../products/ProductCategories.jsx';
 import FeaturedProducts from '../products/FeaturedProducts.jsx';
 import RecommendedProducts from '../products/RecommendedProducts.jsx';
 
 function MasterGrid() {
   return (
-    <div className='w-100 m-0' >
-      <Row className='w-100 bg-primary justify-content-between m-0 p-0' style={{minHeight: '75vh'}} >
-        <Col id='category' md={2} className='bg-info alignjustify-content-evenly gap-2 m-0 p-0'>
-          <ProductCategories categories={[1,2,3,4]}/>
-        </Col>
-        <Col id='products' md={10} className='bg-secondary align-content-stretch m-0 p-0'>
-          <Row className='bg-warning m-0 p-0 d-flex justify-content-center align-items-center'>
-            <Col md={4} className='mx-2 p-0 bg-white' style={{height: '10%'}}>SearchBar</Col>
-            <Col className='bg-black text-white'>
-              <h1 className='float-end'>
-                Current Category Title
-              </h1>
-            </Col>
-          </Row>
-          <Row id='featured' className='bg-danger m-0 p-0' style={{height: '60%'}}>
+    <div style={{ width: '100%', margin: 0 }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          width: '100%',
+          
+          margin: 0,
+          padding: 0,
+          minHeight: '75vh',
+        }}
+      >
+        {/* Category Column */}
+        <div
+          id="category"
+          style={{
+            flexBasis: '16.666%', 
+            
+            display: 'flex',
+            justifyContent: 'space-evenly',
+            flexDirection: 'column',
+            gap: '0.5rem',
+            margin: 0,
+            padding: 0,
+          }}
+        >
+          <ProductCategories categories={[1, 2, 3, 4]} />
+        </div>
+
+        {/* Products Column */}
+        <div
+          id="products"
+          style={{
+            flexBasis: '83.333%', 
+            
+            display: 'flex',
+            flexDirection: 'column',
+            alignContent: 'stretch',
+            margin: 0,
+            padding: 0,
+          }}
+        >
+          {/* Header Row */}
+          <div
+            style={{
+              display: 'flex',
+              
+              margin: 0,
+              padding: 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '100%',
+            }}
+          >
+            <div
+              style={{
+                flexBasis: '33.333%',
+                margin: '0 0.5rem',
+                padding: 0,
+                
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                backgroundColor: '#2d2d2d',
+              }}
+            >
+              SearchBar
+            </div>
+            <div
+              style={{
+                flex: 1,
+                
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+                paddingRight: '1rem',
+              }}
+            >
+              <h1 style={{ margin: 0 }}>Current Category Title</h1>
+            </div>
+          </div>
+
+          {/* Featured Products Row */}
+          <div
+            id="featured"
+            style={{
+              
+              margin: 0,
+              padding: 0,
+              height: '60%',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
             <FeaturedProducts />
-          </Row>
-          <Row id='recommended' className='bg-success m-0 p-0' style={{height: '30%'}}>
+          </div>
+
+          {/* Recommended Products Row */}
+          <div
+            id="recommended"
+            style={{
+              
+              margin: 0,
+              padding: 0,
+              height: '40%',
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+            }}
+          >
             <RecommendedProducts />
-          </Row>
-        </Col>
-      </Row>
+          </div>
+        </div>
+      </div>
     </div>
-  )
+  );
 }
 
 export default MasterGrid;
