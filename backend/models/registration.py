@@ -158,7 +158,7 @@ class Address(db.Model):
     city = db.Column(db.String(100), nullable=False)
     state = db.Column(db.String(100), nullable=False)
     zip_code = db.Column(db.String(20), nullable=False)
-    country = db.Column(db.String(100), default='USA', nullable=False)
+    country = db.Column(db.String(100), nullable=False)
 
     # Relationships
     user = db.relationship('User', back_populates='addresses')

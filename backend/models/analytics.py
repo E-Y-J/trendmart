@@ -46,7 +46,7 @@ class UserSession(db.Model):
     updated_at = db.Column(db.DateTime, default=db.func.now(),
                            onupdate=db.func.now(), nullable=False)
     pages_visited = db.Column(db.Integer, default=0, nullable=False)
-    click_path = db.Column(db.text)  # JSON string of page navigation path
+    click_path = db.Column(db.Text)  # JSON string of page navigation path
     time_per_page = db.Column(db.Float)
 
     @property
