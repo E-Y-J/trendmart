@@ -1,8 +1,8 @@
 from flask import request, jsonify
-from schemas.registration import UserRegistrationSchema
-from . import auth_bp
+from schemas.registration import UserRegistrationSchema, CustomerProfileSchema
+from . import auth_bp, customer_bp
 from extensions import db
-from models.registration import User
+from models.registration import User, CustomerProfile
 from werkzeug.security import generate_password_hash
 from sqlalchemy import select, delete
 from marshmallow import ValidationError
@@ -38,6 +38,34 @@ def register():
         db.session.add(user)
         db.session.commit()
         return jsonify(UserRegistrationSchema().dump(user)), 201
+    
+    except ValidationError as err:
+        return jsonify(err.messages), 400
+
+@customer_bp.route('/profile', methods=['POST'])
+def create_customer_profile():
+    try:
+        profile_data = request.json
+        
+        # Validate the input data using schema
+        validated_data = CustomerProfileSchema().load(profile_data)
+        
+        user_id=validated_data.get('user_id')
+        user = db.session.get(User, user_id)
+        if not user:
+            return jsonify({"error": "User not found"}), 404
+        
+        # Create CustomerProfile instance
+        customer_profile = CustomerProfile(
+            user_id=user_id,
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+            phone=validated_data.get('phone'),
+        )
+        
+        db.session.add(customer_profile)
+        db.session.commit()
+        return jsonify(CustomerProfileSchema().dump(customer_profile)), 201
     
     except ValidationError as err:
         return jsonify(err.messages), 400
