@@ -9,16 +9,9 @@
   xmlns="http://www.w3.org/2000/svg"
   xmlns:svg="http://www.w3.org/2000/svg"
 >
-  <rect
-    width="200"
-    height="200"
-    fill="#f3f3ea"
-  />
   <g
     id="circuits"
     fill="#00aef0"
-    stroke="#0a1f44"
-    stroke-width="2"
   >
     <path
       id="L"

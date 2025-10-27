@@ -10,7 +10,6 @@ function MasterGrid() {
           display: 'flex',
           justifyContent: 'space-between',
           width: '100%',
-          
           margin: 0,
           padding: 0,
           minHeight: '75vh',
@@ -21,7 +20,6 @@ function MasterGrid() {
           id="category"
           style={{
             flexBasis: '16.666%', 
-            
             display: 'flex',
             justifyContent: 'space-evenly',
             flexDirection: 'column',

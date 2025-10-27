@@ -1,7 +1,7 @@
 import NavBar from '../navbar/NavBar.jsx';
 import MasterGrid from './MasterGrid.jsx';
 import PopupLayout from './PopupLayout.jsx';
-import bg from '/starBg.png?url';
+import bg from '/bg.png?url';
 
 function MasterLayout({ PopupChildren }) {
   return (
@@ -12,7 +12,8 @@ function MasterLayout({ PopupChildren }) {
         width: '100vw',
         height: '100vh',
         backgroundImage: `url(${bg})`,
-        backgroundSize: 'cover',
+        backgroundSize: 'auto',
+        backgroundRepeat: 'repeat',
         backgroundPosition: 'center',
         display: 'flex',
         flexDirection: 'column',

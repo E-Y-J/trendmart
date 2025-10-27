@@ -1,6 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
-import logoUrl from '/favicon.svg?url';
-import navBackground from '/nebula-9900ff.png?url';
+import logoUrl from '/logo.svg?url';
 
 function NavBar() {
   return (
@@ -9,12 +8,10 @@ function NavBar() {
         display: 'flex',
         width: '100%',
         height: '10vh',
-        backgroundImage: `url(${navBackground})`,
-        
-        backgroundSize: '100% 100%',
         marginBottom: '1.5rem', 
         justifyContent: 'space-between',
         alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
       }}
     >
       {/* Left container */}
@@ -23,7 +20,6 @@ function NavBar() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'flex-start',
-          
           height: '100%',
           paddingLeft: '1rem',
           paddingRight: '1rem',
