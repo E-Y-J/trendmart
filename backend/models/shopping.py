@@ -4,31 +4,58 @@ from sqlalchemy import UniqueConstraint
 
 class Cart(db.Model):
     """
-    Shopping Cart Model
+    Shopping Cart Model with Analytics Tracking
 
-    Represents a user's active shopping cart.
+    Represents a user's active shopping cart with comprehensive analytics.
     Each user has exactly one cart that persists between sessions.
 
     Attributes:
         id (int): Primary key, unique cart identifier
         user_id (int): Foreign key to User, unique (one cart per user)
 
+        # Cart Analytics (Must-Have Requirements)
+        cart_created_at (datetime): Timestamp when cart was first created
+        abandoned_flag (bool): Flag indicating if cart has been abandoned
+        last_updated_at (datetime): Timestamp of last cart modification
+
+        # Computed Properties
+        cart_total_value (property): Calculated total value of all cart items
+
+    Analytics Features:
+        - Track cart creation and abandonment patterns
+        - Monitor cart lifecycle and conversion rates
+        - Calculate real-time cart value for business metrics
+
     Business Rules:
         - One cart per user (enforced by unique constraint)
         - Cart persists until explicitly cleared or converted to order
         - Items cascade delete when cart is deleted
+        - Analytics data helps identify abandonment patterns
     """
     __tablename__ = 'carts'
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey(
         'users.id', ondelete='CASCADE'), nullable=False, unique=True)
+    cart_created_at = db.Column(
+        db.DateTime, default=db.func.now(), nullable=False)
+    abandoned_flag = db.Column(db.Boolean, default=False, nullable=False)
+    last_updated_at = db.Column(
+        db.DateTime, default=db.func.now(), onupdate=db.func.now())
 
     # Relationships
     user = db.relationship('User', back_populates='cart')
     # One-to-many: cart can contain multiple items
     items = db.relationship('CartItem', back_populates='cart',
                             cascade='all, delete-orphan')
+
+    # Calculate total value of items in cart
+    @property
+    def cart_total_value(self):
+        '''Calculates the total of all the items in the User's cart'''
+        if not self.items:
+            return 0.0
+        return sum(item.price_per_unit * item.quantity for item in self.items)
 
 
 class CartItem(db.Model):

@@ -84,6 +84,8 @@ class Product(db.Model):
     # One-to-many: Product can have multiple recommendation scores
     recommendations = db.relationship(
         'Recommendation', back_populates='product')
+    # One-to-many: Product can have multiple views
+    views = db.relationship('ProductView', back_populates='product')
 
 
 class Inventory(db.Model):

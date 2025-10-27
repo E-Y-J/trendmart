@@ -8,8 +8,8 @@ from marshmallow import Schema
 import stripe
 
 db = SQLAlchemy()
-migrate = Migrate()
 ma = Marshmallow()
+migrate = Migrate()
 jwt = JWTManager()
 cors = CORS()
 

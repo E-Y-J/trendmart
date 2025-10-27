@@ -32,7 +32,7 @@ services:
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: fullstack_db
+      POSTGRES_DB: trendmart_db
 
 volumes:
   db_data:
