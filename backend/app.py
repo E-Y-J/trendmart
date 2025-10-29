@@ -1,7 +1,8 @@
 from flask import Flask, send_from_directory
 from extensions import db, ma, jwt, cors, init_stripe
 from config import Config
-from routes import auth_bp
+from routes.auth import auth_bp
+from routes.customers import customers_bp
 import models
 from flask_swagger_ui import get_swaggerui_blueprint
 import os
@@ -48,6 +49,7 @@ def create_app():
 
     # Register blueprints
     app.register_blueprint(auth_bp)
+    app.register_blueprint(customers_bp)
     app.register_blueprint(swaggerui_blueprint)
 
     # Route to serve swagger.yaml file

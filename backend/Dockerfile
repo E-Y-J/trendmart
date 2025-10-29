@@ -1,32 +1,25 @@
-# /backend/Dockerfile
-# syntax=docker/dockerfile:1.7-labs
-# ^ BuildKit syntax (enables mount caching & parallel layer builds)
+# syntax=docker/dockerfile:1
 
-# ------------------------------------------------------------
-# Stage 1: Base configuration and dependency install
-# ------------------------------------------------------------
-# Use the official NVIDIA PyTorch image as the base.
-# It already includes Python, PyTorch, and CUDA drivers.
-# The `AS base` alias allows subsequent stages to reference this base image.
-FROM nvcr.io/nvidia/pytorch:23.09-py3 AS base
+# Comments are provided throughout this file to help you get started.
+# If you need more help, visit the Dockerfile reference guide at
+# https://docs.docker.com/go/dockerfile-reference/
 
-# System settings
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
+# Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
 
-WORKDIR /
+ARG PYTHON_VERSION=3.12
+FROM python:${PYTHON_VERSION}-slim as base
 
-# The NVIDIA PyTorch image already has many system dependencies.
-# The following apt-get line is likely no longer necessary, but is kept
-# in case you need other specific tools (e.g., git).
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    curl \
-    git \
-    && rm -rf /var/lib/apt/lists/*
+# Prevents Python from writing pyc files.
+ENV PYTHONDONTWRITEBYTECODE=1
 
-# Create a non-privileged user
+# Keeps Python from buffering stdout and stderr to avoid situations where
+# the application crashes without emitting any logs due to buffering.
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Create a non-privileged user that the app will run under.
+# See https://docs.docker.com/go/dockerfile-user-best-practices/
 ARG UID=10001
 RUN adduser \
     --disabled-password \
@@ -37,43 +30,25 @@ RUN adduser \
     --uid "${UID}" \
     appuser
 
-# ------------------------------------------------------------
-# Stage 2: Install dependencies with caching
-# ------------------------------------------------------------
-FROM base AS deps
-
-# Use BuildKit mounts for caching and bind-mounting requirements.txt
-# This ensures that pip downloads are cached and only rebuilt when requirements.txt changes.
+# Download dependencies as a separate step to take advantage of Docker's caching.
+# Leverage a cache mount to /root/.cache/pip to speed up subsequent builds.
+# Leverage a bind mount to requirements.txt to avoid having to copy them into
+# into this layer.
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
-    pip install -r requirements.txt
+    python -m pip install -r requirements.txt
 
-# ------------------------------------------------------------
-# Stage 3: Final runtime image
-# ------------------------------------------------------------
-FROM base AS final
-
-WORKDIR /app
-
-# Copy installed site-packages from deps layer for speed
-COPY --from=deps /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
-COPY --from=deps /usr/local/bin /usr/local/bin
-
-# Copy app code
+# Copy the source code into the container.
 COPY . .
 
 # Ensure appuser owns the application files and instance directory
 RUN mkdir -p /app/instance && chown -R appuser:appuser /app
 
-# Switch to non-root user for safety
+# Switch to the non-privileged user to run the application.
 USER appuser
 
-# Expose port 8000 for app access
+# Expose the port that the application listens on.
 EXPOSE 8000
 
-# ------------------------------------------------------------
-# CMD for development
-# ------------------------------------------------------------
-
-# --- For Gunicorn (production-style dev) ---
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:create_app()"]
+# Run the application.
+CMD ["gunicorn", "app:create_app()", "--bind", "0.0.0.0:8000"]

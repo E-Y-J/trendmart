@@ -1,11 +1,13 @@
-from flask import request, jsonify
-from schemas.registration import UserRegistrationSchema
-from . import auth_bp
+from flask import Blueprint, request, jsonify
+from schemas.registration import UserRegistrationSchema, CustomerProfileSchema
+from .auth import auth_bp
 from extensions import db
-from models.registration import User
+from models.registration import User, CustomerProfile
 from werkzeug.security import generate_password_hash
 from sqlalchemy import select, delete
 from marshmallow import ValidationError
+from flask_jwt_extended import jwt_required, get_jwt, get_jwt_identity
+
 
 
 @auth_bp.route('/register', methods=['POST'])
@@ -41,3 +43,5 @@ def register():
     
     except ValidationError as err:
         return jsonify(err.messages), 400
+    
+

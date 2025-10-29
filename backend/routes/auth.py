@@ -1,12 +1,13 @@
-from flask import request, jsonify
+from flask import Blueprint, request, jsonify
 from schemas.auth import LoginSchema, TokenResponseSchema, LogoutSchema
-from . import auth_bp
+from schemas.registration import UserSchema, CustomerProfileSchema
 from extensions import db
-from models.registration import User
+from models.registration import User, CustomerProfile
 from werkzeug.security import check_password_hash
 from marshmallow import ValidationError
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt, get_jwt_identity
 
+auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -70,3 +71,6 @@ def protected():
         
     except Exception as e:
         return jsonify({"error": "Authentication failed"}), 401
+
+
+
