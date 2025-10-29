@@ -21,7 +21,6 @@ function ProductCategories({ categories }) {
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            
             color: 'white',
             padding: '0.5rem', 
             margin: '0.25rem', 

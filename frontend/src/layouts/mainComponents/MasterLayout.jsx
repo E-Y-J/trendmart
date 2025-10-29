@@ -1,9 +1,9 @@
-import NavBar from '../navbar/NavBar.jsx';
+import NavBar from '../layoutChildren/navbar/NavBar.jsx';
 import MasterGrid from './MasterGrid.jsx';
 import PopupLayout from './PopupLayout.jsx';
-import bg from '/bg.png?url';
+import AlertSpace from '../layoutChildren/alert/AlertSpace.jsx';
 
-function MasterLayout({ PopupChildren }) {
+function MasterLayout({ popupChildren, setPopup }) {
   return (
     <div
       style={{
@@ -11,17 +11,14 @@ function MasterLayout({ PopupChildren }) {
         padding: 0,
         width: '100vw',
         height: '100vh',
-        backgroundImage: `url(${bg})`,
-        backgroundSize: 'auto',
-        backgroundRepeat: 'repeat',
-        backgroundPosition: 'center',
+        backgroundColor: '#f3f3ea',
         display: 'flex',
         flexDirection: 'column',
       }}
     >
-      <NavBar />
-      <div id="alertSpace" style={{ height: '8vh', color: 'white' }}>alert space</div>
-      {PopupChildren && <PopupLayout>{PopupChildren}</PopupLayout>}
+      <NavBar setPopup={setPopup} />
+      <AlertSpace alertMessage={ 'this in an alert' } variant='info' />
+      { popupChildren && <PopupLayout children={ popupChildren } /> }
       <MasterGrid />
       <div style={{ height: '4vh', color: 'white', justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
         links: legal, privacy, terms | &copy; TrendMart 2024

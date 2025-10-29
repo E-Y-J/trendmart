@@ -1,7 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&family=Inter:opsz,wght@0,100..900&display=swap');
 
+/* use Inter and Inter Tight from import, the rest are default fallbacks */
 #root {
-  font-family: Inter Tight, Inter;
+  font-family: Inter Tight, Inter, system-ui, "Segoe UI", Roboto, Arial, Helvetica, sans-serif;;
 }
 
 html, body, #root {

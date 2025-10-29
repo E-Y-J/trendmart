@@ -1,17 +1,29 @@
-import { Routes, Route } from 'react-router-dom';
 import logoUrl from '/logo.svg?url';
+import { Link } from 'react-router-dom';
 
-function NavBar() {
+
+
+function NavBar({ setPopup }) {
+  
+
+  const LoginRegisterButton = () => {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '80vh' }}>
+        <h2>Login / Register Page</h2>
+        <button onClick={() => setPopup(null)} style={{ marginTop: '1rem', padding: '0.5rem 1rem', cursor: 'pointer' }}>Close</button>
+      </div>
+    )
+  }
+
   return (
     <div
       style={{
         display: 'flex',
         width: '100%',
         height: '10vh',
-        marginBottom: '1.5rem', 
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backgroundColor: '#797975',
       }}
     >
       {/* Left container */}
@@ -21,16 +33,22 @@ function NavBar() {
           alignItems: 'center',
           justifyContent: 'flex-start',
           height: '100%',
-          paddingLeft: '1rem',
-          paddingRight: '1rem',
+          padding: '1%',
         }}
       >
         <img
           src={logoUrl}
           alt="Logo"
-          style={{ height: '100%', marginLeft: '20px', objectFit: 'contain' }}
+          style={{ height: '100%', objectFit: 'contain' }}
         />
-        <h1 style={{ color: 'white', marginLeft: '1rem' }}>TrendMart</h1>
+        <h1
+        id="title"
+        style={{
+          color: '#0a1f44',
+          marginLeft: '1rem'
+        }}
+        >
+          TrendMart</h1>
       </div>
 
       {/* Right container */}
@@ -39,26 +57,11 @@ function NavBar() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'flex-end',
-          
           height: '100%',
           paddingRight: '3rem', 
         }}
       >
-        <button
-          style={{
-            
-            color: 'black',
-            border: '1px solid rgba(0,0,0,0.2)',
-            borderRadius: '0.375rem',
-            padding: '0.375rem 0.75rem',
-            cursor: 'pointer',
-            fontSize: '1rem',
-            fontWeight: 500,
-            transition: 'background-color 0.2s ease',
-          }}
-        >
-          Login
-        </button>
+        <LoginRegisterButton />
       </div>
     </div>
   );

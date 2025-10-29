@@ -1,17 +1,17 @@
-import ProductCategories from '../products/ProductCategories.jsx';
-import FeaturedProducts from '../products/FeaturedProducts.jsx';
-import RecommendedProducts from '../products/RecommendedProducts.jsx';
+import ProductCategories from '../layoutChildren/products/ProductCategories';
+import FeaturedProducts from '../layoutChildren/products/FeaturedProducts';
+import RecommendedProducts from '../layoutChildren/products/RecommendedProducts';
 
 function MasterGrid() {
   return (
-    <div style={{ width: '100%', margin: 0 }}>
+    <div style={{ width: '98%', alignContent: 'center', margin: 'auto' }}>
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           width: '100%',
           margin: 0,
-          padding: 0,
+          padding: '0',
           minHeight: '75vh',
         }}
       >
@@ -35,8 +35,7 @@ function MasterGrid() {
         <div
           id="products"
           style={{
-            flexBasis: '83.333%', 
-            
+            flexBasis: '83.333%',
             display: 'flex',
             flexDirection: 'column',
             alignContent: 'stretch',
@@ -48,7 +47,6 @@ function MasterGrid() {
           <div
             style={{
               display: 'flex',
-              
               margin: 0,
               padding: 0,
               justifyContent: 'center',
@@ -61,7 +59,6 @@ function MasterGrid() {
                 flexBasis: '33.333%',
                 margin: '0 0.5rem',
                 padding: 0,
-                
                 height: '100%',
                 display: 'flex',
                 alignItems: 'center',
@@ -75,7 +72,6 @@ function MasterGrid() {
             <div
               style={{
                 flex: 1,
-                
                 color: 'white',
                 display: 'flex',
                 alignItems: 'center',
@@ -91,7 +87,6 @@ function MasterGrid() {
           <div
             id="featured"
             style={{
-              
               margin: 0,
               padding: 0,
               height: '60%',
@@ -107,7 +102,6 @@ function MasterGrid() {
           <div
             id="recommended"
             style={{
-              
               margin: 0,
               padding: 0,
               height: '40%',

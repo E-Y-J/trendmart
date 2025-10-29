@@ -11,14 +11,16 @@ function PopupLayout({ children }) {
     >
       <div
         style={{
-          
-          border: '2px solid #212529', 
-          borderRadius: '0.5rem', 
-          boxShadow: '0 1rem 3rem rgba(0,0,0,0.175)', 
-          padding: '1.5rem', 
-          margin: '1.5rem', 
-          maxWidth: '90vw',
-          maxHeight: '90vh',
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          backgroundColor: '#00000080',
+          backdropFilter: 'blur(5px)',
+          width: '100vw',
+          height: 'calc(100vh - 18vh - 2%)',
+          alignContent: 'center',
+          justifyContent: 'center',
+          display: 'flex',
           overflowY: 'auto',
         }}
       >
