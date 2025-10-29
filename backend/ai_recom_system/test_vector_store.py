@@ -59,7 +59,7 @@ def test_product_vector_store():
 
         for i, (product, score) in enumerate(results, 1):
             print(
-                f"  {i}. {product['name']} (${product['price']}) - Score: {score:.3f}")
+                f" {i}. {product['name']} (${product['price']}) - Score: {score:.3f}")
 
     # Test product-to-product similarity
     print("\nProduct-to-Product Similarity:")
@@ -67,7 +67,7 @@ def test_product_vector_store():
     similar = store.find_similar_to_product(5, top_k=3)
     for i, (product, score) in enumerate(similar, 1):
         print(
-            f"  {i}. {product['name']} (${product['price']}) - Score: {score:.3f}")
+            f" {i}. {product['name']} (${product['price']}) - Score: {score:.3f}")
 
 
 if __name__ == "__main__":

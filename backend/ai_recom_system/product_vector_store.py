@@ -2,6 +2,7 @@ import numpy as np
 import json
 from typing import List, Dict, Any, Tuple, Optional
 from sentence_transformers import SentenceTransformer
+from .helpers.text_builder import create_product_text
 
 
 class ProductVectorStore:
@@ -21,93 +22,6 @@ class ProductVectorStore:
 
         # Mapping from product ID to index in embeddings list
         self.id_to_index = {}
-
-    def create_product_text(self, product: Dict[str, Any]) -> str:
-        """
-        Create a comprehensive text representation of a product for embedding.
-        Enhanced with category context and product type identification.
-        """
-        # Extract product information
-        name = product.get('name', '')
-        tags = product.get('tags', [])
-        price = product.get('price', 0)
-        rating = product.get('rating', 0)
-
-        # Infer product category from name and tags
-        category_context = self._get_category_context(name, tags)
-
-        # Create rich text representation
-        tag_text = ' '.join(tags) if tags else ''
-        price_range = self._get_price_range(price)
-        rating_text = self._get_rating_text(rating)
-
-        # Enhanced text with category context
-        product_text = f"{name} {category_context} {tag_text} {price_range} {rating_text} product"
-
-        return product_text.lower().strip()
-
-    def _get_category_context(self, name: str, tags: List[str]) -> str:
-        """Add explicit category context to distinguish product types."""
-        name_lower = name.lower()
-        tag_text = ' '.join(tags).lower()
-
-        # Text enrichment based on keywords
-        # Electronics categories
-        if any(word in name_lower for word in ['iphone', 'samsung', 'pixel', 'oneplus']):
-            return "smartphone mobile phone cellular device communication"
-        elif any(word in name_lower for word in ['macbook', 'laptop', 'notebook', 'zenbook']):
-            return "laptop computer notebook portable computing"
-        elif any(word in name_lower for word in ['playstation', 'xbox', 'nintendo', 'console']):
-            return "gaming console video game entertainment system"
-
-        # Health & Nutrition
-        elif any(word in tag_text for word in ['whey', 'protein', 'muscle']):
-            return "protein supplement nutrition fitness health powder"
-        elif any(word in tag_text for word in ['probiotic', 'digestive', 'gut']):
-            return "digestive supplement health wellness probiotic capsule"
-        elif any(word in tag_text for word in ['vitamin', 'multivitamin', 'supplement']):
-            return "vitamin supplement nutrition health daily wellness"
-
-        # Food & Snacks
-        elif any(word in tag_text for word in ['chips', 'snack', 'cheese']):
-            return "snack food chips crispy salty taste treat"
-        elif any(word in tag_text for word in ['protein-bar', 'bar', 'ready-to-drink']):
-            return "protein snack nutrition bar convenient food"
-
-        return "general merchandise product item"
-
-    def _get_price_range(self, price: float) -> str:
-        """Categorize price into range for better semantic understanding.
-
-        Args:
-            price: Product price
-            Returns:
-                Descriptive price range text
-    """
-        if price < 100:
-            return "budget affordable cheap"
-        elif price < 500:
-            return "mid-range moderate"
-        elif price < 1000:
-            return "premium quality"
-        else:
-            return "luxury high-end expensive"
-
-    def _get_rating_text(self, rating: float) -> str:
-        """Convert rating to descriptive text.
-
-        Args:
-            rating: Product rating (0-5 scale)
-            Returns:
-                Descriptive rating text"""
-        if rating >= 4.5:
-            return "highly rated excellent"
-        elif rating >= 4.0:
-            return "good quality rated"
-        elif rating >= 3.5:
-            return "decent quality"
-        else:
-            return "affordable"
 
     def add_products(self, products: List[Dict[str, Any]], category_info: Dict[str, Any] = None):
         '''Add products to the vector store and compute their embeddings.
@@ -134,6 +48,10 @@ class ProductVectorStore:
         # Print confirmation message for testing purposes
         print(
             f"Successfully added {len(products)} products. Total products: {len(self.products)}")
+
+    def create_product_text(self, product: Dict[str, Any]) -> str:
+        """Delegate to the helper text builder to compose embedding text."""
+        return create_product_text(product)
 
     def search_similar_products(self, query: str, top_k: int = 10,
                                 exclude_ids: List[int] = None) -> List[Tuple[Dict[str, Any], float]]:

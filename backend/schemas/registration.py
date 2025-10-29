@@ -82,7 +82,7 @@ class UserRegistrationSchema(BaseSchema):
             PASSWORD_VALIDATOR
         ]
     )
-    role = fields.String(dump_only=True, default='customer')
+    role = fields.String(dump_only=True, dump_default='customer')
     email = fields.Email(required=True)
 
 
