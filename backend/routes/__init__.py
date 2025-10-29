@@ -1,11 +1,9 @@
-from flask import Blueprint
+"""Routes package - keep this file minimal to avoid circular imports.
 
-# Create auth blueprint (for both login and registration)
-auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
-swagger_bp = Blueprint('swagger', __name__, url_prefix='/api/docs')
-customer_bp = Blueprint('customer', __name__, url_prefix='/api/customer')
+Blueprints are defined in their respective modules (e.g. `auth.py`,
+`registration.py`) and imported explicitly by `app.create_app()` when
+registering them with Flask.
+"""
 
-from . import auth
-from . import registration
-
+__all__ = []
 
