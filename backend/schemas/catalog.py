@@ -1,6 +1,6 @@
 from marshmallow import Schema, fields, validate, validates, ValidationError
 from extensions import BaseSchema
-from models.catalog import Product, Category, Inventory, Review
+from models.catalog import Product, Category, Inventory, Review, Subcategory
 
 # -------Read and Write Schemas------- #
 
@@ -14,16 +14,28 @@ class CategorySchema(BaseSchema):
         model = Category
 
 
+class SubcategorySchema(BaseSchema):
+    """
+    Subcategory Schema for API serialization/deserialization.
+    Automatically includes all Subcategory model fields.
+    """
+    class Meta:
+        model = Subcategory
+
+    # Include parent category
+    category = fields.Nested(CategorySchema, dump_only=True)
+
+
 class ProductSchema(BaseSchema):
     """
     Product Schema for API responses.
-    Includes nested category and review data for complete product information.
+    Includes nested subcategory and review data for complete product information.
     """
     class Meta:
         model = Product
 
     # Nested relationships for rich API responses (read-only)
-    categories = fields.Nested(CategorySchema, many=True, dump_only=True)
+    subcategory = fields.Nested(SubcategorySchema, dump_only=True)
     reviews = fields.Nested('ReviewSchema', many=True, dump_only=True)
 
 
@@ -58,16 +70,16 @@ class ProductCreateSchema(BaseSchema):
     """
     Product Creation Schema with validation rules.
 
-    Excludes auto-generated fields and provides category assignment via IDs.
+    Excludes auto-generated fields and provides subcategory assignment via ID.
     Implements business validation rules for product data integrity.
     """
     class Meta:
         model = Product
         # Exclude auto/relationship fields
-        exclude = ('id', 'categories', 'reviews')
+        exclude = ('id', 'subcategory', 'reviews')
 
-    # Category assignment via ID list (converted to relationships in business logic)
-    category_ids = fields.List(fields.Integer(), load_only=True)
+    # Subcategory assignment via ID (converted to relationship in business logic)
+    subcategory_id = fields.Integer(required=True, load_only=True)
     price = fields.Float(required=True, validate=validate.Range(min=0))
     name = fields.String(required=True, validate=validate.Length(min=1))
     sku = fields.String(required=True, validate=validate.Length(min=1))
