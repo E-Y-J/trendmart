@@ -1,11 +1,14 @@
+# /backend/Dockerfile
 # syntax=docker/dockerfile:1.7-labs
 # ^ BuildKit syntax (enables mount caching & parallel layer builds)
 
 # ------------------------------------------------------------
 # Stage 1: Base configuration and dependency install
 # ------------------------------------------------------------
-ARG PYTHON_VERSION=3.12
-FROM python:${PYTHON_VERSION}-slim AS base
+# Use the official NVIDIA PyTorch image as the base.
+# It already includes Python, PyTorch, and CUDA drivers.
+# The `AS base` alias allows subsequent stages to reference this base image.
+FROM nvcr.io/nvidia/pytorch:23.09-py3 AS base
 
 # System settings
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -14,8 +17,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /
 
-# Install system deps for building common Python packages faster
-# (includes build-essential and git for shared dev environments)
+# The NVIDIA PyTorch image already has many system dependencies.
+# The following apt-get line is likely no longer necessary, but is kept
+# in case you need other specific tools (e.g., git).
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
@@ -39,6 +43,7 @@ RUN adduser \
 FROM base AS deps
 
 # Use BuildKit mounts for caching and bind-mounting requirements.txt
+# This ensures that pip downloads are cached and only rebuilt when requirements.txt changes.
 RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.txt,target=requirements.txt \
     pip install -r requirements.txt
@@ -66,14 +71,9 @@ USER appuser
 # Expose port 8000 for app access
 EXPOSE 8000
 
-RUN mkdir -p /app/instance && chown -R appuser:appuser /app
-
 # ------------------------------------------------------------
 # CMD for development
 # ------------------------------------------------------------
-
-# --- For Flask ---
-# CMD ["flask", "run", "--host=0.0.0.0", "--port=8000"]
 
 # --- For Gunicorn (production-style dev) ---
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:create_app()"]
