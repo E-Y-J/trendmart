@@ -5,7 +5,8 @@ info:
   title: "TRENDMART API"
   description: "API documentation for the TRENDMART application."
   version: "1.0.0"
-host: "127.0.0.1:5000/api/"
+host: "localhost:8000"
+basePath: "/api"
 schemes:
   - "http"
 consumes:

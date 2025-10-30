@@ -1,14 +1,9 @@
 from extensions import db
 from sqlalchemy import CheckConstraint, UniqueConstraint
 
-# Association table for many-to-many relationship between Product and Category
-# This enables products to belong to multiple categories and vice versa
-product_categories = db.Table('product_categories',
-                              db.Column('product_id', db.Integer, db.ForeignKey(
-                                  'products.id'), primary_key=True),
-                              db.Column('category_id', db.Integer, db.ForeignKey(
-                                  'categories.id'), primary_key=True)
-                              )
+# Note: Removed product_categories association table as products now belong to subcategories
+# which are linked to main categories. This provides a cleaner hierarchy:
+# Product → Subcategory → Category
 
 
 class Category(db.Model):
@@ -30,8 +25,7 @@ class Category(db.Model):
     slug = db.Column(db.String(100), unique=True, nullable=False, index=True)
 
     # Relationships
-    products = db.relationship(
-        'Product', secondary=product_categories, back_populates='categories')
+    subcategories = db.relationship('Subcategory', back_populates='category')
 
 
 class Product(db.Model):
@@ -63,10 +57,6 @@ class Product(db.Model):
     tags = db.Column(db.String(255))
 
     # Relationships
-    # Many-to-many: Products can belong to multiple categories
-    categories = db.relationship(
-        'Category', secondary=product_categories, back_populates='products')
-
     # One-to-many: Product can have multiple reviews, delete reviews if product deleted
     reviews = db.relationship(
         'Review', back_populates='product', cascade='all, delete-orphan')
@@ -84,6 +74,12 @@ class Product(db.Model):
     # One-to-many: Product can have multiple recommendation scores
     recommendations = db.relationship(
         'Recommendation', back_populates='product')
+    # One-to-many: Product can have multiple views
+    views = db.relationship('ProductView', back_populates='product')
+
+    subcategory_id = db.Column(db.Integer, db.ForeignKey(
+        'subcategories.id'), nullable=False)
+    subcategory = db.relationship('Subcategory', back_populates='products')
 
 
 class Inventory(db.Model):
@@ -151,3 +147,29 @@ class Review(db.Model):
     # Relationships
     product = db.relationship('Product', back_populates='reviews')
     user = db.relationship('User', back_populates='reviews')
+
+
+class Subcategory(db.Model):
+    """
+    Product Subcategory Model
+
+    Represents subcategories under main product categories for finer organization.
+    Each subcategory belongs to one main category and can have multiple products.
+
+    Attributes:
+        id (int): Primary key, auto-incrementing subcategory identifier
+        name (str): Name of the subcategory
+        slug (str): URL-friendly version of name, unique and indexed for SEO
+        category_id (int): Foreign key to the main category
+    """
+    __tablename__ = 'subcategories'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    slug = db.Column(db.String(100), unique=True, nullable=False, index=True)
+    category_id = db.Column(db.Integer, db.ForeignKey(
+        'categories.id'), nullable=False)
+
+    # Relationships
+    category = db.relationship('Category', back_populates='subcategories')
+    products = db.relationship('Product', back_populates='subcategory')
