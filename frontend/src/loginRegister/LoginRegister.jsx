@@ -1,7 +1,9 @@
 function LoginRegister() {
-    return (
-        <h1>LoginRegister</h1>
-    )
+  return (
+    <div style={{ minHeight: '50vh', minWidth: '50vw' }}>
+      
+    </div>
+  )
 }
 
 export default LoginRegister;

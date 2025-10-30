@@ -9,22 +9,28 @@ function MasterLayout({ popupChildren }) {
   const outletContent = useOutlet();
 
   return (
-    <div
-      style={{
-        margin: 0,
-        padding: 0,
-        width: '100vw',
-        height: '100vh',
-        backgroundColor: '#f3f3ea',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
+    <>
       <NavBar />
       <AlertSpace alertMessage={ 'this in an alert' } variant='info' />
-      { outletContent && <PopupLayout>{popupChildren}</PopupLayout> }
-      <MasterGrid />
-    </div>
+      <div
+        id='mainContainer'
+        style={{
+          width: '98%',
+          alignContent: 'center',
+          marginLeft: '1%',
+          marginRight: '1%',
+          display: 'flex',
+          justifyContent: 'space-between',
+          margin: 'auto',
+          padding: 0,
+          minHeight: '75vh',
+        }}
+      >
+        { outletContent && <PopupLayout>{popupChildren}</PopupLayout> }
+          
+        <MasterGrid />
+      </div>
+    </>
   );
 }
 
