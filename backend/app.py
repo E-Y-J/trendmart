@@ -1,5 +1,5 @@
 from flask import Flask, send_from_directory
-from extensions import db, ma, jwt, init_stripe
+from extensions import db, ma, jwt, cors, init_stripe
 from config import Config
 from routes.catalog import categories_bp, products_bp
 from routes.auth import auth_bp
@@ -24,11 +24,29 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
+    # Initialize extensions
     db.init_app(app)
     ma.init_app(app)
     jwt.init_app(app)
+    
+    # This line is to allow CORS for all domains
+    cors.init_app(app, resources={
+        r"/api/*": {
+            "origins": "*",
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization"]
+        }
+    })
 
     init_stripe(app)
+
+    with app.app_context():
+        try:
+            db.create_all()
+            print("Database tables created successfully!")
+        except Exception as e:
+            print(f"Database initialization error: {e}")
+           
 
     # Register blueprints
     app.register_blueprint(auth_bp)
@@ -50,11 +68,6 @@ def create_app():
 
 
 if __name__ == '__main__':
+    # For local development only (not used in Docker)
     app = create_app()
-
-    with app.app_context():
-        # db.drop_all()
-        db.create_all()
-        print("Database tables created!")
-
     app.run(debug=True)

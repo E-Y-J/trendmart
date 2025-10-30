@@ -10,12 +10,12 @@
 version: '3.8'
 
 services:
-  #frontend:
-  #  build: ./frontend
-  #  ports:
-  #    - "3000:5173"
-  #  depends_on:
-  #    - backend
+  frontend:
+   build: ./frontend
+   ports:
+     - "3000:5173"
+   depends_on:
+     - backend
 
   backend:
     build: ./backend
