@@ -1,16 +1,16 @@
+import LoginRegister from '../../../loginRegister/LoginRegister';
 import logoUrl from '/logo.svg?url';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 
 
-function NavBar({ setPopup }) {
-  
+function NavBar() {
+  const navigate = useNavigate()
 
   const LoginRegisterButton = () => {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '80vh' }}>
-        <h2>Login / Register Page</h2>
-        <button onClick={() => setPopup(null)} style={{ marginTop: '1rem', padding: '0.5rem 1rem', cursor: 'pointer' }}>Close</button>
+        <button onClick={() => navigate("/login")} style={{ marginTop: '1rem', padding: '0.5rem 1rem', cursor: 'pointer' }}>Login</button>
       </div>
     )
   }

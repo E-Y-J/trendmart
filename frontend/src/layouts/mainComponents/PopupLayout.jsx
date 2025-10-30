@@ -17,14 +17,16 @@ function PopupLayout({ children }) {
           backgroundColor: '#00000080',
           backdropFilter: 'blur(5px)',
           width: '100vw',
-          height: 'calc(100vh - 18vh - 2%)',
+          height: 'calc(100vh - 18vh - 4%)',
           alignContent: 'center',
           justifyContent: 'center',
           display: 'flex',
           overflowY: 'auto',
         }}
       >
-        { children ? children : <Outlet/> }
+        <div style={{backgroundColor: '#fffffb', display: 'flex', width: 'fit-content', margin: 'auto' }} >
+          { children }
+        </div>
       </div>
     </div>
   );

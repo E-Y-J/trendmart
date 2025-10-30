@@ -4,14 +4,14 @@ import RecommendedProducts from '../layoutChildren/products/RecommendedProducts'
 
 function MasterGrid() {
   return (
-    <div style={{ width: '98%', alignContent: 'center', margin: 'auto' }}>
+    <div style={{ width: '98%', alignContent: 'center', marginLeft: 'auto', marginRight: 'auto' }}>
       <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           width: '100%',
           margin: 0,
-          padding: '0',
+          padding: 0,
           minHeight: '75vh',
         }}
       >
@@ -19,7 +19,7 @@ function MasterGrid() {
         <div
           id="category"
           style={{
-            flexBasis: '16.666%', 
+            flexBasis: '14.666%', 
             display: 'flex',
             justifyContent: 'space-evenly',
             flexDirection: 'column',
@@ -35,10 +35,10 @@ function MasterGrid() {
         <div
           id="products"
           style={{
-            flexBasis: '83.333%',
+            flexBasis: '82.333%',
             display: 'flex',
             flexDirection: 'column',
-            alignContent: 'stretch',
+            gap: '2%',
             margin: 0,
             padding: 0,
           }}

@@ -1,15 +1,20 @@
 import { useState } from 'react'
 import './App.css'
 import MasterLayout from './layouts/mainComponents/MasterLayout'
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom'
+import LoginRegister from './loginRegister/LoginRegister'
+import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom'
 
 function App() {
+  console.log(Link, useNavigate)
   const [popup, setPopup] = useState(null)
-  console.log(Link, useNavigate, useLocation)
   
   return (
     <>
-      <MasterLayout popupChildren={ popup } setPopup={ setPopup } />
+        <Routes>
+          <Route path="/" element={ <MasterLayout popupChildren={<Outlet context={[popup, setPopup]} /> } setPopup={setPopup} /> } >
+            <Route path="/login" element={ <LoginRegister /> } />
+          </Route>
+        </Routes>
     </>
   )
 }

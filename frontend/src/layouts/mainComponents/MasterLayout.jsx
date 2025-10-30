@@ -1,9 +1,13 @@
+import React from 'react';
 import NavBar from '../layoutChildren/navbar/NavBar.jsx';
 import MasterGrid from './MasterGrid.jsx';
 import PopupLayout from './PopupLayout.jsx';
 import AlertSpace from '../layoutChildren/alert/AlertSpace.jsx';
+import { Outlet, useOutlet } from 'react-router-dom';
 
-function MasterLayout({ popupChildren, setPopup }) {
+function MasterLayout({ popupChildren }) {
+  const outletContent = useOutlet();
+
   return (
     <div
       style={{
@@ -16,13 +20,10 @@ function MasterLayout({ popupChildren, setPopup }) {
         flexDirection: 'column',
       }}
     >
-      <NavBar setPopup={setPopup} />
+      <NavBar />
       <AlertSpace alertMessage={ 'this in an alert' } variant='info' />
-      { popupChildren && <PopupLayout children={ popupChildren } /> }
+      { outletContent && <PopupLayout>{popupChildren}</PopupLayout> }
       <MasterGrid />
-      <div style={{ height: '4vh', color: 'white', justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
-        links: legal, privacy, terms | &copy; TrendMart 2024
-      </div>
     </div>
   );
 }
