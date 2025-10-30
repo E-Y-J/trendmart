@@ -4,11 +4,12 @@ from config import Config
 from routes.catalog import categories_bp, products_bp
 from routes.auth import auth_bp
 from routes.customers import customers_bp
+from routes.recommendation import recom_bp
 import models
 from flask_swagger_ui import get_swaggerui_blueprint
 import os
 
-SWAGGER_URL = '/api/docs' 
+SWAGGER_URL = '/api/docs'
 API_URL = '/api/swagger'  # URL to serve our swagger file
 
 # Create swaggerui blueprint
@@ -20,6 +21,7 @@ swaggerui_blueprint = get_swaggerui_blueprint(
     }
 )
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
@@ -28,7 +30,7 @@ def create_app():
     db.init_app(app)
     ma.init_app(app)
     jwt.init_app(app)
-    
+
     # This line is to allow CORS for all domains
     cors.init_app(app, resources={
         r"/api/*": {
@@ -46,7 +48,6 @@ def create_app():
             print("Database tables created successfully!")
         except Exception as e:
             print(f"Database initialization error: {e}")
-           
 
     # Register blueprints
     app.register_blueprint(auth_bp)
@@ -54,6 +55,7 @@ def create_app():
     app.register_blueprint(categories_bp)
     app.register_blueprint(products_bp)
     app.register_blueprint(swaggerui_blueprint)
+    app.register_blueprint(recom_bp)
 
     # Route to serve swagger.yaml file
     @app.route('/api/swagger')

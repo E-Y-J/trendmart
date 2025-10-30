@@ -75,15 +75,14 @@ class UserRegistrationSchema(BaseSchema):
         exclude = ('id', 'created_at', 'active', 'role',
                    'customer_profile', 'addresses', 'password_hash')
 
-    password = fields.String(   
+    password = fields.String(
         required=True,
         validate=[
             validate.Length(min=8, max=50),
             PASSWORD_VALIDATOR
         ]
     )
-    # role = fields.String(dump_only=True, default='customer')
-    role = fields.String(dump_only=True)
+    role = fields.String(dump_only=True, dump_default='customer')
     email = fields.Email(required=True)
 
 
