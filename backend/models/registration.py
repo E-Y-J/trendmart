@@ -6,8 +6,8 @@ class User(db.Model):
     """
     User Account Model
 
-    Core authentication and account management model.
-    Serves as the central entity for all user-related functionality.
+    Core authentication and account management model with analytics tracking.
+    Serves as the central entity for all user-related functionality and behavioral analytics.
 
     Attributes:
         id (int): Primary key, unique user identifier
@@ -17,10 +17,26 @@ class User(db.Model):
         active (bool): Account status flag, defaults to True
         created_at (datetime): Account creation timestamp
 
+        # Authentication Analytics (Must-Have)
+        logins_count (int): Total number of successful logins for security tracking
+        last_login_at (datetime): Timestamp of most recent successful login
+        failed_logins (int): Count of failed login attempts for security monitoring
+
+    Relationships:
+        - customer_profile: One-to-one customer details
+        - addresses: One-to-many user addresses (includes country demographics)
+        - cart: One-to-one active shopping cart
+        - orders: One-to-many order history
+        - reviews: One-to-many product reviews
+        - recommendations: One-to-many personalized product recommendations
+        - sessions: One-to-many user session tracking for analytics
+        - product_views: One-to-many product view tracking for behavioral analytics
+
     Security Notes:
         - Passwords are always hashed, never stored in plain text
         - Email uniqueness enforced at database level
         - Active flag allows soft account deactivation
+        - Login tracking enables security monitoring and analytics
     """
     __tablename__ = 'users'
 
@@ -30,6 +46,10 @@ class User(db.Model):
     role = db.Column(db.String(50), default='customer')
     active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # User login authentication tracking
+    logins_count = db.Column(db.Integer, default=0, nullable=False)
+    last_login_at = db.Column(db.DateTime)
+    failed_logins = db.Column(db.Integer, default=0, nullable=False)
 
     # Relationships - User is the central hub for all user-related data
     # One-to-one: Each user has one customer profile
@@ -55,6 +75,14 @@ class User(db.Model):
     # One-to-many: User gets personalized product recommendations
     recommendations = db.relationship(
         'Recommendation', back_populates='user', cascade='all, delete-orphan')
+
+    # One-to-many: User can have multiple sessions for analytics
+    sessions = db.relationship(
+        'UserSession', back_populates='user', cascade='all, delete-orphan')
+
+    # One-to-many: User can have multiple product views for analytics
+    product_views = db.relationship(
+        'ProductView', back_populates='user', cascade='all, delete-orphan')
 
 
 class CustomerProfile(db.Model):
@@ -97,8 +125,8 @@ class Address(db.Model):
     """
     Address Model
 
-    Stores shipping and billing addresses for users.
-    Users can have multiple addresses for different purposes.
+    Stores shipping and billing addresses for users with demographic analytics.
+    Users can have multiple addresses for different purposes and countries.
 
     Attributes:
         id (int): Primary key, unique address identifier
@@ -107,12 +135,19 @@ class Address(db.Model):
         line2 (str): Optional secondary address line (apt, suite, etc.)
         city (str): City name (required)
         state (str): State/province (required)
+        country (str): Country name (required for demographics, defaults to 'USA')
         zip_code (str): Postal/ZIP code (required)
 
+    Demographics Analytics:
+        - Provides city, state, country data for user analytics
+        - Supports international customers and shipping
+        - Enables geographic analysis of customer base
+
     Usage Notes:
-        - line1, city, state, zip_code are required for valid addresses
+        - line1, city, state, country, zip_code are required for valid addresses
         - line2 is optional for apartment numbers, suite numbers, etc.
         - Can be referenced as default address in CustomerProfile
+        - Country field supports analytics demographic requirements
     """
     __tablename__ = 'addresses'
 
@@ -123,6 +158,7 @@ class Address(db.Model):
     city = db.Column(db.String(100), nullable=False)
     state = db.Column(db.String(100), nullable=False)
     zip_code = db.Column(db.String(20), nullable=False)
+    country = db.Column(db.String(100), nullable=False)
 
     # Relationships
     user = db.relationship('User', back_populates='addresses')
