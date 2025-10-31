@@ -2,23 +2,16 @@
 <svg
   width="200mm"
   height="200mm"
-  viewBox="16 30 150 150"
+  viewBox="0 -15 200 200"
   version="1.1"
   id="svg1"
   xml:space="preserve"
   xmlns="http://www.w3.org/2000/svg"
   xmlns:svg="http://www.w3.org/2000/svg"
 >
-  <rect
-    width="200"
-    height="200"
-    fill="#f3f3ea"
-  />
   <g
     id="circuits"
     fill="#00aef0"
-    stroke="#0a1f44"
-    stroke-width="2"
   >
     <path
       id="L"

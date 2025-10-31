@@ -1,0 +1,415 @@
+{
+	"info": {
+		"_postman_id": "264afb32-5b9d-4040-8a8f-be7fdf046d29",
+		"name": "Trendmart",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44227108"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"user@example.com\",\r\n    \"password\": \"SecurePass123!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"user@examples.com\",\r\n    \"password\": \"SecurePass123!\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Protected",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2MTc1ODY2NSwianRpIjoiYWU5Y2I4MDUtODhiZS00YjMxLWI2YjQtNmIxNjMyYWI4ZjgzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NjE3NTg2NjUsImNzcmYiOiI4MmJjZGZmNy1lMzRkLTQ2NjUtYTNkYi0xM2Y4NjAyNWMzMDEiLCJleHAiOjE3NjE3NjIyNjV9.v7Nj5DAI0s-A7vFMEx8YgWf-3wOHY3yyawBP-u63nVw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/auth/protected",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"auth",
+								"protected"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Customers",
+			"item": [
+				{
+					"name": "Get Customers",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8000/customers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"customers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2MTc0NzY1OCwianRpIjoiM2I1N2ZhYzMtYmUyMC00N2E2LTk5MTktMGNmNTEwOTg3NzkwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NjE3NDc2NTgsImNzcmYiOiJiZmIwNTgwNy04ZWFjLTQ3OWQtOGQxMi01ZDkxYTE4OWE3ZWMiLCJleHAiOjE3NjE3NTEyNTh9.MzPUnJFpuuZlX42sN3aoXtpVjvzPg4lcqSy49y6NZyw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"first_name\": \"fred\",\r\n    \"last_name\": \"tuazon\",\r\n    \"phone\": \"123231\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/customers/profile",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"customers",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2MTc0NzY1OCwianRpIjoiM2I1N2ZhYzMtYmUyMC00N2E2LTk5MTktMGNmNTEwOTg3NzkwIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NjE3NDc2NTgsImNzcmYiOiJiZmIwNTgwNy04ZWFjLTQ3OWQtOGQxMi01ZDkxYTE4OWE3ZWMiLCJleHAiOjE3NjE3NTEyNTh9.MzPUnJFpuuZlX42sN3aoXtpVjvzPg4lcqSy49y6NZyw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"first_name\": \"fred\",\r\n    \"last_name\": \"tuazon\",\r\n    \"phone\": \"123231\"\r\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8000/customers/profile",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"customers",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"first_name\": \"you_first_name\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/customers/profile",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"customers",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Address",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2MTc1MjgwMiwianRpIjoiYTE3OWYzZTUtODEyYy00MzE5LThlY2ItNTAyYjhiMmQ1MDE4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NjE3NTI4MDIsImNzcmYiOiI0MDY5YTM0ZS1hNWI2LTRkNzctODFhZi00YTg0MDAxNGIzMGQiLCJleHAiOjE3NjE3NTY0MDJ9.MiVuaY8CVFlBNbm54q_bXLTLIgFqwMfbaxyIQGGrZK0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user_id\": 1,\r\n    \"line1\": \"123 Main St\",\r\n    \"line2\": \"Apt 1 Bldg 2\",\r\n    \"city\": \"London\",\r\n    \"zip_code\": \"1234\",\r\n    \"state\": \"CA\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/customers/addresses",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"customers",
+								"addresses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Addresses",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2MTc1MjgwMiwianRpIjoiYTE3OWYzZTUtODEyYy00MzE5LThlY2ItNTAyYjhiMmQ1MDE4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NjE3NTI4MDIsImNzcmYiOiI0MDY5YTM0ZS1hNWI2LTRkNzctODFhZi00YTg0MDAxNGIzMGQiLCJleHAiOjE3NjE3NTY0MDJ9.MiVuaY8CVFlBNbm54q_bXLTLIgFqwMfbaxyIQGGrZK0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8000/customers/addresses",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"customers",
+								"addresses"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set default address",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2MTc1ODY2NSwianRpIjoiYWU5Y2I4MDUtODhiZS00YjMxLWI2YjQtNmIxNjMyYWI4ZjgzIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NjE3NTg2NjUsImNzcmYiOiI4MmJjZGZmNy1lMzRkLTQ2NjUtYTNkYi0xM2Y4NjAyNWMzMDEiLCJleHAiOjE3NjE3NjIyNjV9.v7Nj5DAI0s-A7vFMEx8YgWf-3wOHY3yyawBP-u63nVw",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/customers/set_default_address/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"customers",
+								"set_default_address",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Address",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTc2MTc1MjgwMiwianRpIjoiYTE3OWYzZTUtODEyYy00MzE5LThlY2ItNTAyYjhiMmQ1MDE4IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjEiLCJuYmYiOjE3NjE3NTI4MDIsImNzcmYiOiI0MDY5YTM0ZS1hNWI2LTRkNzctODFhZi00YTg0MDAxNGIzMGQiLCJleHAiOjE3NjE3NTY0MDJ9.MiVuaY8CVFlBNbm54q_bXLTLIgFqwMfbaxyIQGGrZK0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8000/customers/addresses/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"customers",
+								"addresses",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
