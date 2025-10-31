@@ -69,7 +69,16 @@ def register():
 
         db.session.add(user)
         db.session.commit()
-        return jsonify(UserSchema().dump(user)), 201
+
+        # Auto-login after registration
+        access_token = create_access_token(identity=str(user.id))
+        refresh_token = create_refresh_token(identity=str(user.id))
+
+        return jsonify({
+            "user": UserSchema().dump(user),
+            "access_token": access_token,
+            "refresh_token": refresh_token
+        }), 201
 
     except ValidationError as err:
         return jsonify(err.messages), 400
