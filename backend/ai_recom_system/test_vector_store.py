@@ -3,7 +3,7 @@ import sys
 import os
 import json
 
-# parent directory to backend
+# parent directory to backend.
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Load sample products for testing

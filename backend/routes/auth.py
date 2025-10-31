@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from schemas.auth import LoginSchema, TokenResponseSchema, LogoutSchema
-from schemas.registration import UserSchema, UserRegistrationSchema, CustomerProfileSchema
+from schemas.registration import UserSchema, UserRegistrationSchema
 from extensions import db
 from sqlalchemy import select, delete
 from models.registration import User, CustomerProfile
@@ -9,7 +9,7 @@ from marshmallow import ValidationError
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt, get_jwt_identity
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
-customer_bp = Blueprint('customer', __name__, url_prefix='/customer')
+
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -39,40 +39,51 @@ def login():
     except ValidationError as err:
         return jsonify(err.messages), 400
 
+
 @auth_bp.route('/register', methods=['POST'])
 def register():
     try:
         user_data = request.json
-        
+
         # Validate the input data using schema
         validated_data = UserRegistrationSchema().load(user_data)
-        
+
         # Check if email already exists
         email_exist = db.session.execute(
             select(User).filter_by(email=validated_data['email'])
         ).scalar_one_or_none()
-        
+
         if email_exist:
-            return jsonify({"status":"error","message": "A user with this email already exists!"}), 400
-        
+            return jsonify({"status": "error", "message": "A user with this email already exists!"}), 400
+
         # Hash the password
         password = validated_data.get('password')
         if not password:
             return jsonify({"error": "Password is required"}), 400
-            
+
         # Create User instance
         user = User(
             email=validated_data['email'],
             password_hash=generate_password_hash(password)
         )
-        
+
         db.session.add(user)
         db.session.commit()
-        return jsonify(UserSchema().dump(user)), 201
-    
+
+        # Auto-login after registration
+        access_token = create_access_token(identity=str(user.id))
+        refresh_token = create_refresh_token(identity=str(user.id))
+
+        return jsonify({
+            "user": UserSchema().dump(user),
+            "access_token": access_token,
+            "refresh_token": refresh_token
+        }), 201
+
     except ValidationError as err:
         return jsonify(err.messages), 400
-    
+
+
 @auth_bp.route('/logout', methods=['POST'])
 def logout():
 

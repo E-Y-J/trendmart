@@ -1,4 +1,5 @@
 from extensions import db
+from .serializers import product_to_dict
 from sqlalchemy import CheckConstraint, UniqueConstraint
 
 # Note: Removed product_categories association table as products now belong to subcategories
@@ -80,6 +81,15 @@ class Product(db.Model):
     subcategory_id = db.Column(db.Integer, db.ForeignKey(
         'subcategories.id'), nullable=False)
     subcategory = db.relationship('Subcategory', back_populates='products')
+
+    def to_dict(self):
+        """Return a JSON-serializable dict of this Product for the vector store.
+
+        Delegates to the shared helper in `product_serialization.py` so the
+        serialization logic can live in one place and be reused by the
+        indexer or tests.
+        """
+        return product_to_dict(self)
 
 
 class Inventory(db.Model):
