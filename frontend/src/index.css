@@ -1,13 +1,30 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&family=Inter:opsz,wght@0,100..900&display=swap');
 
 /* use Inter and Inter Tight from import, the rest are default fallbacks */
+/* src/index.css or a global style file */
+
+/* 1. Reset default browser margins and padding */
+html,
+body,
 #root {
-  font-family: Inter Tight, Inter, system-ui, "Segoe UI", Roboto, Arial, Helvetica, sans-serif;;
+  margin: 0;
+  padding: 0;
 }
 
-html, body, #root {
-  height: 100vh;
-  width: 100vw;
-  margin: 0;
-  background-color: #f3f3ea;
+/* 2. Apply a universal box-sizing for predictable sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 3. Ensure full-screen dimensions and hide overflow */
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  overflow: hidden; /* Hide any content that exceeds viewport size */
 }

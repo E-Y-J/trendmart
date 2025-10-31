@@ -11,7 +11,6 @@ function ProductCategories({ categories }) {
         alignItems: 'center',
         gap: '0.5rem',
         backgroundColor: '#6c757d',
-        borderRadius: '0.5rem',
       }}
     >
       {categories.map((category, index) => (
@@ -24,8 +23,7 @@ function ProductCategories({ categories }) {
             color: 'white',
             padding: '0.5rem', 
             margin: '0.25rem', 
-            borderRadius: '0.375rem', 
-            width: '75%',
+                        width: '75%',
             textAlign: 'center',
             fontWeight: 500,
             cursor: 'pointer',
@@ -37,8 +35,7 @@ function ProductCategories({ categories }) {
               
               width: '100%',
               padding: '0.25rem',
-              borderRadius: '0.25rem',
-            }}
+                          }}
           >
             <h3 style={{ margin: 0 }}>{category}</h3>
           </div>

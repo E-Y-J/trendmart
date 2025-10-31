@@ -20,7 +20,7 @@ function NavBar() {
       style={{
         display: 'flex',
         width: '100%',
-        height: '10vh',
+        height: '100%',
         justifyContent: 'space-between',
         alignItems: 'center',
         backgroundColor: '#797975',

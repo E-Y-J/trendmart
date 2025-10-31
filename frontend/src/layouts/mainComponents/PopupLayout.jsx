@@ -9,10 +9,11 @@ function PopupLayout({ children }) {
           backgroundColor: '#00000080',
           backdropFilter: 'blur(5px)',
           width: '100vw',
-          height: 'calc(100vh - 18vh - 4%)',
+          height: '82vh',
           alignContent: 'center',
           justifyContent: 'center',
           display: 'flex',
+          flexDirection: 'column',
           overflowY: 'auto',
         }}
       >

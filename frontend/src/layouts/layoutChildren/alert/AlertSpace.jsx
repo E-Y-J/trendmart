@@ -10,19 +10,15 @@ function AlertSpace({ alertMessage, variant='success'|'error'|'info' }) {
     <div
       id="alertSpace"
       style={{
-        width: '98%',
-        height: '8vh',
+        flexGrow: 1,
+        height: '100%',
         alignContent: 'center',
-        margin: '1%',
         backgroundColor: `${alertType[variant] || '#00000000'}`,
         textAlign: 'center',
         color: 'wheat'
       }}
     >
-      <div style={{ height: '100%' }}>
-
       { alertMessage }
-      </div>
     </div>
   );
 }
