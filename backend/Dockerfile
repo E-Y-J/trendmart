@@ -38,9 +38,9 @@ RUN adduser \
 # ------------------------------------------------------------
 FROM base AS deps
 
-# Use BuildKit mounts for caching and bind-mounting requirements.txt
+# Use BuildKit mounts for caching and bind-mounting runtime requirements
 RUN --mount=type=cache,target=/root/.cache/pip \
-    --mount=type=bind,source=requirements.txt,target=requirements.txt \
+    --mount=type=bind,source=requirements.runtime.txt,target=requirements.txt \
     pip install -r requirements.txt
 
 # ------------------------------------------------------------

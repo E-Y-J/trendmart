@@ -1,27 +1,27 @@
 import numpy as np
 import json
 from typing import List, Dict, Any, Tuple, Optional
-from sentence_transformers import SentenceTransformer
 from .helpers.text_builder import create_product_text
+from .embeddings_backend import make_backend, BaseEmbeddingBackend
 
 
 class ProductVectorStore:
     '''A simple in-memory vector store for product embeddings.'''
 
-    def __init__(self, model_name: str = 'all-MiniLM-L6-v2'):
-        '''Initialize the vector store with a specified sentence transformer model.
+    def __init__(self, model_name: str = 'all-MiniLM-L6-v2', backend: BaseEmbeddingBackend | None = None):
+        '''Initialize the vector store with a specified embedding backend.
 
         Args:
-            model_name: Name of the sentence transformer model to use.
+            model_name: Name of the sentence transformer model to use (when using HF backend).
+            backend: Optional embedding backend; if None, chosen via env (HF vs Ollama).
         '''
         self.model_name = model_name
-        # Initialize the sentence transformer model
-        self.sentence_model = SentenceTransformer(model_name)
-        self.products = []
-        self.product_embeddings = []
+        self.backend = backend or make_backend()
+        self.products: List[Dict[str, Any]] = []
+        self.product_embeddings: List[List[float]] = []
 
         # Mapping from product ID to index in embeddings list
-        self.id_to_index = {}
+        self.id_to_index: Dict[int, int] = {}
 
     def add_products(self, products: List[Dict[str, Any]], category_info: Dict[str, Any] = None):
         '''Add products to the vector store and compute their embeddings.
@@ -38,8 +38,7 @@ class ProductVectorStore:
 
             # Create text representation and compute embedding
             product_text = self.create_product_text(product)
-            embedding = self.sentence_model.encode(
-                product_text, convert_to_tensor=False)
+            embedding = self.backend.embed(product_text)
 
             self.products.append(product)
             self.product_embeddings.append(embedding)
@@ -70,8 +69,7 @@ class ProductVectorStore:
             return []
 
         # Generate query embedding
-        query_embedding = self.sentence_model.encode(
-            query, convert_to_tensor=False)
+        query_embedding = self.backend.embed(query)
 
         # Calculate similarities with all products
         similarities = []

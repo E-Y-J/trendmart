@@ -1,4 +1,4 @@
-from sqlalchemy import CheckConstraint, UniqueConstraint
+from sqlalchemy import UniqueConstraint
 from extensions import db
 
 

@@ -2,7 +2,14 @@ import os
 from datetime import timedelta
 from dotenv import load_dotenv
 
-load_dotenv()
+# Load environment from backend/.env explicitly, then fall back to current working dir
+_here = os.path.dirname(__file__)
+_backend_env = os.path.join(_here, '.env')
+if os.path.exists(_backend_env):
+    load_dotenv(_backend_env)
+else:
+    load_dotenv()
+
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY')
