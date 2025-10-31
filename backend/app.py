@@ -3,6 +3,7 @@ from extensions import db, ma, jwt, cors, init_stripe
 from config import Config
 from routes.catalog import categories_bp, products_bp
 from routes.auth import auth_bp
+from routes.registration import customer_bp
 from routes.customers import customers_bp
 from routes.recommendation import recom_bp
 import models
@@ -51,6 +52,7 @@ def create_app():
 
     # Register blueprints
     app.register_blueprint(auth_bp)
+    app.register_blueprint(customer_bp)
     app.register_blueprint(customers_bp)
     app.register_blueprint(categories_bp)
     app.register_blueprint(products_bp)
