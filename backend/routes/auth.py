@@ -8,8 +8,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from marshmallow import ValidationError
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt, get_jwt_identity
 
-auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
-customer_bp = Blueprint('customer', __name__, url_prefix='/api/customer')
+auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
+customer_bp = Blueprint('customer', __name__, url_prefix='/customer')
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
