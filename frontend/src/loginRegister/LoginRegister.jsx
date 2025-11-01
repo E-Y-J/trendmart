@@ -1,7 +1,13 @@
+
+
 function LoginRegister() {
   return (
-    <div style={{ minHeight: '50vh', minWidth: '50vw' }}>
+    <div >
+
+    <form id="login">
       
+      <button type="submit"></button>
+    </form>
     </div>
   )
 }
