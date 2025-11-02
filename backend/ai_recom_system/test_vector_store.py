@@ -1,10 +1,8 @@
-from product_vector_store import ProductVectorStore
+from ai_recom_system.product_vector_store import ProductVectorStore
 import sys
 import os
 import json
 
-# parent directory to backend.
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Load sample products for testing
 

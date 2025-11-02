@@ -10,23 +10,32 @@
 
 services:
   frontend:
-   build: ./frontend
-   ports:
-     - "3000:5173"
-   depends_on:
-     - backend
+    build: ./frontend
+    ports:
+      - "3000:5173"
+    depends_on:
+      - backend
 
   backend:
     build: ./backend
     ports:
       - "8000:8000"
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     environment:
       DATABASE_URL: postgresql://user:password@database:5432/trendmart_db
       FLASK_ENV: development
       SECRET_KEY: trend1234
       JWT_SECRET_KEY: mart1234
+      # Ensure Hugging Face caches are writable (container runs as non-root with no HOME)
+      HF_HOME: /app/instance/hf_cache
+      TRANSFORMERS_CACHE: /app/instance/hf_cache/transformers
+      HUGGINGFACE_HUB_CACHE: /app/instance/hf_cache/hub
+      SENTENCE_TRANSFORMERS_HOME: /app/instance/hf_cache/sentence_transformers
+      XDG_CACHE_HOME: /app/instance/.cache
+      # Explicitly choose a small, fast embedding model (CPU-friendly)
+      HUGGINGFACE_EMBEDDING_MODEL: sentence-transformers/all-MiniLM-L6-v2
       # Optional RAG settings if you want the container to use host Ollama via HTTP
       # USE_OLLAMA_EMBED: "1"
       # OLLAMA_EMBED_MODEL: hf.co/CompendiumLabs/bge-base-en-v1.5-gguf
@@ -34,17 +43,24 @@ services:
       # LOCAL_LLM_URL: http://host.docker.internal:11434
     volumes:
       - ./instance:/app/instance
+    restart: unless-stopped
 
   database:
     image: postgres:16-alpine
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: trendmart_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U user -d trendmart_db" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
 
 volumes:
   db_data:

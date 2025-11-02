@@ -38,9 +38,13 @@ def index_all_products(fetch_products_fn=None):
     vs = ProductVectorStore()
     vs.add_products(prods)
 
-    # Persist a small JSON summary for reuse by the simple RAG fallback
-    out = {"products": vs.products,
-           "embeddings_count": len(vs.product_embeddings)}
+    # Persist products and embeddings for reuse by the simple RAG fallback
+    out = {
+        "products": vs.products,
+        "embeddings": vs.product_embeddings,
+        "embedding_dimension": len(vs.product_embeddings[0]) if vs.product_embeddings else 0,
+        "embeddings_count": len(vs.product_embeddings)
+    }
     os.makedirs(os.path.dirname(INDEX_PATH), exist_ok=True)
     with open(INDEX_PATH, "w", encoding="utf-8") as fh:
         json.dump(out, fh, default=str)

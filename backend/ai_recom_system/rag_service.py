@@ -27,8 +27,16 @@ def load_simple_index():
         payload = json.load(fh)
 
     products = payload.get("products", [])
+    embeddings = payload.get("embeddings")
     vs = ProductVectorStore()
-    # add_products expects product dicts
+    # If embeddings are present, load them directly; otherwise compute on the fly
+    if isinstance(embeddings, list) and len(embeddings) == len(products) and (len(products) > 0):
+        try:
+            vs.set_products_and_embeddings(products, embeddings)
+            return vs
+        except Exception:
+            # Fallback to compute if persisted embeddings invalid
+            pass
     vs.add_products(products)
     return vs
 

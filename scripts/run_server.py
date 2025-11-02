@@ -2,7 +2,6 @@
 import os
 import sys
 from pathlib import Path
-import requests
 
 
 def _find_repo_root(start: Path, marker: str = "backend", max_up: int = 6) -> Path:
@@ -30,19 +29,10 @@ def main():
     debug = os.environ.get('FLASK_DEBUG', '1') in ('1', 'true', 'True')
 
     app = create_app()
-    app.run(host=host, port=port, debug=debug)
+    # Disable the reloader to avoid double-execution on Windows and
+    # prevent socket issues when mixing server and client calls in one process.
+    app.run(host=host, port=port, debug=debug, use_reloader=False)
 
 
 if __name__ == '__main__':
     main()
-
-# Example usage
-url = "http://127.0.0.1:5000/recommendations/answer"
-payload = {"question": "What are the best sneakers under $100?"}
-print("Posting:", payload)
-r = requests.post(url, json=payload, timeout=30)
-print("Status:", r.status_code)
-try:
-    print("JSON:", r.json())
-except Exception:
-    print("Text:", r.text)
