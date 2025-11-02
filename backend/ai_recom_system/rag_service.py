@@ -2,9 +2,8 @@ import os
 import json
 import logging
 from typing import List, Dict, Any, Optional
-
+from .llm_adapter import OllamaAdapter
 from .product_vector_store import ProductVectorStore
-from .langchain_ollama import OllamaWrapper
 from . import generator
 
 logger = logging.getLogger(__name__)
@@ -42,16 +41,15 @@ def load_simple_index():
 
 
 def _ollama_llm_caller_factory(model: Optional[str] = None, temperature: float = 0.0):
-    wrapper = OllamaWrapper(model=model, temperature=temperature)
+    """Factory to create an Ollama LLM caller matching generator.generate_answer contract."""
+    adapter = OllamaAdapter(model=model, temperature=temperature)
 
     def _caller(messages: List[Dict[str, str]], *, model: Optional[str] = None, timeout: int = 30, temperature: float = 0.0) -> Dict[str, Any]:
-        # Build a single prompt string from messages similar to generator.call_llm
-        prompt = "\n\n".join(
-            [f"{m.get('role').upper()}: {m.get('content')}" for m in messages])
-        resp = wrapper.generate(prompt)
-        # Ensure returned shape matches generator expectations
-        return {"text": resp.get("text") if isinstance(resp, dict) else str(resp), "raw": resp.get("raw") if isinstance(resp, dict) else resp}
-
+        resp = adapter.chat(
+            messages, model=model, temperature=temperature, max_tokens=256, timeout=timeout)
+        # Normalize to generator.generate_answer expected contract
+        return {"text": resp.get("text") if isinstance(resp, dict) else str(resp),
+                "raw": resp.get("raw") if isinstance(resp, dict) else resp}
     return _caller
 
 
@@ -83,3 +81,6 @@ def answer_question(question: str, k: int = 5, temperature: float = 0.0, model: 
     res["_retrieved"] = [
         {"id": p.get("id"), "score": float(s)} for p, s in retrieved]
     return res
+
+
+# Note: Only one _ollama_llm_caller_factory is defined (adapter-based).
