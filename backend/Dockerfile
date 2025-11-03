@@ -38,9 +38,9 @@ RUN adduser \
 # ------------------------------------------------------------
 FROM base AS deps
 
-# Use BuildKit mounts for caching and bind-mounting requirements.txt
+# Use BuildKit mounts for caching and bind-mounting runtime requirements
 RUN --mount=type=cache,target=/root/.cache/pip \
-    --mount=type=bind,source=requirements.txt,target=requirements.txt \
+    --mount=type=bind,source=requirements.runtime.txt,target=requirements.txt \
     pip install -r requirements.txt
 
 # ------------------------------------------------------------
@@ -65,15 +65,6 @@ USER appuser
 
 # Expose port 8000 for app access
 EXPOSE 8000
-
-RUN mkdir -p /app/instance && chown -R appuser:appuser /app
-
-# ------------------------------------------------------------
-# CMD for development
-# ------------------------------------------------------------
-
-# --- For Flask ---
-# CMD ["flask", "run", "--host=0.0.0.0", "--port=8000"]
 
 # --- For Gunicorn (production-style dev) ---
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:create_app()"]

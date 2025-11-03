@@ -9,8 +9,24 @@ function NavBar() {
 
   const LoginRegisterButton = () => {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '80vh' }}>
-        <button onClick={() => navigate("/login")} style={{ marginTop: '1rem', padding: '0.5rem 1rem', cursor: 'pointer' }}>Login</button>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '80vh'
+        }}
+      >
+        <button
+          onClick={() => navigate("/login")}
+          style={{
+            padding: '0.5rem 1rem',
+            cursor: 'pointer'
+          }}
+        >
+          Login
+        </button>
       </div>
     )
   }

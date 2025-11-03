@@ -27,4 +27,4 @@ def get_category_context(name: str, tags: List[str]) -> str:
     if any(word in tag_text for word in ['protein-bar', 'bar', 'ready-to-drink']):
         return "protein snack nutrition bar convenient food"
 
-    return "general merchandise product item"
+    return 'general product item'

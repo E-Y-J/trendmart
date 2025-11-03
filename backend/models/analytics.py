@@ -96,7 +96,7 @@ class ProductView(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey(
         'products.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
-    session_id = db.Column(db.String(255), db.ForeignKey(
+    session_id = db.Column(db.Integer, db.ForeignKey(
         'user_sessions.id'), nullable=True)
     # seconds spent viewing
     view_time = db.Column(db.Integer, default=0, nullable=False)

@@ -4,6 +4,7 @@ from .shopping import Cart, CartItem, Order, OrderItem
 from .payment import Payment
 from .recommendation import Recommendation
 from .analytics import UserSession, ProductView
+from .serializers import product_to_dict
 
 __all__ = [
     'User', 'CustomerProfile', 'Address',
