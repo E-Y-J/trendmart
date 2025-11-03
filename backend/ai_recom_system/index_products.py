@@ -5,8 +5,11 @@ from typing import List
 from .product_vector_store import ProductVectorStore
 
 # Path to save a simple persisted index (numpy/JSON via the ProductVectorStore is used)
-INDEX_PATH = os.environ.get(
-    "FAISS_INDEX_PATH", "./instance/product_index.json")
+_HERE = os.path.dirname(__file__)
+_REPO_ROOT = os.path.abspath(os.path.join(_HERE, os.pardir, os.pardir))
+_DEFAULT_INDEX_PATH = os.path.join(
+    _REPO_ROOT, "instance", "product_index.json")
+INDEX_PATH = os.environ.get("FAISS_INDEX_PATH", _DEFAULT_INDEX_PATH)
 
 
 def index_all_products(fetch_products_fn=None):

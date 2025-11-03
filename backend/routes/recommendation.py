@@ -24,6 +24,13 @@ def _to_product_card(p: Dict[str, Any], score: Optional[float] = None) -> Dict[s
     The vector store holds dicts that may come from DB serialization or sample data.
     We defensively extract common fields and provide sensible defaults.
     """
+    # Prefer canonical image fields but fall back to sample_data naming
+    primary_image = p.get("primary_image") or p.get(
+        "product_img") or p.get("image_url")
+    images = p.get("images")
+    if not images:
+        images = [primary_image] if primary_image else []
+
     card = {
         "id": p.get("id"),
         "sku": p.get("sku"),
@@ -32,10 +39,12 @@ def _to_product_card(p: Dict[str, Any], score: Optional[float] = None) -> Dict[s
         "price": p.get("price", 0.0),
         "rating": p.get("rating", 0.0),
         "tags": p.get("tags") or [],
-        "primary_image": p.get("primary_image") or p.get("product_img"),
-        "images": p.get("images") or [],
+        "primary_image": primary_image,
+        "thumbnail": p.get("image_thumb_url"),
+        "images": images,
         "subcategory": p.get("subcategory"),
         "main_category": p.get("main_category"),
+        "category_info": p.get("category_info"),
         "times_click_on": p.get("times_click_on", 0),
     }
     if score is not None:

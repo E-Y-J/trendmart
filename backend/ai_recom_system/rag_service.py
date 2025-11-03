@@ -9,8 +9,12 @@ from . import generator
 logger = logging.getLogger(__name__)
 
 
-INDEX_PATH = os.environ.get(
-    "FAISS_INDEX_PATH", "./instance/product_index.json")
+# Resolve the default index path to the repository root to avoid CWD issues
+_HERE = os.path.dirname(__file__)
+_REPO_ROOT = os.path.abspath(os.path.join(_HERE, os.pardir, os.pardir))
+_DEFAULT_INDEX_PATH = os.path.join(
+    _REPO_ROOT, "instance", "product_index.json")
+INDEX_PATH = os.environ.get("FAISS_INDEX_PATH", _DEFAULT_INDEX_PATH)
 
 
 def load_simple_index():

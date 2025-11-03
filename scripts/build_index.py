@@ -77,7 +77,7 @@ def build_sample_index():
     from backend.ai_recom_system.index_products import index_all_products
 
     try:
-        products, _category_info = _load_sample_products()
+        products, category_info = _load_sample_products()
     except Exception:
         # Fallback tiny sample if sample_data is missing
         products = [
@@ -86,9 +86,21 @@ def build_sample_index():
             {"id": 2, "name": "Trail Boots", "description": "Waterproof trail boots",
                 "price": 119.0, "rating": 4.5, "tags": ["boots", "trail"]},
         ]
+        category_info = {}
 
     def fetch_products() -> Iterable[Dict[str, Any]]:
-        return products
+        # Enrich products with category metadata if available
+        enriched: List[Dict[str, Any]] = []
+        for p in products:
+            q = dict(p)
+            pid = q.get("id")
+            if pid is not None and int(pid) in category_info:
+                info = category_info[int(pid)]
+                q.setdefault("category_info", info)
+                q.setdefault("main_category", info.get("main_category"))
+                q.setdefault("subcategory", info.get("subcategory"))
+            enriched.append(q)
+        return enriched
 
     index_all_products(fetch_products_fn=fetch_products)
 
