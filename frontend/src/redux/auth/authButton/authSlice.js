@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../beConnection/api';
+import api from '../../../beConnection/api';
 
 const initialState = {
   user: null,

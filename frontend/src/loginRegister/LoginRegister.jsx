@@ -3,7 +3,7 @@ import TextInput from "../layouts/layoutChildren/input/textInput";
 import CheckboxToggle from "../layouts/layoutChildren/input/CheckboxToggle";
 import { useNavigate } from "react-router-dom";
 import api from "../beConnection/api"
-import { createUser, loginUser } from "../redux/auth/authSlice";
+import { createUser, loginUser } from "../redux/auth/authButton/authSlice";
 
 
 function LoginRegister({ formName }) {
@@ -49,9 +49,8 @@ function LoginRegister({ formName }) {
     if (errors.length) return errors
 
     const authData = { email: formData.email, password: formData.password}
-    console.table(authData)
       try {
-        const response = await api.post(`auth/${formName}`, authData);
+        const response = await (api.post(`auth/${formName}`), authData);
         console.log('User created successfully:', response.data);
         return response.data;
       } catch (error) {

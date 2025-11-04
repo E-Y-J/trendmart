@@ -10,10 +10,12 @@ function NavBar() {
       <div
         id="logRegContainer"
         style={{
+          height: '100%',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
+          backgroundColor: '#fffffb'
         }}
       >
         <button
@@ -25,42 +27,14 @@ function NavBar() {
             height: '3rem',
             fontSize: '1.3rem',
             fontWeight: 600,
-            color: '#fffffb',
-            backgroundColor: '#0a1f44',
-            borderRadius: '12rem',
-            border: '.3rem groove #00aef0',
+            color: '#0a1f44',
+            backgroundColor: 'transparent',
+            border: 'none',
             overflow: 'hidden',
             cursor: 'pointer',
           }}
         >
-          <div
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '7rem',
-              height: '3rem',
-              backgroundColor: '#fffffb55',
-              filter: 'blur(8r)',
-              backdropFilter: 'blur(5px)',
-              borderRadius: '12rem 12rem',
-              zIndex: 1,
-              pointerEvents: 'none',
-            }}
-          />
-          <div
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              zIndex: 2,
-              color: '#fffffb',
-            }}
-          >
-            Login
-          </div>
+          Login
         </button>
       </div>
     )
@@ -74,7 +48,6 @@ function NavBar() {
         height: '100%',
         justifyContent: 'space-between',
         alignItems: 'center',
-        backgroundColor: '#797975',
       }}
     >
       {/* Left container */}
@@ -107,7 +80,6 @@ function NavBar() {
           alignItems: 'center',
           alignContent: 'flex-end',
           height: '100%',
-          paddingRight: '.5rem'
         }}
       >
         <LoginRegisterButton />

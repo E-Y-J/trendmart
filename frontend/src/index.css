@@ -1,4 +1,4 @@
-/* 1. Reset default browser margins and padding */
+/* 0 margins */
 html,
 body,
 #root {
@@ -8,20 +8,35 @@ body,
   padding: 0;
 }
 
-/* 2. Apply a universal box-sizing for predictable sizing */
+/* Force 100% to Single screen */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
-/* 3. Ensure full-screen dimensions and hide overflow */
 html,
 body {
   height: 100%;
   width: 100%;
 }
 
+/* Force no scrollbars */
 body {
-  overflow: hidden; /* Hide any content that exceeds viewport size */
+  overflow: hidden;
+}
+
+#root {
+  background: 
+    /* Base gradient */
+    linear-gradient(to right, #fffffb, #f3f3ea),
+    /* Noise layer - subtle repeating lines */
+    repeating-linear-gradient(
+      45deg, 
+      rgba(255, 255, 255, 0.05), 
+      rgba(255, 255, 255, 0.5) 1px, 
+      transparent 1px, 
+      transparent 2px
+    );
+  background-blend-mode: overlay; /* Or multiply, soft-light, etc. */
 }
