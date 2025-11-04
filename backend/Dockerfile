@@ -66,14 +66,5 @@ USER appuser
 # Expose port 8000 for app access
 EXPOSE 8000
 
-RUN mkdir -p /app/instance && chown -R appuser:appuser /app
-
-# ------------------------------------------------------------
-# CMD for development
-# ------------------------------------------------------------
-
-# --- For Flask ---
-# CMD ["flask", "run", "--host=0.0.0.0", "--port=8000"]
-
 # --- For Gunicorn (production-style dev) ---
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:create_app()"]
