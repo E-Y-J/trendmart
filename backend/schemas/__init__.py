@@ -1,3 +1,10 @@
+from .bulk_add import *
+from .recommendation import *
+from .payment import *
+from .shopping import *
+from .catalog import *
+from .auth import *
+from .registration import *
 from marshmallow import validate
 
 # Define PASSWORD_VALIDATOR first to avoid circular imports
@@ -7,12 +14,6 @@ PASSWORD_VALIDATOR = validate.Regexp(
     error='Password must include uppercase, lowercase, number, and special character'
 )
 
-from .registration import *
-from .auth import *
-from .catalog import *
-from .shopping import *
-from .payment import *
-from .recommendation import *
 
 __all__ = [
     'PASSWORD_VALIDATOR'
