@@ -1,12 +1,15 @@
 import {  useState } from "react";
 import TextInput from "../layouts/layoutChildren/input/textInput";
 import CheckboxToggle from "../layouts/layoutChildren/input/CheckboxToggle";
+import { useNavigate } from "react-router-dom";
+import api from "../beConnection/api"
+import { createUser, loginUser } from "../redux/auth/authSlice";
 
 
-function LoginRegister() {
+function LoginRegister({ formName }) {
   const [formData, setFormData]  = useState({ email: '', password: '', verification: '' })
-  const [toggleForm, setToggleForm] = useState('login')
   const [passHidden, setPassHidden] = useState(true)
+  const navigate = useNavigate()
 
   const handleChange = (event) => {
     const { id, value } = event.target
@@ -17,7 +20,7 @@ function LoginRegister() {
   }
 
   const handleChecked = () => {
-    toggleForm == 'login' ? setToggleForm('register') : setToggleForm('login')
+    formName == 'login' ? navigate('/register') : navigate('/login')
   }
 
   const validEmail = () => /.*@.*\.(.*){2,4}/.test(formData.email)
@@ -30,21 +33,32 @@ function LoginRegister() {
     const errors = [];
     if (passLength < 8) errors.push("At least 8 characters");
     if (passLength > 50) errors.push("At most 50 characters")
-      if (/[^a-z]/.test(pass)) errors.push("One lowercase letter");
-    if (/[^A-Z]/.test(pass)) errors.push("One uppercase letter");
-    if (/[^\d]/.test(pass)) errors.push("One number");
-    if (/[^!@#$%^&*(),.?":{}|<>]/.test(pass)) errors.push("One special character");
+    if (!/[a-z]/.test(pass)) errors.push("One lowercase letter");
+    if (!/[A-Z]/.test(pass)) errors.push("One uppercase letter");
+    if (!/[\d]/.test(pass)) errors.push("One number");
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(pass)) errors.push("One special character");
     return errors;
   }
 
-  const handleSubmit = () => {
-    if (!validEmail()) return
+  const handleSubmit = async() => {
 
-    const errors = validatePassword()
+    // collect errors if any
+    let errors = validatePassword()
+    if (!validEmail()) errors = ["Email doesn't match required format, double-check and try again.", ...errors]
+    // return any errors -- send to alert space
     if (errors.length) return errors
 
-    
-  }
+    const authData = { email: formData.email, password: formData.password}
+    console.table(authData)
+      try {
+        const response = await api.post(`auth/${formName}`, authData);
+        console.log('User created successfully:', response.data);
+        return response.data;
+      } catch (error) {
+        console.error('Error authorizing user:', error);
+        throw error;
+      }
+    }
 
   return (
     <div
@@ -59,10 +73,14 @@ function LoginRegister() {
         flexDirection: 'column',
       }}
     >
-      <CheckboxToggle onClick={ handleChecked } checked={ toggleForm == 'register' } />
+      <CheckboxToggle name="logRegToggle" onClick={ handleChecked } checked={ formName == 'register' } />
       
       <form
-        id={ `${toggleForm}Form` }
+        onSubmit={e => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+        id={ `${formName}Form` }
         style={{
           height: '100%',
           flexDirection: 'row',
@@ -70,7 +88,7 @@ function LoginRegister() {
           marginTop: 'auto',
           marginBottom: 'auto'
         }}
-        >
+      >
         <div
           style={{
             display: 'flex',
@@ -82,12 +100,12 @@ function LoginRegister() {
         >
           <TextInput
             inputId="email"
-            label={ toggleForm }
+            label={ formName }
             title="Email"
             placeholder="e.g. user@email.com"
             onChange={ handleChange }
           />
-          { toggleForm == 'register' &&
+          { formName == 'register' &&
             <TextInput
               inputId="verification" 
               title="Verify Email"
@@ -101,11 +119,11 @@ function LoginRegister() {
             inputId="password"
             title="Password"
             placeholder="Enter your password"
-            info={ toggleForm == 'register' ? 'Passwords must be 8-50 characters long and include at least one of each following characters are required: lowercase, uppercase, number, and !@#$%^&*(),.?":{}|<></>' : '' }
+            info={ formName == 'register' ? 'Passwords must be 8-50 characters long and include at least one of each following characters are required: lowercase, uppercase, number, and !@#$%^&*(),.?":{}|<></>' : '' }
             password={ passHidden }
             onChange={ handleChange }
           >
-            <button id="showbutton" onClick={ () => setPassHidden(!passHidden) } style={{fontSize: '.4rem'}}>
+            <button id="showbutton" type="button" onClick={ () => setPassHidden(!passHidden) } style={{fontSize: '.4rem'}}>
               show
               <br/>
               password
@@ -113,11 +131,10 @@ function LoginRegister() {
           </TextInput>
           <button
             type="submit"
-            onSubmit={ handleSubmit }
             disabled={
               formData.email == '' ||
               formData.password.length < 8 ||
-              toggleForm == 'register' && formData.verification != formData.email
+              formName == 'register' && formData.verification != formData.email
             }
             style={{
               flexDirection: 'row',
@@ -125,7 +142,7 @@ function LoginRegister() {
               alignContent: 'flex-end'
             }}
           >
-            { toggleForm === 'login' ? 'Login' : 'Register' }
+            { formName === 'login' ? 'Login' : 'Register' }
           </button>
         </div>
       </form>

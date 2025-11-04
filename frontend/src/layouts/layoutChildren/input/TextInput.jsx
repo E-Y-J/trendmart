@@ -38,7 +38,7 @@ function TextInput({ children, inputId, title, placeholder, onChange, disabled=f
           boxSizing: 'border-box',
           fieldSizing: 'content',
         }}
-        />
+      />
         {children}
       </label>
       { info &&

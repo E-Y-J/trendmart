@@ -1,4 +1,4 @@
-function CheckboxToggle({ onClick, checked }) {
+function CheckboxToggle({ name, onClick, checked }) {
   return (
     <div
       id="toggleContainer"
@@ -27,6 +27,7 @@ function CheckboxToggle({ onClick, checked }) {
         Login
       </h4>
       <input
+        id={ name }
         type="checkbox"
         checked={checked}
         onChange={ onClick }

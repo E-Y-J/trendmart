@@ -19,7 +19,7 @@ function PopupLayout({ children }) {
       >
         <div
           style={{
-            backgroundColor: '#fffffb',
+            backgroundColor: '#f3f3ea',
             display: 'flex',
             width: 'fit-content',
             margin: 'auto',

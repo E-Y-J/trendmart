@@ -2,30 +2,65 @@ import LoginRegister from '../../../loginRegister/LoginRegister';
 import logoUrl from '/logo.svg?url';
 import { useNavigate } from 'react-router-dom';
 
-
-
 function NavBar() {
   const navigate = useNavigate()
 
   const LoginRegisterButton = () => {
     return (
       <div
+        id="logRegContainer"
         style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          height: '80vh'
         }}
       >
         <button
+          id="toLoginButton"
           onClick={() => navigate("/login")}
           style={{
-            padding: '0.5rem 1rem',
-            cursor: 'pointer'
+            position: 'relative',
+            width: '7rem',
+            height: '3rem',
+            fontSize: '1.3rem',
+            fontWeight: 600,
+            color: '#fffffb',
+            backgroundColor: '#0a1f44',
+            borderRadius: '12rem',
+            border: '.3rem groove #00aef0',
+            overflow: 'hidden',
+            cursor: 'pointer',
           }}
         >
-          Login
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '7rem',
+              height: '3rem',
+              backgroundColor: '#fffffb55',
+              filter: 'blur(8r)',
+              backdropFilter: 'blur(5px)',
+              borderRadius: '12rem 12rem',
+              zIndex: 1,
+              pointerEvents: 'none',
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 2,
+              color: '#fffffb',
+            }}
+          >
+            Login
+          </div>
         </button>
       </div>
     )
@@ -49,7 +84,6 @@ function NavBar() {
           alignItems: 'center',
           justifyContent: 'flex-start',
           height: '100%',
-          padding: '1%',
         }}
       >
         <img
@@ -66,15 +100,14 @@ function NavBar() {
         >
           TrendMart</h1>
       </div>
-
       {/* Right container */}
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'flex-end',
+          alignContent: 'flex-end',
           height: '100%',
-          paddingRight: '3rem', 
+          paddingRight: '.5rem'
         }}
       >
         <LoginRegisterButton />

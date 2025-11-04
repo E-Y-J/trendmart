@@ -72,7 +72,11 @@ const authSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(loginUser)
+      .addCase(createUser.fulfilled, (state, action) => {
+        state.isAuthenticated = true;
+        state.user = action.payload;
+        state.status = 'succeeded'
+      })
       // Login reducers
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isAuthenticated = true;
