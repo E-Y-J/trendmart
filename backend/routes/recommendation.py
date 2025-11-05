@@ -105,6 +105,8 @@ def _to_product_card(p: Dict[str, Any], score: Optional[float] = None) -> Dict[s
     if score is not None:
         card["score"] = float(score)
     return card
+
+
 # Semantic search endpoint
 
 

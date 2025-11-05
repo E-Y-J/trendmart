@@ -3,10 +3,12 @@ from extensions import db, ma, jwt, cors, init_stripe
 from config import Config
 from routes.catalog import categories_bp, products_bp
 from routes.bulk_add import bulk_bp
+from routes.bulk_users import bulk_users_bp
 from routes.auth import auth_bp
 from routes.registration import customer_bp
 from routes.customers import customers_bp
 from routes.recommendation import recom_bp
+from routes import cold_start
 import models
 from flask_swagger_ui import get_swaggerui_blueprint
 import os
@@ -64,6 +66,7 @@ def create_app():
     app.register_blueprint(swaggerui_blueprint)
     app.register_blueprint(recom_bp)
     app.register_blueprint(bulk_bp)
+    app.register_blueprint(bulk_users_bp)
 
     # Route to serve swagger.yaml file
     @app.route("/api/swagger")

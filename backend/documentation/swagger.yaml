@@ -55,6 +55,74 @@ paths:
           schema:
             $ref: '#/definitions/ErrorResponse'
 
+  /bulk/users:
+    post:
+      tags:
+        - Analytics
+      summary: Bulk ingest user analytics dataset
+      description: |
+        Accepts a dataset with products (flat), users, interactions, purchases, search queries, and sessions.
+        Notes:
+        - Products are upserted into catalog (creates categories/subcategories as needed)
+        - Users are created with synthetic emails (user{user_id}@example.com)
+        - Purchases create Orders and OrderItems and optional Reviews
+        - Interactions create views/add_to_cart and ratings (purchase interactions are ignored to avoid duplication)
+        - Search queries record result clicks as lightweight views
+        - The endpoint also accepts JS-exported payloads like `export const userData = {...};`
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/BulkUserData'
+      responses:
+        200:
+          description: Ingestion summary
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: ok
+              created:
+                type: object
+                properties:
+                  products:
+                    type: integer
+                  users:
+                    type: integer
+                  sessions:
+                    type: integer
+                  views:
+                    type: integer
+                  orders:
+                    type: integer
+                  order_items:
+                    type: integer
+                  reviews:
+                    type: integer
+              updated:
+                type: object
+                properties:
+                  products:
+                    type: integer
+                  users:
+                    type: integer
+              mapped_products:
+                type: integer
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        409:
+          description: Integrity error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        500:
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
   /recommendations/health:
     get:
       tags:
@@ -218,6 +286,23 @@ paths:
             $ref: '#/definitions/ProductCardList'
 
   /recommendations/reindex:
+  /recommendations/cold_start:
+    get:
+      tags:
+        - Recommendations
+      summary: Cold-start recommendations for new users
+      description: Returns top-selling products, with a fallback to most-viewed when no sales exist.
+      parameters:
+        - in: query
+          name: top_k
+          type: integer
+          required: false
+          default: 5
+      responses:
+        200:
+          description: Product cards
+          schema:
+            $ref: '#/definitions/ProductCardList'
     post:
       tags:
         - Recommendations
@@ -656,6 +741,171 @@ definitions:
       details:
         type: object
         description: "Validation error details"
+
+  # -----------------
+  # Bulk User Data Schemas
+  # -----------------
+  CategoryInfoIn:
+    type: object
+    required: [main_category, subcategory]
+    properties:
+      main_category:
+        type: string
+      subcategory:
+        type: string
+
+  ProductFlatIn:
+    type: object
+    required: [id, name, price, category_info]
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      description:
+        type: string
+      price:
+        type: number
+      rating:
+        type: number
+      tags:
+        type: array
+        items:
+          type: string
+      category_info:
+        $ref: '#/definitions/CategoryInfoIn'
+
+  UserIn:
+    type: object
+    required: [user_id]
+    properties:
+      user_id:
+        type: integer
+      age:
+        type: integer
+      gender:
+        type: string
+      location:
+        type: string
+      income_range:
+        type: string
+      preferences:
+        type: array
+        items:
+          type: string
+      created_at:
+        type: string
+
+  InteractionIn:
+    type: object
+    required: [user_id, product_id, interaction_type, timestamp]
+    properties:
+      user_id:
+        type: integer
+      product_id:
+        type: integer
+      interaction_type:
+        type: string
+        enum: [view, add_to_cart, rating, purchase]
+      timestamp:
+        type: string
+      duration_seconds:
+        type: integer
+      rating_given:
+        type: number
+      quantity:
+        type: integer
+
+  PurchaseIn:
+    type: object
+    required: [user_id, product_id, purchase_date, quantity, price_paid]
+    properties:
+      user_id:
+        type: integer
+      product_id:
+        type: integer
+      purchase_date:
+        type: string
+      quantity:
+        type: integer
+      price_paid:
+        type: number
+      rating_given:
+        type: number
+      review_text:
+        type: string
+
+  SearchQueryIn:
+    type: object
+    required: [user_id, query, timestamp]
+    properties:
+      user_id:
+        type: integer
+      query:
+        type: string
+      timestamp:
+        type: string
+      results_clicked:
+        type: array
+        items:
+          type: integer
+      products_purchased:
+        type: array
+        items:
+          type: integer
+
+  SessionIn:
+    type: object
+    required: [session_id, user_id, session_start, session_end]
+    properties:
+      session_id:
+        type: integer
+      user_id:
+        type: integer
+      products_viewed:
+        type: array
+        items:
+          type: integer
+      view_durations:
+        type: array
+        items:
+          type: integer
+      session_start:
+        type: string
+      session_end:
+        type: string
+
+  BulkUserData:
+    type: object
+    properties:
+      schema_version:
+        type: string
+      generated_at:
+        type: string
+      products:
+        type: array
+        items:
+          $ref: '#/definitions/ProductFlatIn'
+      users:
+        type: array
+        items:
+          $ref: '#/definitions/UserIn'
+      interactions:
+        type: array
+        items:
+          $ref: '#/definitions/InteractionIn'
+      purchases:
+        type: array
+        items:
+          $ref: '#/definitions/PurchaseIn'
+      search_queries:
+        type: array
+        items:
+          $ref: '#/definitions/SearchQueryIn'
+      sessions:
+        type: array
+        items:
+          $ref: '#/definitions/SessionIn'
 
 
 
