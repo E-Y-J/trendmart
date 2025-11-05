@@ -1,0 +1,709 @@
+#app/static/swagger.yaml
+
+swagger: '2.0'
+info:
+  title: "TRENDMART API"
+  description: "API documentation for the TRENDMART application."
+  version: "1.0.0"
+host: "localhost:8000"
+basePath: "/"
+schemes:
+  - "http"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+
+
+
+# =========================
+# Paths
+# =========================
+paths: 
+  
+  /auth/register: # Authentication - Register
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Create a new user account with email and password. Returns user data and JWT tokens for immediate login.
+      parameters:
+        - in: body
+          name: body
+          description: Registration data
+          required: true
+          schema:
+            $ref: '#/definitions/RegisterPayload'
+      responses:
+        201:
+          description: User registered successfully
+          schema:
+            $ref: '#/definitions/RegisterResponse'
+          examples:
+            application/json:
+              {
+                "email": "user@example.com",
+              }
+        400:
+          description: Validation error or email already exists
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              {
+                "status": "error",
+                "message": "A user with this email already exists!"
+              }
+
+  /auth/login: # Authentication - Login
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user with email and password. Returns JWT access and refresh tokens.
+      parameters:
+        - in: body
+          name: body
+          description: Login credentials
+          required: true
+          schema:
+            $ref: '#/definitions/LoginPayload'
+      responses:
+        200:
+          description: Login successful
+          schema:
+            $ref: '#/definitions/TokenResponse'
+          examples:
+            application/json:
+              {
+                "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+                "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+                "token_type": "Bearer",
+                "expires_in": 3600
+              }
+        401:
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              {
+                "error": "Invalid credentials"
+              }
+
+  /auth/protected: # Protected Route - Test
+    get:
+      tags:
+        - Authentication
+      summary: Test protected route
+      description: Test endpoint to verify JWT authentication is working
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Authentication successful
+          schema:
+            $ref: '#/definitions/ProtectedResponse'
+          examples:
+            application/json:
+              {
+                "message": "Hello! You are successfully authenticated!",
+                "user_id": 1,
+                "email": "user@example.com",
+              }
+        401:
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              {
+                "msg": "Missing Authorization Header"
+              }
+
+  # =========================
+  # Customer Management Routes
+  # =========================
+  /customers/: # Get Current User
+    get:
+      tags:
+        - Customer Management
+      summary: Get current user
+      description: Retrieve the current authenticated user's basic information
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: User information retrieved successfully
+          schema:
+            $ref: '#/definitions/User'
+          examples:
+            application/json:
+              {
+                "active": true,
+                "addresses": [],
+                "created_at": "2025-10-30T22:27:58.331401",
+                "customer_profile": null,
+                "email": "user@example.com",
+                "failed_logins": 0,
+                "id": 1,
+                "last_login_at": null,
+                "logins_count": 0,
+                "role": "customer"
+              }
+        401:
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        404:
+          description: User not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /customers/profile: # Customer Profile Management
+    get:
+      tags:
+        - Customer Profile
+      summary: Get customer profile
+      description: Retrieve the current user's customer profile
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Profile retrieved successfully
+          schema:
+            $ref: '#/definitions/CustomerProfile'
+          examples:
+            application/json:
+              {
+                "id": 1,
+                "user_id": 1,
+                "first_name": "John",
+                "last_name": "Doe",
+                "phone": "+1234567890"
+              }
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        404:
+          description: Profile not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        500:
+          description: Failed to retrieve profile
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+    post:
+      tags:
+        - Customer Profile
+      summary: Create customer profile
+      description: Create a new customer profile for the current user
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: body
+          name: body
+          description: Profile data
+          required: true
+          schema:
+            $ref: '#/definitions/ProfilePayload'
+      responses:
+        201:
+          description: Profile created successfully
+          schema:
+            $ref: '#/definitions/ProfileResponse'
+          examples:
+            application/json:
+              {
+                "message": "Profile created successfully",
+                "profile": {
+                  "default_address": null,
+                  "first_name": "John",
+                  "last_name": "Doe",
+                  "phone": "+1234567890"
+                }
+              }
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        404:
+          description: User not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        500:
+          description: Failed to create profile
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+    patch:
+      tags:
+        - Customer Profile
+      summary: Update customer profile
+      description: Update an existing customer profile
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: body
+          name: body
+          description: Profile data to update
+          required: true
+          schema:
+            $ref: '#/definitions/ProfileUpdatePayload'
+      responses:
+        200:
+          description: Profile updated successfully
+          schema:
+            $ref: '#/definitions/ProfileResponse'
+          examples:
+            application/json:
+              {
+                "message": "Profile updated successfully",
+                "profile": {
+                  "default_address": null,
+                  "first_name": "John",
+                  "last_name": "Doe",
+                  "phone": "+1234567890"
+                }
+              }
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        404:
+          description: User not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        500:
+          description: Failed to update profile
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /customers/addresses: # Address Management
+    get:
+      tags:
+        - Address Management
+      summary: Get customer addresses
+      description: Retrieve all addresses for the current user
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Addresses retrieved successfully
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Address'
+          examples:
+            application/json:
+              [
+                {
+                  "id": 1,
+                  "line1": "123 Main St",
+                  "line2": "Apt 4B",
+                  "city": "New York",
+                  "state": "NY",
+                  "zip_code": "10001",
+                  "country": "USA"
+                }
+              ]
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        500:
+          description: Failed to retrieve addresses
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+    post:
+      tags:
+        - Address Management
+      summary: Add new address
+      description: Add a new address for the current user
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: body
+          name: body
+          description: Address data
+          required: true
+          schema:
+            $ref: '#/definitions/AddressPayload'
+      responses:
+        201:
+          description: Address added successfully
+          schema:
+            $ref: '#/definitions/AddressResponse'
+          examples:
+            application/json:
+              {
+                "message": "Address added successfully",
+                "address": {
+                  "id": 1,
+                  "line1": "123 Main St",
+                  "line2": "Apt 4B",
+                  "city": "New York",
+                  "state": "NY",
+                  "zip_code": "10001",
+                  "country": "USA"
+                }
+              }
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        500:
+          description: Failed to add address
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /customers/addresses/{address_id}: # Delete Address
+    delete:
+      tags:
+        - Address Management
+      summary: Delete address
+      description: Delete a specific address belonging to the current user
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: address_id
+          description: ID of the address to delete
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Address deleted successfully
+          schema:
+            $ref: '#/definitions/MessageResponse'
+          examples:
+            application/json:
+              {
+                "message": "Address deleted successfully"
+              }
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        404:
+          description: Address not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        500:
+          description: Failed to delete address
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /customers/set_default_address/{address_id}: # Set Default Address
+    patch:
+      tags:
+        - Address Management
+      summary: Set default address
+      description: Set a specific address as the default address for the user
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: address_id
+          description: ID of the address to set as default
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Address set as default successfully
+          schema:
+            $ref: '#/definitions/DefaultAddressResponse'
+          examples:
+            application/json:
+              {
+                "message": "Address set as default successfully",
+                "default_address": {
+                  "id": 1,
+                  "line1": "123 Main St",
+                  "line2": "Apt 4B",
+                  "city": "New York",
+                  "state": "NY",
+                  "zip_code": "10001",
+                  "country": "USA"
+                }
+              }
+        401:
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        404:
+          description: Profile or address not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        500:
+          description: Failed to set default address
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          
+# =========================
+# Security Definitions
+# =========================
+securityDefinitions:
+  BearerAuth:
+    type: apiKey
+    name: Authorization
+    in: header
+    description: "Enter 'Bearer' followed by your JWT token. Example: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+
+# =========================
+# Definitions (Schemas)
+# =========================  
+definitions: 
+  # Authentication Schemas
+  RegisterPayload:
+    type: object
+    required:
+      - email
+      - password
+    properties:
+      email:
+        type: string
+        format: email
+        example: "user@example.com"
+        description: "Valid email address for the user"
+      password:
+        type: string
+        minLength: 8
+        example: "SecurePass123!"
+        description: "Password must be at least 8 characters with uppercase, lowercase, number, and special character"
+
+  RegisterResponse:
+    type: object
+    properties:
+      email:
+        type: string
+        example: "user@example.com"
+      
+  LoginPayload:
+    type: object
+    required:
+      - email
+      - password
+    properties:
+      email:
+        type: string
+        format: email
+        example: "user@example.com"
+      password:
+        type: string
+        example: "SecurePass123!"
+
+  TokenResponse:
+    type: object
+    properties:
+      access_token:
+        type: string
+        example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+        description: "JWT access token for API authentication"
+      refresh_token:
+        type: string
+        example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+        description: "JWT refresh token for getting new access tokens"
+      token_type:
+        type: string
+        example: "Bearer"
+        description: "Token type (always 'Bearer')"
+      expires_in:
+        type: integer
+        example: 3600
+        description: "Token expiration time in seconds"
+
+  ProtectedResponse:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Hello! You are successfully authenticated!"
+      user_id:
+        type: integer
+        example: 1
+      email:
+        type: string
+        example: "user@example.com"
+
+  ErrorResponse:
+    type: object
+    properties:
+      error:
+        type: string
+        example: "Error message"
+      status:
+        type: string
+        example: "error"
+      message:
+        type: string
+        example: "Detailed error message"
+      details:
+        type: object
+        description: "Validation error details"
+
+  # =========================
+  # Customer Management Schemas
+  # =========================
+  User:
+    type: object
+    properties:
+      id:
+        type: integer
+        example: 1
+      email:
+        type: string
+        example: "user@example.com"
+
+  CustomerProfile:
+    type: object
+    properties:
+      id:
+        type: integer
+        example: 1
+      user_id:
+        type: integer
+        example: 1
+      first_name:
+        type: string
+        example: "John"
+      last_name:
+        type: string
+        example: "Doe"
+      phone:
+        type: string
+        example: "+1234567890"
+
+  ProfilePayload:
+    type: object
+    required:
+      - first_name
+      - last_name
+    properties:
+      first_name:
+        type: string
+        example: "John"
+        description: "Customer's first name"
+      last_name:
+        type: string
+        example: "Doe"
+        description: "Customer's last name"
+      phone:
+        type: string
+        example: "+1234567890"
+        description: "Customer's phone number"
+
+  ProfileUpdatePayload:
+    type: object
+    properties:
+      first_name:
+        type: string
+        example: "John"
+        description: "Customer's first name"
+      last_name:
+        type: string
+        example: "Doe"
+        description: "Customer's last name"
+      phone:
+        type: string
+        example: "+1234567890"
+        description: "Customer's phone number"
+
+  ProfileResponse:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Profile created successfully"
+      profile:
+        $ref: '#/definitions/CustomerProfile'
+
+  Address:
+    type: object
+    properties:
+      id:
+        type: integer
+        example: 1
+      user_id:
+        type: integer
+        example: 1
+      line1:
+        type: string
+        example: "123 Main St"
+      line2:
+        type: string
+        example: "Apt 4B"
+      city:
+        type: string
+        example: "New York"
+      state:
+        type: string
+        example: "NY"
+      zip_code:
+        type: string
+        example: "10001"
+
+  AddressPayload:
+    type: object
+    required:
+      - line1
+      - city
+      - state
+      - zip_code
+      - country
+    properties:
+      line1:
+        type: string
+        example: "123 Main St"
+        description: "Primary address line"
+      line2:
+        type: string
+        example: "Apt 4B"
+        description: "Secondary address line (optional)"
+      city:
+        type: string
+        example: "New York"
+        description: "City name"
+      state:
+        type: string
+        example: "NY"
+        description: "State code"
+      zip_code:
+        type: string
+        example: "10001"
+        description: "ZIP/postal code"
+      country:
+        type: string
+        example: "USA"
+        description: "Country name"
+
+  AddressResponse:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Address added successfully"
+      address:
+        $ref: '#/definitions/Address'
+
+  DefaultAddressResponse:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Address set as default successfully"
+      default_address:
+        $ref: '#/definitions/Address'
+
+  MessageResponse:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Operation completed successfully"
+
+
+
