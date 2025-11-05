@@ -20,6 +20,7 @@ produces:
 # Paths
 # =========================
 paths: 
+
   
   /auth/register: # Authentication - Register
     post:
@@ -60,7 +61,14 @@ paths:
       tags:
         - Authentication
       summary: User login
-      description: Authenticate user with email and password. Returns JWT access and refresh tokens.
+      description: |
+        Authenticate user with email and password. Returns JWT access and refresh tokens along with user information.
+        
+        Features:
+        - Updates login tracking (login count, last login time)
+        - Resets failed login counter on successful authentication
+        - Tracks failed login attempts for security monitoring
+        - Returns user data for immediate frontend population
       parameters:
         - in: body
           name: body
@@ -79,7 +87,17 @@ paths:
                 "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
                 "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
                 "token_type": "Bearer",
-                "expires_in": 3600
+                "expires_in": 3600,
+                "user": {
+                  "id": 1,
+                  "email": "user@example.com",
+                  "role": "customer",
+                  "active": true,
+                  "created_at": "2024-01-01T00:00:00Z",
+                  "logins_count": 5,
+                  "last_login_at": "2024-01-15T10:30:00Z",
+                  "failed_logins": 0
+                }
               }
         401:
           description: Invalid credentials
@@ -122,12 +140,195 @@ paths:
               }
 
   # =========================
+  # Admin User Routes
+  # =========================
+
+  /admin/register: # Admin - Register
+    post:
+      tags:
+        - Admin
+      summary: Register a new admin user
+      description: Create a new admin user account with email and password. Returns user data and JWT tokens for immediate login.
+      parameters:
+        - in: body
+          name: body
+          description: Registration data
+          required: true
+          schema:
+            $ref: '#/definitions/AdminRegisterPayload'
+      responses:
+        201:
+          description: Admin user registered successfully
+          schema:
+            $ref: '#/definitions/RegisterResponse'
+          examples:
+            application/json:
+              {
+                "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+                "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+                "user": {
+                  "active": true,
+                  "addresses": [],
+                  "created_at": "2025-11-05T16:05:49.508395",
+                  "customer_profile": null,
+                  "email": "admin@example.com",
+                  "failed_logins": 0,
+                  "id": 1,
+                  "last_login_at": null,
+                  "logins_count": 0,
+                  "role": "admin"
+                }
+              }
+        400:
+          description: Validation error or email already exists
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              {
+                "status": "error",
+                "message": "A user with this email already exists!"
+              }
+              
+  /admin/manage_users: # Admin - Manage Users (Placeholder for future expansion)
+    get:
+      tags:
+        - Admin
+      summary: Get all users (Admin only)
+      description: Retrieve a list of all registered users. Accessible only by admin users.
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: List of users retrieved successfully
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UsersList'
+        401:
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        403:
+          description: Forbidden - Admin access required
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /admin/manage_users/{user_id}:
+    get:
+      tags:
+        - Admin
+      summary: Get user details (Admin only)
+      description: Retrieve details of a specific user by user ID. Accessible only by admin users.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          description: ID of the user to retrieve
+          required: true
+          type: integer
+      responses:
+        200:
+          description: User details retrieved successfully
+          schema:
+            $ref: '#/definitions/User'
+        401:
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        403:
+          description: Forbidden - Admin access required
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        404:
+          description: User not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    patch:
+      tags:
+        - Admin
+      summary: Update user details (Admin only)
+      description: Update details of a specific user. Accessible only by admin users.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          description: ID of the user to update
+          required: true
+          type: integer
+        - in: body
+          name: body
+          description: User data to update
+          required: true
+          example:
+            {
+              "role": "admin",
+              "email": "new_email@example.com",
+            }
+      responses:
+        200:
+          description: User updated successfully
+          schema:
+            $ref: '#/definitions/UserResponse'
+        401:
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        403:
+          description: Forbidden - Admin access required
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        404:
+          description: User not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    delete:
+      tags:
+        - Admin
+      summary: Delete a user (Admin only)
+      description: Delete a specific user account. Accessible only by admin users.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          description: User ID to delete
+          required: true
+          type: integer
+      responses:
+        200:
+          description: User deleted successfully
+          schema:
+            $ref: '#/definitions/MessageResponse'
+        401:
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        403:
+          description: Forbidden - Admin access required or cannot delete self
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              {
+                "message": "Access forbidden: Admins only | Cannot delete your own account"
+              }
+        404:
+          description: User not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+
+
+  # =========================
   # Customer Management Routes
   # =========================
   /customers/: # Get Current User
     get:
       tags:
-        - Customer Management
+        - Get current customer details
       summary: Get current user
       description: Retrieve the current authenticated user's basic information
       security:
@@ -458,6 +659,23 @@ securityDefinitions:
 # =========================  
 definitions: 
   # Authentication Schemas
+  AdminRegisterPayload:
+    type: object
+    required:
+      - email
+      - password
+    properties:
+      email:
+        type: string
+        format: email
+        example: "admin@example.com"
+        description: "Valid email address for the user"
+      password:
+        type: string
+        minLength: 8
+        example: "SecurePass123!"
+        description: "Password must be at least 8 characters with uppercase, lowercase, number, and special character"
+  
   RegisterPayload:
     type: object
     required:
@@ -515,6 +733,9 @@ definitions:
         type: integer
         example: 3600
         description: "Token expiration time in seconds"
+      user:
+        $ref: '#/definitions/User'
+        description: "User information for immediate frontend population"
 
   ProtectedResponse:
     type: object
@@ -557,7 +778,31 @@ definitions:
       email:
         type: string
         example: "user@example.com"
+      role:
+        type: string
+        example: "customer"
+      active:
+        type: boolean
+        example: true
+      addresses:
+        type: array
+        items:
+          $ref: '#/definitions/Address'
+      customer_profile:
+        $ref: '#/definitions/CustomerProfile'
 
+
+  UsersList:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Users retrieved successfully"
+      users:
+        type: array
+        items:
+          $ref: '#/definitions/User'
+      
   CustomerProfile:
     type: object
     properties:

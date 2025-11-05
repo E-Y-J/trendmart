@@ -3,6 +3,7 @@ from extensions import db, ma, jwt, cors, init_stripe
 from config import Config
 from routes.catalog import categories_bp, products_bp
 from routes.auth import auth_bp
+from routes.admin import admin_bp
 from routes.customers import customers_bp
 from routes.recommendation import recom_bp
 import models
@@ -54,6 +55,7 @@ def create_app():
             print(f"Database initialization error: {e}")
 
     # Register blueprints
+    app.register_blueprint(admin_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(customers_bp)
     app.register_blueprint(categories_bp)
