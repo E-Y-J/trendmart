@@ -11,16 +11,16 @@ import models
 from flask_swagger_ui import get_swaggerui_blueprint
 import os
 
-SWAGGER_URL = '/api/docs'
-API_URL = '/api/swagger'  # URL to serve our swagger file
+SWAGGER_URL = "/api/docs"
+API_URL = "/api/swagger"  # URL to serve our swagger file
 
 # Create swaggerui blueprint
 swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_URL,
     config={
-        'app_name': "Trendmart API Documentation",
-    }
+        "app_name": "Trendmart API Documentation",
+    },
 )
 
 
@@ -34,18 +34,17 @@ def create_app():
     jwt.init_app(app)
 
     # This line is to allow CORS for all domains
-    cors.init_app(app, resources={
-        r"/*": {
-            "origins": "*",
-            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"]
+    cors.init_app(
+        app,
+        resources={
+            r"/*": {
+                "origins": "*",
+                "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+                "allow_headers": ["Content-Type", "Authorization"],
+                "supports_credentials": True,
+            },
         },
-        r"/recommendations/*": {
-            "origins": "*",
-            "methods": ["GET", "POST", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"]
-        }
-    })
+    )
 
     init_stripe(app)
 
@@ -67,18 +66,18 @@ def create_app():
     app.register_blueprint(bulk_bp)
 
     # Route to serve swagger.yaml file
-    @app.route('/api/swagger')
+    @app.route("/api/swagger")
     def swagger_spec():
-        return send_from_directory('documentation', 'swagger.yaml')
+        return send_from_directory("documentation", "swagger.yaml")
 
-    @app.route('/')
+    @app.route("/")
     def home():
         return "Welcome to the Trendmart API"
 
     return app
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # For local development only (not used in Docker)
     app = create_app()
     app.run(debug=True)

@@ -1,9 +1,9 @@
 function AlertSpace({ alertMessage, variant='success'|'error'|'info' }) {
 
   const alertType = {
-    success: '#008800',
-    error: '#880000',
-    info: '#000088'
+    success: '#00aef0',
+    error: '#be4748',
+    info: '#f3f3ea'
   };
 
   return (
@@ -13,9 +13,10 @@ function AlertSpace({ alertMessage, variant='success'|'error'|'info' }) {
         flexGrow: 1,
         height: '100%',
         alignContent: 'center',
-        backgroundColor: `${alertType[variant] || '#00000000'}`,
+        backgroundColor: `${alertType[variant] || 'none'}`,
         textAlign: 'center',
-        color: 'wheat'
+        fontWeight: 600,
+        color: '#0a1f44',
       }}
     >
       { alertMessage }
