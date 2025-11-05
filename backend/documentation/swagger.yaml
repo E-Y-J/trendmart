@@ -6,7 +6,7 @@ info:
   description: "API documentation for the TRENDMART application."
   version: "1.0.0"
 host: "localhost:8000"
-basePath: "/api"
+basePath: "/"
 schemes:
   - "http"
 consumes:
@@ -20,6 +20,219 @@ produces:
 # Paths
 # =========================
 paths: 
+  /bulk/add:
+    post:
+      tags:
+        - Catalog
+      summary: Bulk add categories, subcategories, and products
+      description: |
+        Ingest a nested structure of categories → subcategories → products.
+        Entries are upserted to avoid duplicates:
+        - Category uniqueness by slugified main_category
+        - Subcategory uniqueness by slugified "{category-slug}-{name}"
+        - Product uniqueness by SKU (if provided) or (name + subcategory)
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/BulkAddRequest'
+      responses:
+        200:
+          description: Upsert summary and created/updated items
+          schema:
+            $ref: '#/definitions/BulkAddResponse'
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        409:
+          description: Integrity error (e.g., SKU collisions after retries)
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        500:
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /recommendations/health:
+    get:
+      tags:
+        - Recommendations
+      summary: Health/status for recommendation service
+      responses:
+        200:
+          description: Health info
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: ok
+              vector_store:
+                type: object
+                properties:
+                  total_products:
+                    type: integer
+                    example: 180
+                  embedding_dimension:
+                    type: integer
+                    example: 384
+                  model_name:
+                    type: string
+                    example: all-MiniLM-L6-v2
+
+  /recommendations/search:
+    post:
+      tags:
+        - Recommendations
+      summary: Semantic product search
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              query:
+                type: string
+                example: comfortable running sneakers
+              top_k:
+                type: integer
+                example: 5
+      responses:
+        200:
+          description: Search results
+          schema:
+            $ref: '#/definitions/ProductCardList'
+
+  /recommendations/similar/{product_id}:
+    get:
+      tags:
+        - Recommendations
+      summary: Find products similar to a given product id
+      parameters:
+        - in: path
+          name: product_id
+          required: true
+          type: integer
+        - in: query
+          name: top_k
+          required: false
+          type: integer
+          default: 3
+      responses:
+        200:
+          description: Similar products
+          schema:
+            $ref: '#/definitions/ProductCardList'
+
+  /recommendations/category/{name}:
+    get:
+      tags:
+        - Recommendations
+      summary: Category products (exact, semantic or hybrid)
+      parameters:
+        - in: path
+          name: name
+          required: true
+          type: string
+        - in: query
+          name: top_k
+          type: integer
+          default: 3
+        - in: query
+          name: mode
+          type: string
+          enum: [exact, semantic, hybrid]
+          default: exact
+      responses:
+        200:
+          description: Category products
+          schema:
+            $ref: '#/definitions/ProductCardList'
+
+  /recommendations/answer:
+    post:
+      tags:
+        - Recommendations
+      summary: Ask a question and get an answer with relevant products
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              question:
+                type: string
+                example: What are some waterproof trail shoes?
+              top_k:
+                type: integer
+                example: 5
+      responses:
+        200:
+          description: Answer and products
+          schema:
+            type: object
+            properties:
+              answer:
+                type: string
+              source_ids:
+                type: array
+                items:
+                  type: integer
+              products:
+                type: array
+                items:
+                  $ref: '#/definitions/ProductCard'
+              raw:
+                type: object
+              retrieved:
+                type: array
+                items:
+                  type: object
+              elapsed_ms:
+                type: integer
+
+  /recommendations/by_ids:
+    post:
+      tags:
+        - Recommendations
+      summary: Resolve product ids to product cards
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              ids:
+                type: array
+                items:
+                  type: integer
+      responses:
+        200:
+          description: Product cards
+          schema:
+            $ref: '#/definitions/ProductCardList'
+
+  /recommendations/reindex:
+    post:
+      tags:
+        - Recommendations
+      summary: Force reload the product index file into memory
+      responses:
+        200:
+          description: Reloaded status
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: reloaded
+              stats:
+                type: object
   
   /auth/register: # Authentication - Register
     post:
@@ -135,6 +348,227 @@ securityDefinitions:
 # Definitions (Schemas)
 # =========================  
 definitions: 
+  # -----------------
+  # Bulk Add Schemas
+  # -----------------
+  ProductIn:
+    type: object
+    required: [name]
+    properties:
+      id:
+        type: integer
+        description: Optional id from sample data (not persisted)
+      external_id:
+        type: string
+        description: Optional external id for future use
+      sku:
+        type: string
+        description: Optional SKU. If omitted, one will be derived and truncated to 50 chars.
+      name:
+        type: string
+        example: "ASUS ZenBook X14"
+      description:
+        type: string
+        example: ""
+      price:
+        type: number
+        format: float
+        example: 1299.99
+      rating:
+        type: number
+        format: float
+        description: Not stored in DB (used for embeddings/context)
+        example: 4.5
+      tags:
+        type: array
+        items:
+          type: string
+        example: ["brand-asus", "os-windows"]
+      image_url:
+        type: string
+        example: "https://placehold.co/800x800?text=ASUS%20ZenBook%20X14"
+      image_thumb_url:
+        type: string
+        example: "https://placehold.co/300x300?text=ASUS%20ZenBook%20X14"
+      image_attribution:
+        type: string
+        example: "Placeholder"
+
+  SubcategoryIn:
+    type: object
+    required: [name]
+    properties:
+      name:
+        type: string
+        example: "Laptops"
+      products:
+        type: array
+        items:
+          $ref: '#/definitions/ProductIn'
+      related_subcategories:
+        type: array
+        items:
+          type: string
+        description: Present in sample data; not persisted
+
+  CategoryIn:
+    type: object
+    required: [main_category]
+    properties:
+      main_category:
+        type: string
+        example: "Electronics"
+      subcategories:
+        type: array
+        items:
+          $ref: '#/definitions/SubcategoryIn'
+
+  BulkAddRequest:
+    type: object
+    required: [categories]
+    properties:
+      categories:
+        type: array
+        items:
+          $ref: '#/definitions/CategoryIn'
+    example:
+      categories:
+        - main_category: Electronics
+          subcategories:
+            - name: Laptops
+              products:
+                - name: ASUS ZenBook X14
+                  price: 1299.99
+                  rating: 4.5
+                  tags: [brand-asus, os-windows]
+                  image_url: https://placehold.co/800x800?text=ASUS%20ZenBook%20X14
+                  image_thumb_url: https://placehold.co/300x300?text=ASUS%20ZenBook%20X14
+                  image_attribution: Placeholder
+
+  BulkAddProductResult:
+    type: object
+    properties:
+      id:
+        type: integer
+      sku:
+        type: string
+      name:
+        type: string
+
+  BulkAddSubcategoryResult:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      products:
+        type: array
+        items:
+          $ref: '#/definitions/BulkAddProductResult'
+
+  BulkAddCategoryResult:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      subcategories:
+        type: array
+        items:
+          $ref: '#/definitions/BulkAddSubcategoryResult'
+
+  BulkAddResponse:
+    type: object
+    properties:
+      status:
+        type: string
+        example: ok
+      created:
+        type: object
+        properties:
+          categories:
+            type: integer
+            example: 1
+          subcategories:
+            type: integer
+            example: 1
+          products:
+            type: integer
+            example: 10
+      updated:
+        type: object
+        properties:
+          categories:
+            type: integer
+            example: 0
+          subcategories:
+            type: integer
+            example: 0
+          products:
+            type: integer
+            example: 0
+      results:
+        type: object
+        properties:
+          categories:
+            type: array
+            items:
+              $ref: '#/definitions/BulkAddCategoryResult'
+
+  ProductCard:
+    type: object
+    properties:
+      id:
+        type: integer
+      sku:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      price:
+        type: number
+        format: float
+      rating:
+        type: number
+        format: float
+      tags:
+        type: array
+        items:
+          type: string
+      primary_image:
+        type: string
+      thumbnail:
+        type: string
+      images:
+        type: array
+        items:
+          type: string
+      subcategory:
+        type: string
+      main_category:
+        type: string
+      category_info:
+        type: object
+      times_click_on:
+        type: integer
+      score:
+        type: number
+        format: float
+
+  ProductCardList:
+    type: object
+    properties:
+      results:
+        type: array
+        items:
+          $ref: '#/definitions/ProductCard'
+      count:
+        type: integer
+      elapsed_ms:
+        type: integer
   # Authentication Schemas
   RegisterPayload:
     type: object

@@ -20,12 +20,15 @@ class ProductInSchema(ValidationSchema):
     tags = fields.List(fields.Str(), load_default=[])
     image_url = fields.Str(load_default=None)
     image_thumb_url = fields.Str(load_default=None)
+    image_attribution = fields.Str(load_default=None)
 
 
 class SubcategoryInSchema(ValidationSchema):
     '''Lightweight input schema representing a subcategory payload used for bulk/nested creates.'''
     name = fields.Str(required=True)
     products = fields.List(fields.Nested(ProductInSchema), load_default=[])
+    # present in sample_data/product_data.js, not used for persistence but kept for context
+    related_subcategories = fields.List(fields.Str(), load_default=[])
 
 
 class CategoryInSchema(ValidationSchema):

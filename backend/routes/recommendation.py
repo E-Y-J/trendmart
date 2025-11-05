@@ -1,21 +1,76 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, make_response
+from marshmallow import fields, ValidationError
+from extensions import ValidationSchema
 import threading
-from typing import List, Dict, Any, Optional
-from ai_recom_system.rag_service import answer_question, load_simple_index
+import os
+import time
+import uuid
+from typing import List, Dict, Any, Optional, Tuple
+from ai_recom_system.rag_service import answer_question, load_simple_index, INDEX_PATH
 
 # Blueprint placed here to prevent circular imports
 recom_bp = Blueprint('recommendation', __name__, url_prefix='/recommendations')
 
 _vector_store = None  # Placeholder for vector store initialization
 _vector_lock = threading.Lock()
+_vs_cache = None  # type: Optional[object]
+_vs_cache_mtime = None  # type: Optional[float]
 
 
 def _init_vector_store():
+    '''Initialize the ProductVectorStore from app config.'''
     from ai_recom_system.product_vector_store import ProductVectorStore
 
     model_name = current_app.config.get('EMBED_MODEL', 'all-MiniLM-L6-v2')
     vs = ProductVectorStore(model_name=model_name)
     return vs
+
+
+def _now_ms() -> int:
+    '''Return current time in milliseconds.'''
+    return int(time.time() * 1000)
+
+
+def _req_id() -> str:
+    '''Generate a short unique request ID.'''
+    return uuid.uuid4().hex[:12]
+
+
+def _json_response(payload: Dict[str, Any], status: int = 200, req_id: Optional[str] = None):
+    '''Helper to create a JSON response with optional request ID header.'''
+    resp = make_response(jsonify(payload), status)
+    if req_id:
+        resp.headers['X-Request-ID'] = req_id
+    return resp
+
+
+def _get_vs_cached() -> Tuple[object, Dict[str, Any]]:
+    """Return a cached ProductVectorStore, reloading only if the index file changed."""
+    global _vs_cache, _vs_cache_mtime
+    idx_path = INDEX_PATH
+    mtime = None
+
+    try:
+        # Get the last modified time of the index file
+        mtime = os.path.getmtime(idx_path)
+    except Exception:
+        # Failed to get mtime; treat as not modified
+        mtime = None
+
+    with _vector_lock:
+        # Reload if cache is empty or index file changed
+        if _vs_cache is None or (_vs_cache_mtime is not None and mtime is not None and mtime > _vs_cache_mtime):
+            _vs_cache = load_simple_index()
+            _vs_cache_mtime = mtime
+
+    stats = {}
+    try:
+        # Get stats from the vector store
+        stats = _vs_cache.get_stats() if _vs_cache else {}
+    except Exception:
+        # Failed to get stats; treat as empty
+        stats = {}
+    return _vs_cache, stats
 
 
 def _to_product_card(p: Dict[str, Any], score: Optional[float] = None) -> Dict[str, Any]:
@@ -55,46 +110,88 @@ def _to_product_card(p: Dict[str, Any], score: Optional[float] = None) -> Dict[s
 
 @recom_bp.route('/search', methods=['POST'])
 def search_recoms():
+    rid = _req_id()
+    t0 = _now_ms()
     data = request.get_json() or {}
     query = data.get('query') or data.get('q')
     top_k = int(data.get('top_k', 3))
     if not query:
-        return jsonify({'error': 'missing query'}), 400
+        return _json_response({'error': 'missing query'}, 400, rid)
 
     # Simple RAG-style retrieval using the JSON index and in-memory cosine similarity
-    vs = load_simple_index()
+    vs, stats = _get_vs_cached()
     retrieved = vs.search_similar_products(query, top_k=top_k)
     items = [_to_product_card(prod, score) for prod, score in retrieved]
-    return jsonify({'results': items, 'count': len(items)})
+    elapsed = _now_ms() - t0
+    current_app.logger.info(
+        f"[recom.search] rid={rid} q='{query}' k={top_k} hits={len(items)} elapsed_ms={elapsed} idx_stats={stats}")
+    return _json_response({'results': items, 'count': len(items), 'elapsed_ms': elapsed}, req_id=rid)
 
 
 # Get similar products for a given product ID
 @recom_bp.route('/similar/<int:product_id>', methods=['GET'])
 def similar_products(product_id):
+    rid = _req_id()
+    t0 = _now_ms()
     top_k = request.args.get('top_k', 3, type=int)
-    vs = load_simple_index()
+    vs, stats = _get_vs_cached()
     sims = vs.find_similar_to_product(product_id, top_k=top_k)
     items = [_to_product_card(prod, score) for prod, score in sims]
-    return jsonify({'results': items, 'count': len(items)})
+    elapsed = _now_ms() - t0
+    current_app.logger.info(
+        f"[recom.similar] rid={rid} pid={product_id} k={top_k} hits={len(items)} elapsed_ms={elapsed} idx_stats={stats}")
+    return _json_response({'results': items, 'count': len(items), 'elapsed_ms': elapsed}, req_id=rid)
 
 # Get products by category
 
 
 @recom_bp.route('/category/<string:category_name>', methods=['GET'])
 def category_products(category_name):
+    rid = _req_id()
+    t0 = _now_ms()
     top_k = request.args.get('top_k', 3, type=int)
-    # For now, filter loaded products by simple string contains on category fields if present.
-    vs = load_simple_index()
-    # naive filtering: find products that contain category_name in name/description
-    results = []
-    for p in getattr(vs, 'products', []):
-        text = f"{p.get('name','')} {p.get('description','')} {p.get('main_category','')} {p.get('category_info','')}".lower()
-        if category_name.lower() in text:
-            results.append(p)
-        if len(results) >= top_k:
-            break
+    mode = request.args.get('mode', 'exact')  # exact | semantic | hybrid
+    vs, stats = _get_vs_cached()
+
+    results: List[Dict[str, Any]] = []
+    lname = category_name.lower()
+    if mode in ('exact', 'hybrid'):
+        # Prefer explicit field matches when available
+        for p in getattr(vs, 'products', []):
+            main_cat = (p.get('main_category') or '').lower()
+            sub_cat = (p.get('subcategory') or '').lower()
+            if lname == main_cat or lname == sub_cat:
+                results.append(p)
+                if len(results) >= top_k:
+                    break
+    if mode in ('semantic', 'hybrid') and len(results) < top_k:
+        # Fill remaining slots using a semantic query
+        needed = top_k - len(results)
+        q = f"category: {category_name}"
+        sem = vs.search_similar_products(q, top_k=max(needed * 2, needed))
+        # Deduplicate by id
+        seen = {p.get('id') for p in results}
+        for prod, _score in sem:
+            pid = prod.get('id')
+            if pid not in seen:
+                results.append(prod)
+                seen.add(pid)
+            if len(results) >= top_k:
+                break
+    # Fallback naive contains if still empty
+    if not results:
+        for p in getattr(vs, 'products', []):
+            text = f"{p.get('name','')} {p.get('description','')} {p.get('main_category','')} {p.get('subcategory','')}".lower()
+            if lname in text:
+                results.append(p)
+                if len(results) >= top_k:
+                    break
+
     items = [_to_product_card(p) for p in results]
-    return jsonify({'results': items, 'count': len(items)})
+    elapsed = _now_ms() - t0
+    current_app.logger.info(
+        f"[recom.category] rid={rid} name='{category_name}' mode={mode} k={top_k} hits={len(items)} elapsed_ms={elapsed} idx_stats={stats}")
+    return _json_response({'results': items, 'count': len(items), 'elapsed_ms': elapsed}, req_id=rid)
 
 
 @recom_bp.route('/health', methods=['GET'])
@@ -130,16 +227,19 @@ def health_check():
 
 @recom_bp.route('/answer', methods=['POST'])
 def answer():
+    rid = _req_id()
+    t0 = _now_ms()
     data = request.get_json() or {}
     question = data.get('question') or data.get('query')
     if not question:
-        return jsonify({'error': 'missing question'}), 400
+        return _json_response({'error': 'missing question'}, 400, rid)
     try:
         res = answer_question(question)
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        current_app.logger.exception(f"[recom.answer] rid={rid} failed: {e}")
+        return _json_response({'error': str(e)}, 500, rid)
     # Resolve product cards for the retrieved/source ids for direct rendering on the frontend
-    vs = load_simple_index()
+    vs, _ = _get_vs_cached()
     source_ids = res.get('source_ids') or []
     cards: List[Dict[str, Any]] = []
     for sid in source_ids:
@@ -154,13 +254,17 @@ def answer():
         except Exception:
             continue
 
-    return jsonify({
+    elapsed = _now_ms() - t0
+    current_app.logger.info(
+        f"[recom.answer] rid={rid} hits={len(cards)} elapsed_ms={elapsed}")
+    return _json_response({
         'answer': res.get('answer'),
         'source_ids': source_ids,
         'products': cards,
         'raw': res.get('raw'),
-        'retrieved': res.get('_retrieved', [])
-    })
+        'retrieved': res.get('_retrieved', []),
+        'elapsed_ms': elapsed
+    }, req_id=rid)
 
 
 @recom_bp.route('/by_ids', methods=['POST'])
@@ -176,10 +280,31 @@ def products_by_ids():
     except Exception:
         return jsonify({"error": "invalid ids"}), 400
 
-    vs = load_simple_index()
+    rid = _req_id()
+    vs, _ = _get_vs_cached()
     out = []
     for pid in ids:
         p = vs.get_product_by_id(pid)
         if p:
             out.append(_to_product_card(p))
-    return jsonify({"results": out, "count": len(out)})
+    return _json_response({"results": out, "count": len(out)}, req_id=rid)
+
+
+@recom_bp.route('/reindex', methods=['POST'])
+def force_reindex():
+    """Force reload of the product index file into memory cache."""
+    rid = _req_id()
+    with _vector_lock:
+        global _vs_cache, _vs_cache_mtime
+        _vs_cache = load_simple_index()
+        try:
+            _vs_cache_mtime = os.path.getmtime(INDEX_PATH)
+        except Exception:
+            _vs_cache_mtime = None
+    stats = {}
+    try:
+        stats = _vs_cache.get_stats() if _vs_cache else {}
+    except Exception:
+        pass
+    current_app.logger.info(f"[recom.reindex] rid={rid} stats={stats}")
+    return _json_response({"status": "reloaded", "stats": stats}, req_id=rid)

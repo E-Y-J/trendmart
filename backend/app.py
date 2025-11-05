@@ -2,6 +2,7 @@ from flask import Flask, send_from_directory
 from extensions import db, ma, jwt, cors, init_stripe
 from config import Config
 from routes.catalog import categories_bp, products_bp
+from routes.bulk_add import bulk_bp
 from routes.auth import auth_bp
 from routes.registration import customer_bp
 from routes.customers import customers_bp
@@ -34,7 +35,7 @@ def create_app():
 
     # This line is to allow CORS for all domains
     cors.init_app(app, resources={
-        r"/api/*": {
+        r"/*": {
             "origins": "*",
             "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
             "allow_headers": ["Content-Type", "Authorization"]
@@ -63,6 +64,7 @@ def create_app():
     app.register_blueprint(products_bp)
     app.register_blueprint(swaggerui_blueprint)
     app.register_blueprint(recom_bp)
+    app.register_blueprint(bulk_bp)
 
     # Route to serve swagger.yaml file
     @app.route('/api/swagger')

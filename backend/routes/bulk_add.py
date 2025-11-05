@@ -1,12 +1,14 @@
 from flask import Blueprint, request, jsonify
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select
+import hashlib
 from extensions import db
 from schemas.bulk_add import BulkAddSchema
 from models.catalog import Category, Subcategory, Product
 from ai_recom_system.helpers.slugify import slugify
 
-bulk_bp = Blueprint("bulk", __name__, url_prefix="/api/bulk")
+bulk_bp = Blueprint("bulk", __name__, url_prefix="/bulk")
+SKU_MAX_LEN = 50
 
 
 def ensure_category(name: str) -> tuple[Category, bool]:
@@ -60,27 +62,46 @@ def _normalize_tags_csv(tags) -> str | None:
     return ",".join(items) if items else None
 
 
-def _pick_image(p: dict) -> str | None:
-    '''Pick the best available image URL from the product dict.
-    Preference order: image_url > image_thumb_url > primary_image
-    '''
-    return p.get("image_url") or p.get("image_thumb_url") or p.get("primary_image")
+def _pick_primary_image(p: dict) -> str | None:
+    """Pick the best available primary image URL from the product dict.
+    Preference order: image_url > primary_image
+    """
+    return p.get("image_url") or p.get("primary_image")
+
+
+def _trim_to_len(value: str, max_len: int) -> str:
+    return value[:max_len] if len(value) > max_len else value
 
 
 def _unique_sku(base: str) -> str:
+    """Return a unique SKU under the max length, trimming and suffixing as needed.
+
+    Strategy:
+    - slugify base
+    - try trimmed base (<= SKU_MAX_LEN)
+    - try numeric suffixes -1..-99, trimming base to make room
+    - fallback to a short hash suffix for determinism
     """
-    Return a unique SKU by checking and appending -1..-10 if needed.
-    Avoids IntegrityError/rollback by deciding before insert.
-    """
-    base = slugify(base)
-    if not db.session.execute(select(Product.id).filter_by(sku=base)).first():
-        return base
-    for i in range(1, 11):
-        candidate = f"{base}-{i}"
+    slug_base = slugify(base)
+    # Try plain base trimmed to max
+    base_trim = _trim_to_len(slug_base, SKU_MAX_LEN)
+    if not db.session.execute(select(Product.id).filter_by(sku=base_trim)).first():
+        return base_trim
+
+    # Try numeric suffixes
+    for i in range(1, 100):
+        sfx = str(i)
+        # Leave room for hyphen + suffix
+        head = _trim_to_len(slug_base, SKU_MAX_LEN - len(sfx) - 1)
+        candidate = f"{head}-{sfx}"
         if not db.session.execute(select(Product.id).filter_by(sku=candidate)).first():
             return candidate
-    # last resort - still deterministic but very unlikely to hit
-    return f"{base}-x"
+
+    # Deterministic short hash fallback
+    short = hashlib.md5(slug_base.encode("utf-8")).hexdigest()[:6]
+    head = _trim_to_len(slug_base, SKU_MAX_LEN - len(short) - 1)
+    candidate = f"{head}-{short}"
+    return _trim_to_len(candidate, SKU_MAX_LEN)
 
 
 def ensure_product(subcat: Subcategory, p: dict) -> tuple[Product, bool]:
@@ -104,7 +125,7 @@ def ensure_product(subcat: Subcategory, p: dict) -> tuple[Product, bool]:
         ).scalar_one_or_none()
 
     tags_csv = _normalize_tags_csv(p.get("tags"))
-    image = _pick_image(p)
+    primary_image = _pick_primary_image(p)
     price = float(p.get("price") or 0.0)
     desc = p.get("description") or ""
 
@@ -115,8 +136,13 @@ def ensure_product(subcat: Subcategory, p: dict) -> tuple[Product, bool]:
         product.price = price
         if tags_csv is not None:
             product.tags = tags_csv
-        if image:
-            product.product_img = image
+        # Update images/attribution if present
+        if primary_image:
+            product.image_url = primary_image
+        if p.get("image_thumb_url"):
+            product.image_thumb_url = p.get("image_thumb_url")
+        if p.get("image_attribution"):
+            product.image_attribution = p.get("image_attribution")
         if product.subcategory_id != subcat.id:
             product.subcategory_id = subcat.id
         return product, False
@@ -129,7 +155,9 @@ def ensure_product(subcat: Subcategory, p: dict) -> tuple[Product, bool]:
         name=name,
         description=desc,
         price=price,
-        product_img=image,
+        image_url=primary_image,
+        image_thumb_url=p.get("image_thumb_url"),
+        image_attribution=p.get("image_attribution"),
         tags=tags_csv,
         subcategory_id=subcat.id,
     )
