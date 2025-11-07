@@ -1,22 +1,21 @@
-import SearchbarHeader from "../sectionSearchbar/searchbarHeader";
+import { Row, Col } from 'react-bootstrap';
+import SearchbarRow from "../sectionSearchbar/SearchbarRow";
 
 function RecommendedProducts() {
   return (
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        gap: '0.5rem',
-        backgroundColor: '#d9d9d9',
-      }}
+    <Col
+      className="d-flex flex-column justify-content-start align-items-center m-0 p-0"
+      style={{ width: '100%', height: '100%', backgroundColor: '#d9d9d9' }}
     >
-    <SearchbarHeader searchId="recommendedSearch" placeholder="Recommended Products" sectionTitle="Recommended Products" />
-    <h2 style={{color: "white"}}>Recommended Products Section</h2>
-    </div>
+      <SearchbarRow
+        searchId="recommendedSearch"
+        placeholder="Search Recommended"
+        sectionTitle="Recommended Products"
+      />
+      <Row className='m-0 p-1'>
+        Recommended products go here
+      </Row>
+    </Col>
   );
 }
 

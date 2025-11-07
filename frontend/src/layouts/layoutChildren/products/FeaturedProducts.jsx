@@ -1,15 +1,19 @@
-import SearchbarHeader from "../sectionSearchbar/searchbarHeader";
+import { Row, Col, Container } from 'react-bootstrap';
+import SearchbarRow from "../sectionSearchbar/SearchbarRow";
 
 function FeaturedProducts() {
   return (
-    <div
-      style={{
-        width: '100%',
-        height: '100%,'
-      }}
-    >
-      <SearchbarHeader searchId="featuredSearch" placeholder="Featured Products" filterButton sectionTitle="Featured Products"/>
-    </div>
+    <Col className='w-100 p-0'>
+      <SearchbarRow
+        searchId="featuredSearch"
+        placeholder="Search Featured"
+        sectionTitle="Featured Products"
+        filterButton
+      />
+      <Row className='m-0 p-1'>
+        Featured products go here
+      </Row>
+    </Col>
   );
 }
 

@@ -1,85 +1,30 @@
-import LoginRegister from '../../../loginRegister/LoginRegister';
+import LoginRegister from '../popupLayoutChildren/loginRegister/LoginRegister';
 import logoUrl from '/logo.svg?url';
-import { useNavigate } from 'react-router-dom';
-
-
+import { Link, useNavigate } from 'react-router-dom';
+import { Navbar, Button, Image, Col } from 'react-bootstrap';
+import NavLink from 'react-bootstrap/NavLink'
 
 function NavBar() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  const LoginRegisterButton = () => {
-    return (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '80vh'
-        }}
-      >
-        <button
-          onClick={() => navigate("/login")}
-          style={{
-            padding: '0.5rem 1rem',
-            cursor: 'pointer'
-          }}
-        >
-          Login
-        </button>
-      </div>
-    )
-  }
+  const LoginRegisterButton = () => (
+    <Col className="d-flex w-100 justify-content-end">
+      <NavLink className="bg-white align-t w-25 h-100" onClick={() => navigate("/login")}>
+        Login
+      </NavLink>
+    </Col>
+  );
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        width: '100%',
-        height: '100%',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        backgroundColor: '#797975',
-      }}
-    >
-      {/* Left container */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-          height: '100%',
-          padding: '1%',
-        }}
-      >
-        <img
-          src={logoUrl}
-          alt="Logo"
-          style={{ height: '100%', objectFit: 'contain' }}
-        />
-        <h1
-        id="title"
-        style={{
-          color: '#0a1f44',
-          marginLeft: '1rem'
-        }}
-        >
-          TrendMart</h1>
-      </div>
-
-      {/* Right container */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'flex-end',
-          height: '100%',
-          paddingRight: '3rem', 
-        }}
-      >
+    <Navbar bg="secondary" expand="lg" className="h-100 w-100 m-0 p-0">
+      <div className="d-flex w-100 m-0 px-3 py-0 align-items-center">
+        <Col className="d-flex align-items-center">
+          <Image src={logoUrl} alt="Logo" style={{ height: '100%', maxHeight: '3rem', objectFit: 'contain' }} />
+          <h1 id="title" className="ms-3 text-dark mb-0">TrendMart</h1>
+        </Col>
         <LoginRegisterButton />
       </div>
-    </div>
+    </Navbar>
   );
 }
 

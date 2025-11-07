@@ -1,34 +1,23 @@
 function PopupLayout({ children }) {
   return (
-    <>
+    <div
+      className="position-absolute bottom-0 start-0 d-flex flex-column justify-content-center align-content-center m-0 p-0"
+      style={{
+        backgroundColor: '#00000080',
+        backdropFilter: 'blur(5px)',
+        width: '100vw',
+        height: '82vh',
+      }}
+    >
       <div
+        className="d-flex bg-light mx-auto"
         style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          backgroundColor: '#00000080',
-          backdropFilter: 'blur(5px)',
-          width: '100vw',
-          height: '82vh',
-          alignContent: 'center',
-          justifyContent: 'center',
-          display: 'flex',
-          flexDirection: 'column',
-          overflowY: 'auto',
+          width: 'fit-content',
         }}
       >
-        <div
-          style={{
-            backgroundColor: '#fffffb',
-            display: 'flex',
-            width: 'fit-content',
-            margin: 'auto',
-          }}
-        >
-          { children }
-        </div>
+        {children}
       </div>
-    </>
+    </div>
   );
 }
 
