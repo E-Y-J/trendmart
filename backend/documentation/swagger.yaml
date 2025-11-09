@@ -123,6 +123,124 @@ paths:
           schema:
             $ref: '#/definitions/ErrorResponse'
 
+  /events/view:
+    post:
+      tags:
+        - Events
+      summary: Record a product view event
+      description: Creates a ProductInteraction with event_type="view".
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ProductInteractionCreate'
+      responses:
+        201:
+          description: Created
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: ok
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    get:
+      tags:
+        - Events
+      summary: Convenience GET for testing view events
+      description: Same behavior as POST; accepts optional query/body JSON (testing only).
+      responses:
+        201:
+          description: Created
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: ok
+
+  /events/cart_add:
+    post:
+      tags:
+        - Events
+      summary: Record an add-to-cart event
+      description: Creates a ProductInteraction with event_type="add_to_cart".
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ProductInteractionCreate'
+      responses:
+        201:
+          description: Created
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: ok
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /events/purchase:
+    post:
+      tags:
+        - Events
+      summary: Record a purchase interaction event
+      description: Creates a ProductInteraction with event_type="purchase" (analytics logging).
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ProductInteractionCreate'
+      responses:
+        201:
+          description: Created
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: ok
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /recommendations/feedback:
+    post:
+      tags:
+        - Recommendations
+      summary: Submit recommendation feedback action
+      description: Logs explicit feedback on a recommended product (clicked, converted, ignored, dismissed, pinned).
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/RecommendationFeedbackCreate'
+      responses:
+        201:
+          description: Created
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: ok
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
   /recommendations/health:
     get:
       tags:
@@ -652,6 +770,45 @@ definitions:
           $ref: '#/definitions/ProductCard'
       count:
         type: integer
+  
+  # -----------------
+  # Events Schemas
+  # -----------------
+  ProductInteractionCreate:
+    type: object
+    required: [product_id]
+    properties:
+      user_id:
+        type: integer
+        description: Optional; if omitted and JWT is present, user_id is taken from token
+      product_id:
+        type: integer
+      source:
+        type: string
+        enum: [search, similar, related, answer, cold_start]
+      session_id:
+        type: integer
+      context_json:
+        type: string
+
+  RecommendationFeedbackCreate:
+    type: object
+    required: [product_id, source, action]
+    properties:
+      user_id:
+        type: integer
+        description: Optional; if omitted and JWT is present, user_id is taken from token
+      product_id:
+        type: integer
+      source:
+        type: string
+        enum: [search, similar, related, answer, cold_start]
+      action:
+        type: string
+        enum: [clicked, converted, ignored, dismissed, pinned]
+      score_delta:
+        type: number
+        format: float
       elapsed_ms:
         type: integer
   # Authentication Schemas
