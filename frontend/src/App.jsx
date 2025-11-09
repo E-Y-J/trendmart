@@ -13,6 +13,7 @@ function App() {
         <Routes>
           <Route path="/" element={ <MasterLayout popupChildren={<Outlet context={[popup, setPopup]} /> } setPopup={setPopup} /> } >
             <Route path="/login" element={ <LoginRegister /> } />
+            <Route path="/register" element={ <LoginRegister /> } />
           </Route>
         </Routes>
     </>

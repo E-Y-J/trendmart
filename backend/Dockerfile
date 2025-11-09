@@ -54,11 +54,11 @@ WORKDIR /app
 COPY --from=deps /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=deps /usr/local/bin /usr/local/bin
 
-# Copy app code
-COPY . .
-
 # Ensure appuser owns the application files and instance directory
 RUN mkdir -p /app/instance && chown -R appuser:appuser /app
+
+# Copy app code
+COPY . .
 
 # Switch to non-root user for safety
 USER appuser

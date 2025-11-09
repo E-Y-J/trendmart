@@ -1,58 +1,42 @@
-import React from 'react';
-import NavBar from '../layoutChildren/navbar/NavBar.jsx';
-import MasterGrid from './MasterGrid.jsx';
-import PopupLayout from './PopupLayout.jsx';
-import AlertSpace from '../layoutChildren/alert/AlertSpace.jsx';
+import Col from 'react-bootstrap/Col';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+
 import { useOutlet } from 'react-router-dom';
+
+import GlobalAlert from '../layoutChildren/alert/GlobalAlert.jsx';
+import MasterGrid from './MasterGrid.jsx';
+import NavBar from '../layoutChildren/navbar/NavBar.jsx';
+import PopupLayout from './PopupLayout.jsx';
 
 function MasterLayout({ popupChildren }) {
   const outletContent = useOutlet();
 
   return (
-    <div
-      id="superContainer"
-      style={{
-        width: '100%',
-        height: '100%',
-        backgroundColor: '#f3f3ea'
-      }}
-    >
-      <div
-        id="navbarContainer"
-        style={{
-          height: '10vh',
-          width: '100%',
-          flexDirection: 'row'
-        }}
-      >
+    <Container id="superContainer" fluid className="v-100 justify-content-center align-items-center" style={{ height: '100vh', backgroundColor: '#f3f3ea' }} >
+      <Row id="navbarContainer" className="" style={{ height: '10vh' }}>
         <NavBar />
-      </div>
-      <div
-        id="alertContainer"
-        style={{
-          height: '8vh',
-          width: '100%',
-          flexDirection: 'row',
-          padding: '.5rem'
-        }}
-      >
-        <AlertSpace alertMessage={ 'this in an alert' } variant='info' />
-      </div>
-      <div
-        id='mainContainer'
-        style={{
-          height: '82vh',
-          alignContent: 'center',
-          display: 'flex',
-          gap: '.5rem',
-          padding: '0 .5rem .5rem .5rem',
-        }}
-      >
-        { outletContent && <PopupLayout>{popupChildren}</PopupLayout> }
-          
-        <MasterGrid />
-      </div>
-    </div>
+      </Row>
+
+      <Container id="alert-mGrid-popupContainer" fluid className='h-100 m-0 px-2'>
+        <Row id="alertContainer" className="py-2" style={{ height: '8vh' }} >
+          <GlobalAlert />
+        </Row>
+
+        <Row id="mGrid-popupContainer" className="pb-2" style={{ height: '81vh' }}>
+          <Col className="w-100 h-100 m-0 p-0">
+            <MasterGrid />
+          </Col>
+
+          {outletContent && (
+              <PopupLayout>{ popupChildren }</PopupLayout>
+          )}
+
+        </Row>
+
+      </Container>
+
+    </Container>
   );
 }
 
