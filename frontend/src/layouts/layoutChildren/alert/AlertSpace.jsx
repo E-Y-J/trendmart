@@ -1,25 +1,20 @@
-function AlertSpace({ alertMessage, variant='success'|'error'|'info' }) {
+import Alert from "react-bootstrap/Alert";
 
-  const alertType = {
-    success: '#008800',
-    error: '#880000',
-    info: '#000088'
-  };
-
+function AlertSpace({ alertMessage, variant = "success" }) {
   return (
-    <div
-      id="alertSpace"
+    <Alert
+    key={variant}
+    variant={variant === "error" ? "danger" : variant}
+    className="h-100 m-0 p-0 w-100 justify-content-center align-items-center"
       style={{
-        flexGrow: 1,
-        height: '100%',
-        alignContent: 'center',
-        backgroundColor: `${alertType[variant] || '#00000000'}`,
-        textAlign: 'center',
-        color: 'wheat'
+        height: '6vh',
+        display: "flex",
+        color: "wheat",
       }}
+      dismissible
     >
-      { alertMessage }
-    </div>
+      {alertMessage}
+    </Alert>
   );
 }
 

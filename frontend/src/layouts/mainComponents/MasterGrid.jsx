@@ -1,75 +1,42 @@
 import ProductCategories from '../layoutChildren/products/ProductCategories';
 import FeaturedProducts from '../layoutChildren/products/FeaturedProducts';
 import RecommendedProducts from '../layoutChildren/products/RecommendedProducts';
-import SearchbarHeader from '../layoutChildren/sectionSearchbar/searchbarHeader';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col'
+import Container from 'react-bootstrap/Container';
 
 function MasterGrid() {
   return (
-    // 1. PRIMARY CONTAINER: Display Flex (Row) to hold two main columns side-by-side
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'row', // Horizontal arrangement (Category | Products)
-        flex: 1, // Allow the MasterGrid to fill the space in the MasterLayout
-        gap: '.5rem', // Added padding for overall spacing
-      }}
-    >
-      
-      {/* 2. CATEGORY COLUMN: Fixed width, occupies the left side */}
-      <div
-        id="category"
-        style={{
-          width: '15%', // Set a visible width (e.g., 20%)
-          display: 'flex',
-          justifyContent: 'flex-start', // Align categories to the top
-          flexDirection: 'column',
-          // Adjust min-width if categories are very long
-        }}
-      >
-        <ProductCategories categories={['Really long category', 'Short Category', 3, 4]} />
-      </div>
-
-      {/* 3. PRODUCTS COLUMN: Takes up the remaining width and uses FLEX DIRECTION COLUMN to stack the two rows */}
-      <div
-        id="products"
-        style={{
-          flex: 1, // Takes up the rest of the available space (80%)
-          display: 'flex',
-          flexDirection: 'column', // Vertical arrangement (Featured then Recommended)
-          gap: '.5rem', // Gap between Featured and Recommended sections
-          margin: 0,
-          padding: 0,
-        }}
-      >
-        
-        {/* 4. FEATURED PRODUCTS ROW (Header and Content) */}
-        <div
-          id="featuredContainer"
-          style={{
-            height: '60%', // Adjust height proportion as needed
-            display: 'flex',
-            flexDirection: 'column', // Now that this is the content, use column/row layout as needed
-            gap: '.5rem',
-            backgroundColor: '#717171'
-          }}
-        >
+    <Row className='w-100 h-100 d-flex flex-row m-0 p-0 gap-2'>
+      <Col id="leftCol" className="d-flex flex-column bg-black m-0 p-0 h-100" style={{ maxWidth: '20%' }}>
+        <ProductCategories categories={['Really long category', 'Short Cat...', 3, 4]} />
+      </Col>
+      <Col id="rightCol" className="bg-info d-flex flex-column h-100 w-100 gap-2" style={{ maxWidth: '80%' }}>
+        <Row id="featuredRow" className="d-flex flex-row" style={{ height: '55%' }} >
           <FeaturedProducts />
-        </div>
-
-        {/* 5. RECOMMENDED PRODUCTS ROW */}
-        <div
-          id="recommended"
-          style={{
-            height: '40%',
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
+        </Row>
+        <Row className="d-flex flex-row" style={{ height: '45%' }}>
           <RecommendedProducts />
-        </div>
-      </div>
-    </div>
+        </Row>
+      </Col>
+    </Row>
+
+
+    // <Row className="d-flex flex-flex-grow-1 gap-2 m-0 p-0 h-100">
+    //   <Col className="d-flex flex-column h-100 justify-content-start" style={{ width: '20%' }}>
+    //     <ProductCategories categories={['Really long category', 'Short Category', 3, 4]} />
+    //   </Col>
+
+    //   <Col className="d-flex flex-column gap-2 m-0 p-0">
+    //     <Row style={{ height: '60%' }} className="d-flex flex-column gap-2 bg-secondary">
+    //       <FeaturedProducts />
+    //     </Row>
+
+    //     <Row style={{ height: '40%' }} className="d-flex flex-column w-100">
+    //       <RecommendedProducts />
+    //     </Row>
+    //   </Col>
+    // </Row>
   );
 }
 

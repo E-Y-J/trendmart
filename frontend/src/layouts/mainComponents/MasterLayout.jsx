@@ -1,9 +1,7 @@
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
-
 import { useOutlet } from 'react-router-dom';
-
 import GlobalAlert from '../layoutChildren/alert/GlobalAlert.jsx';
 import MasterGrid from './MasterGrid.jsx';
 import NavBar from '../layoutChildren/navbar/NavBar.jsx';
