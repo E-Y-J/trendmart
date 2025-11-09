@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { loginUser, createUser } from "../../../../redux/auth/authSlice";
 import { setStatus, clearStatus } from "../../../../redux/status/statusSlice"
-import TextInput from "../../input/textInput";
+import TextInput from "../../input/TextInput";
 import CheckboxToggle from "../../input/CheckboxToggle";
 import PasswordRequirements from "./PasswordRequirements";
 
@@ -63,37 +63,20 @@ function LoginRegister() {
       dispatch(setStatus({ message: `Unmet password criteria: ${errors.join(", ")}.` }))
       return;
     }
-    
+    // take email and password from formData
     const authData = { email: formData.email, password: formData.password }
-      console.table(authData)
-    try {
-      // loginUser and createUser are async
-      const action = await dispatch(
-        toggleForm === "login"
-          ? loginUser(authData)
-          : createUser(authData)
-      ).unwrap();
-
-      if (action.type.endsWith("fulfilled")) {
-        dispatch(setStatus({
-          message: toggleForm === "login" ? "Login successful!" : "Registration successful!",
-          variant: "success",
-        }));
-        navigate("/");
+      if (toggleForm === 'login') {
+        const result = await dispatch(loginUser(authData)).unwrap();
+        console.log('Login successful:', result);
       } else {
-        dispatch(setStatus({
-          message: action.error?.message || (toggleForm === "login" ? "Login failed." : "Registration failed."),
-          variant: "error",
-        }));
+        const result = await dispatch(createUser(authData)).unwrap();
+        console.log('Registration successful:', result);
       }
-    } catch (err) {
-      dispatch(setStatus({ message: err.message, variant: "error" }));
-    }
-  };
+    };
+    
 
   return (
     <div
-      fluid
       style={{
         display: "flex",
         padding: ".5rem",
@@ -114,7 +97,7 @@ function LoginRegister() {
           <Col className="d-flex flex-column gap-1" style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
             <TextInput
               inputId="email"
-              label={toggleForm}
+              label={ toggleForm }
               title="Email"
               placeholder="Email"
               onChange={handleChange}
@@ -126,13 +109,14 @@ function LoginRegister() {
                 title="Verify Email"
                 placeholder="Re-enter email"
                 disabled={formData.email.length === 0}
-                onChange={handleChange}
+                onChange={ handleChange }
               />
             )}
 
             <TextInput
               inputId="password"
               title="Password"
+              label={ toggleForm }
               placeholder="Password"
               info={
                 toggleForm === "register"
@@ -140,10 +124,10 @@ function LoginRegister() {
                   : ""
               }
               password={passHidden}
-              onChange={handleChange}
+              onChange={ handleChange }
             >
               <Button
-                variant="link"
+                variant="danger"
                 onClick={() => setPassHidden(!passHidden)}
                 style={{
                   fontSize: ".6rem",
@@ -153,7 +137,9 @@ function LoginRegister() {
                   textDecoration: "none",
                 }}
               >
-                {passHidden ? "show password" : "hide password"}
+                {passHidden ? "show" : "hide"}
+                <br />
+                password
               </Button>
             </TextInput>
 

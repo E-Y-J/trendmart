@@ -9,7 +9,7 @@ function AlertSpace({ alertMessage, variant = "success" }) {
       style={{
         height: '6vh',
         display: "flex",
-        color: "wheat",
+        color: "#0a1f44",
       }}
       dismissible
     >
