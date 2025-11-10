@@ -5,8 +5,10 @@ import threading
 import os
 import time
 import uuid
+import numpy as np
 from typing import List, Dict, Any, Optional, Tuple
 from ai_recom_system.rag_service import answer_question, load_simple_index, INDEX_PATH
+from ai_recom_system.index_products import index_all_products
 
 # Blueprint placed here to prevent circular imports
 recom_bp = Blueprint('recommendation', __name__, url_prefix='/recommendations')
@@ -15,6 +17,10 @@ _vector_store = None  # Placeholder for vector store initialization
 _vector_lock = threading.Lock()
 _vs_cache = None  # type: Optional[object]
 _vs_cache_mtime = None  # type: Optional[float]
+
+# Simple in-memory job registry for async reindex tasks
+_reindex_jobs: Dict[str, Dict[str, Any]] = {}
+_reindex_jobs_lock = threading.Lock()
 
 
 def _init_vector_store():
@@ -310,3 +316,204 @@ def force_reindex():
         pass
     current_app.logger.info(f"[recom.reindex] rid={rid} stats={stats}")
     return _json_response({"status": "reloaded", "stats": stats}, req_id=rid)
+
+
+# ------------------------------
+# Related Products Endpoint
+# ------------------------------
+@recom_bp.route('/related', methods=['POST'])
+def related_products():
+    """Return products related to a set of seed product_ids.
+
+    Body: {"product_ids": [..], "top_k": 10, "exclude_ids": [..] }
+    Approach: average (centroid) of seed embeddings, then cosine similarity to all.
+    """
+    rid = _req_id()
+    t0 = _now_ms()
+    data = request.get_json() or {}
+    seed_ids = data.get('product_ids') or data.get('ids') or []
+    exclude_ids = set(data.get('exclude_ids') or [])
+    top_k = int(data.get('top_k', 10))
+    if not seed_ids:
+        return _json_response({'error': 'missing product_ids'}, 400, rid)
+
+    vs, stats = _get_vs_cached()
+    if not vs or not getattr(vs, 'products', None):
+        return _json_response({'results': [], 'count': 0, 'elapsed_ms': 0, 'warning': 'empty index'}, req_id=rid)
+
+    # Collect seed embeddings
+    seed_vecs = []
+    for sid in seed_ids:
+        if sid in vs.id_to_index:
+            idx = vs.id_to_index[sid]
+            try:
+                seed_vecs.append(np.array(vs.product_embeddings[idx]))
+            except Exception:
+                continue
+    if not seed_vecs:
+        return _json_response({'error': 'no seed embeddings found'}, 400, rid)
+
+    centroid = np.mean(seed_vecs, axis=0)
+    # Compute similarity vs all products
+    sims: List[Tuple[int, float]] = []
+    c_norm = np.linalg.norm(centroid)
+    if c_norm == 0:
+        return _json_response({'error': 'degenerate centroid'}, 500, rid)
+    for i, emb in enumerate(vs.product_embeddings):
+        pid = vs.products[i].get('id')
+        if pid in seed_ids or pid in exclude_ids:
+            continue
+        v = np.array(emb)
+        denom = (c_norm * (np.linalg.norm(v) or 1.0))
+        score = float(np.dot(centroid, v) / denom)
+        sims.append((i, score))
+    sims.sort(key=lambda x: x[1], reverse=True)
+    out_items = []
+    for i, score in sims[:top_k]:
+        out_items.append(_to_product_card(vs.products[i], score))
+    elapsed = _now_ms() - t0
+    current_app.logger.info(
+        f"[recom.related] rid={rid} seeds={len(seed_ids)} k={top_k} hits={len(out_items)} elapsed_ms={elapsed}")
+    return _json_response({'results': out_items, 'count': len(out_items), 'elapsed_ms': elapsed}, req_id=rid)
+
+
+# ------------------------------
+# Reranking Endpoint
+# ------------------------------
+@recom_bp.route('/rerank', methods=['POST'])
+def rerank_candidates():
+    """Rerank a provided candidate set against a natural language query.
+
+    Body: {"query": "text", "ids": [list], "top_k": optional}
+    Returns: products with semantic similarity score.
+    """
+    rid = _req_id()
+    t0 = _now_ms()
+    data = request.get_json() or {}
+    query = data.get('query') or data.get('q')
+    ids = data.get('ids') or []
+    top_k = int(data.get('top_k', len(ids) or 10))
+    if not query:
+        return _json_response({'error': 'missing query'}, 400, rid)
+    if not ids:
+        return _json_response({'error': 'missing ids'}, 400, rid)
+    vs, stats = _get_vs_cached()
+    if not vs:
+        return _json_response({'error': 'no index loaded'}, 500, rid)
+
+    # Embed query once
+    try:
+        # Reuse backend via a pseudo search to access embedding backend directly
+        backend = getattr(vs, 'backend', None)
+        if backend is None:
+            raise RuntimeError('embedding backend unavailable')
+        q_vec = np.array(backend.embed(query))
+    except Exception as e:
+        current_app.logger.exception(
+            f"[recom.rerank] rid={rid} embed failed: {e}")
+        return _json_response({'error': 'embedding failed'}, 500, rid)
+
+    q_norm = np.linalg.norm(q_vec) or 1.0
+    scored: List[Tuple[int, float]] = []
+    for pid in ids:
+        if pid not in vs.id_to_index:
+            continue
+        idx = vs.id_to_index[pid]
+        emb = np.array(vs.product_embeddings[idx])
+        denom = (q_norm * (np.linalg.norm(emb) or 1.0))
+        score = float(np.dot(q_vec, emb) / denom)
+        scored.append((pid, score))
+    scored.sort(key=lambda x: x[1], reverse=True)
+
+    out_items = []
+    for pid, score in scored[:top_k]:
+        prod = vs.get_product_by_id(pid)
+        if prod:
+            out_items.append(_to_product_card(prod, score))
+    elapsed = _now_ms() - t0
+    current_app.logger.info(
+        f"[recom.rerank] rid={rid} q='{query}' candidates={len(ids)} returned={len(out_items)} elapsed_ms={elapsed}")
+    return _json_response({'results': out_items, 'count': len(out_items), 'elapsed_ms': elapsed}, req_id=rid)
+
+
+# ------------------------------
+# Async Index Rebuild
+# ------------------------------
+def _spawn_reindex_job():
+    job_id = uuid.uuid4().hex[:16]
+    with _reindex_jobs_lock:
+        _reindex_jobs[job_id] = {
+            'id': job_id,
+            'status': 'pending',
+            'started_at': None,
+            'finished_at': None,
+            'error': None,
+            'stats': None,
+        }
+
+    def _worker(app):
+        with app.app_context():
+            with _reindex_jobs_lock:
+                _reindex_jobs[job_id]['status'] = 'running'
+                _reindex_jobs[job_id]['started_at'] = _now_ms()
+            try:
+                # Build a fresh index file from DB
+                index_all_products()
+                # Reload in-process cache
+                with _vector_lock:
+                    global _vs_cache, _vs_cache_mtime
+                    _vs_cache = load_simple_index()
+                    try:
+                        _vs_cache_mtime = os.path.getmtime(INDEX_PATH)
+                    except Exception:
+                        _vs_cache_mtime = None
+                stats = {}
+                try:
+                    stats = _vs_cache.get_stats() if _vs_cache else {}
+                except Exception:
+                    pass
+                with _reindex_jobs_lock:
+                    _reindex_jobs[job_id]['status'] = 'done'
+                    _reindex_jobs[job_id]['finished_at'] = _now_ms()
+                    _reindex_jobs[job_id]['stats'] = stats
+                current_app.logger.info(
+                    f"[recom.reindex.async] job={job_id} done stats={stats}")
+            except Exception as e:
+                current_app.logger.exception(
+                    f"[recom.reindex.async] job={job_id} failed: {e}")
+                with _reindex_jobs_lock:
+                    _reindex_jobs[job_id]['status'] = 'error'
+                    _reindex_jobs[job_id]['finished_at'] = _now_ms()
+                    _reindex_jobs[job_id]['error'] = str(e)
+
+    th = threading.Thread(target=_worker, args=(
+        current_app._get_current_object(),), daemon=True)
+    th.start()
+    return job_id
+
+
+@recom_bp.route('/reindex/async', methods=['POST'])
+def async_reindex():
+    rid = _req_id()
+    job_id = _spawn_reindex_job()
+    return _json_response({'job_id': job_id, 'status': 'queued'}, 202, rid)
+
+
+@recom_bp.route('/reindex/status/<job_id>', methods=['GET'])
+def reindex_status(job_id: str):
+    rid = _req_id()
+    with _reindex_jobs_lock:
+        job = _reindex_jobs.get(job_id)
+    if not job:
+        return _json_response({'error': 'job not found'}, 404, rid)
+    return _json_response({'job': job}, req_id=rid)
+
+
+@recom_bp.route('/reindex/jobs', methods=['GET'])
+def list_reindex_jobs():
+    rid = _req_id()
+    with _reindex_jobs_lock:
+        jobs = list(_reindex_jobs.values())
+    # Return most recent first
+    jobs.sort(key=lambda j: (j.get('started_at') or 0), reverse=True)
+    return _json_response({'jobs': jobs[:50], 'count': len(jobs)}, req_id=rid)

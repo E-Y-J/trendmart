@@ -215,6 +215,150 @@ paths:
           schema:
             $ref: '#/definitions/ErrorResponse'
 
+  /recommendations/related:
+    post:
+      tags:
+        - Recommendations
+      summary: Related products from seed IDs
+      description: |
+        Computes a centroid embedding of provided seed product_ids and returns the most similar other products.
+        Body: {"product_ids": [1,2], "top_k": 10, "exclude_ids": [3] }
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              product_ids:
+                type: array
+                items:
+                  type: integer
+              top_k:
+                type: integer
+              exclude_ids:
+                type: array
+                items:
+                  type: integer
+      responses:
+        200:
+          description: Related products
+          schema:
+            type: object
+            properties:
+              results:
+                type: array
+                items:
+                  $ref: '#/definitions/ProductCard'
+              count:
+                type: integer
+              elapsed_ms:
+                type: integer
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /recommendations/rerank:
+    post:
+      tags:
+        - Recommendations
+      summary: Rerank candidate products by query relevance
+      description: |
+        Body: {"query": "text", "ids": [1,2,3], "top_k": 3}
+        Returns the subset ordered by semantic similarity with score.
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              query:
+                type: string
+              ids:
+                type: array
+                items:
+                  type: integer
+              top_k:
+                type: integer
+      responses:
+        200:
+          description: Reranked products
+          schema:
+            type: object
+            properties:
+              results:
+                type: array
+                items:
+                  $ref: '#/definitions/ProductCard'
+              count:
+                type: integer
+              elapsed_ms:
+                type: integer
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /recommendations/reindex/async:
+    post:
+      tags:
+        - Recommendations
+      summary: Start async index rebuild
+      description: Spawns a background job to rebuild the product embedding index and refresh cache.
+      responses:
+        202:
+          description: Job queued
+          schema:
+            type: object
+            properties:
+              job_id:
+                type: string
+              status:
+                type: string
+
+  /recommendations/reindex/status/{job_id}:
+    get:
+      tags:
+        - Recommendations
+      summary: Get reindex job status
+      parameters:
+        - in: path
+          name: job_id
+          required: true
+          type: string
+      responses:
+        200:
+          description: Job status
+          schema:
+            type: object
+            properties:
+              job:
+                type: object
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /recommendations/reindex/jobs:
+    get:
+      tags:
+        - Recommendations
+      summary: List recent reindex jobs
+      responses:
+        200:
+          description: Jobs list
+          schema:
+            type: object
+            properties:
+              jobs:
+                type: array
+                items:
+                  type: object
+              count:
+                type: integer
+
   /recommendations/feedback:
     post:
       tags:
