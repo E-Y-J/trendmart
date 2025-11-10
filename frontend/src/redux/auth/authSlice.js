@@ -32,7 +32,7 @@ export const loginUser = createAsyncThunk(
   'auth/login',
   async ({ email, password }, { rejectWithValue, dispatch }) => {
     try {
-      const response = await api.post('/login', { email, password });
+      const response = await api.post('auth/login', { email, password });
       dispatch(setStatus({ message: 'Login successful!', variant: 'success' }));
       return response.data;
     } catch (error) {
@@ -83,7 +83,7 @@ export const logoutUser = createAsyncThunk(
 const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {},
+  reducers: {  },
   extraReducers: (builder) => {
     builder
       // Login reducers

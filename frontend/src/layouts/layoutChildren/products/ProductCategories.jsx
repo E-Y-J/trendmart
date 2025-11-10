@@ -6,9 +6,9 @@ function ProductCategories({ categories }) {
   return (
     <Container fluid className='p-0 m-0' style={{ height: '100%' }}>
       <Stack direction='vertical' className='gap-2'>
-        <SearchbarRow searchId="subcategorySearch" placeholder="Category" />
+        <SearchbarRow searchId="subcategorySearch" placeholder="Category" sm={ 12 }/>
         {categories.map((category, index) => (
-          <h3 key={index} className="bg-white" style={{ margin: 0 }}>{category}</h3>
+          <h3 key={ index } className="bg-white" style={{ margin: 0 }}>{ category }</h3>
         ))}
       </Stack>
     </Container>

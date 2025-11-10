@@ -11,6 +11,7 @@ function RecommendedProducts() {
         searchId="recommendedSearch"
         placeholder="Search Recommended"
         sectionTitle="Recommended Products"
+        sm={ 6 }
       />
       <Row className='m-0 p-1'>
         Recommended products go here

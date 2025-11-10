@@ -1,7 +1,8 @@
+import { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
-import { useOutlet } from 'react-router-dom';
 import GlobalAlert from '../layoutChildren/alert/GlobalAlert.jsx';
 import MasterGrid from './MasterGrid.jsx';
 import NavBar from '../layoutChildren/navbar/NavBar.jsx';
@@ -12,7 +13,7 @@ function MasterLayout({ popupChildren }) {
 
   return (
     <Container id="superContainer" fluid className="v-100 justify-content-center align-items-center" style={{ height: '100vh', backgroundColor: '#f3f3ea' }} >
-      <Row id="navbarContainer" className="" style={{ height: '10vh' }}>
+      <Row id="navbarContainer" style={{ height: '10vh', minWidth: '100%' }}>
         <NavBar />
       </Row>
 

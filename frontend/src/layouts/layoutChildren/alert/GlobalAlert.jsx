@@ -5,7 +5,7 @@ function GlobalAlert() {
   const { message, variant } = useSelector((state) => state.status);
   if (!message) return null;
 
-  return <AlertSpace alertMessage={message} variant={variant} />;
+  return <AlertSpace alertMessage={ message } variant={ variant } />;
 }
 
 export default GlobalAlert;

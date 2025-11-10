@@ -16,12 +16,13 @@ function PasswordRequirements({ password }) {
 
         return (
           <ListGroup.Item
-            className="d-flex align-items-center p-0"
-            key={index}
+            className="d-flex align-items-center p-0 "
+            key={ index }
             style={{
               border: "none",
               backgroundColor: 'inherit',
               color: passed ? "green" : "red",
+              fontSize: '.8rem',
             }}
           >
             {( passed ? "✅" : "❌") + req.text }

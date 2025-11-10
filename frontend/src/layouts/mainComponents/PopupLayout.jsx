@@ -1,7 +1,7 @@
 function PopupLayout({ children }) {
   return (
     <div
-      className="position-absolute bottom-0 start-0 d-flex flex-column justify-content-center align-content-center m-0 p-0"
+      className="position-absolute bottom-0 start-0 d-flex flex-column justify-content-start align-content-center m-0 p-0"
       style={{
         backgroundColor: '#00000080',
         backdropFilter: 'blur(5px)',
@@ -9,13 +9,14 @@ function PopupLayout({ children }) {
         height: '82vh',
       }}
     >
+      <div className="h-25" />
       <div
         className="d-flex bg-light mx-auto"
         style={{
           width: 'fit-content',
         }}
       >
-        {children}
+        { children }
       </div>
     </div>
   );
