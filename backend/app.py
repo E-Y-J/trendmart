@@ -1,11 +1,11 @@
-from flask import Flask, send_from_directory, jsonify
+from flask import Flask, send_from_directory, jsonify, redirect
 from extensions import db, ma, jwt, cors, init_stripe
 from config import Config
 from routes.catalog import categories_bp, products_bp
 from routes.bulk_add import bulk_bp
 from routes.bulk_users import bulk_users_bp
 from routes.auth import auth_bp
-from routes.registration import customer_bp
+from routes.admin import admin_bp
 from routes.customers import customers_bp
 from routes.recommendation import recom_bp
 from routes.events import events_bp, recom_feedback_bp
@@ -15,8 +15,9 @@ from models.catalog import Category, Subcategory, Product
 from flask_swagger_ui import get_swaggerui_blueprint
 import os
 
+# Swagger UI configuration
 SWAGGER_URL = "/api/docs"
-API_URL = "/api/swagger"  # URL to serve our swagger file
+API_URL = "/api/swagger"  # Served via send_from_directory below
 
 # Create swaggerui blueprint
 swaggerui_blueprint = get_swaggerui_blueprint(
@@ -74,8 +75,8 @@ def create_app():
             print(f"Database initialization error: {e}")
 
     # Register blueprints
+    app.register_blueprint(admin_bp)
     app.register_blueprint(auth_bp)
-    app.register_blueprint(customer_bp)
     app.register_blueprint(customers_bp)
     app.register_blueprint(categories_bp)
     app.register_blueprint(products_bp)
@@ -86,14 +87,15 @@ def create_app():
     app.register_blueprint(bulk_bp)
     app.register_blueprint(bulk_users_bp)
 
-    # Route to serve swagger.yaml file
+    # Serve the raw swagger.yaml
     @app.route("/api/swagger")
     def swagger_spec():
         return send_from_directory("documentation", "swagger.yaml")
 
+    # Root redirect to docs
     @app.route("/")
     def home():
-        return "Welcome to the Trendmart API"
+        return redirect('/api/docs')
 
     # JSON error handlers for consistent API responses
     @app.errorhandler(400)
