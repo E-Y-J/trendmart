@@ -1,20 +1,25 @@
 import { useState, useEffect } from "react";
-import { Form, Button, Row, Col } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import Button from "react-bootstrap/Button";
+import Col from "react-bootstrap/Col";
+import Form from "react-bootstrap/Form";
+import Row from "react-bootstrap/Row";
 import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { useOutletContext } from "react-router-dom";
 import { loginUser, createUser } from "../../../../redux/auth/authSlice";
 import { setStatus, clearStatus } from "../../../../redux/status/statusSlice"
 import TextInput from "../../input/TextInput";
 import CheckboxToggle from "../../input/CheckboxToggle";
 import PasswordRequirements from "./PasswordRequirements";
+import PopupCloseButton from "../../input/CloseButton";
 
 function LoginRegister() {
   const [formData, setFormData] = useState({ email: "", password: "", verification: "" });
   const [toggleForm, setToggleForm] = useState("login");
   const [passHidden, setPassHidden] = useState(true);
-  const navigate = useNavigate()
   const dispatch = useDispatch()
-
+  const navigate = useNavigate()
+  const [, setPopup] = useOutletContext()
 
   const handleChange = (event) => {
     const { id, value } = event.target;
@@ -25,7 +30,11 @@ function LoginRegister() {
   };
 
   useEffect(() => {
-    navigate(`/${ toggleForm }`)
+    if (toggleForm === 'login' || toggleForm === 'register') {
+      navigate(`/${ toggleForm }`)
+    } else {
+      setToggleForm(null)
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toggleForm])
 
@@ -33,7 +42,7 @@ function LoginRegister() {
     setToggleForm(toggleForm === "login" ? 'register' : "login");
   };
 
-  const validEmail = () => /.*@.*\.(.*){2,4}/.test(formData.email);
+  const validEmail = () => /.+@.+[.](.+){2,4}/.test(formData.email);
 
   const validatePassword = () => {
     const pass = formData.password;
@@ -43,7 +52,7 @@ function LoginRegister() {
     if (!/[a-z]/.test(pass)) errors.push("One lowercase letter");
     if (!/[A-Z]/.test(pass)) errors.push("One uppercase letter");
     if (!/\d/.test(pass)) errors.push("One number");
-    if (!/[!@#$%^&*(),.?":{}|<>]/.test(pass)) errors.push("One special character");
+    if (!/[!@#$%^&*(),.?":{  }|<>]/.test(pass)) errors.push("One special character");
     return errors;
   };
 
@@ -64,7 +73,7 @@ function LoginRegister() {
       return;
     }
     // take email and password from formData
-    const authData = { email: formData.email, password: formData.password }
+    const authData = { email: formData.email.toLowerCase(), password: formData.password }
       if (toggleForm === 'login') {
         const result = await dispatch(loginUser(authData)).unwrap();
         console.log('Login successful:', result);
@@ -76,20 +85,12 @@ function LoginRegister() {
     
 
   return (
-    <div
-      style={{
-        display: "flex",
-        padding: ".5rem",
-        gap: "1rem",
-        justifyContent: "space-between",
-        alignItems: "center",
-        flexDirection: "column",
-      }}
-    >
-      <CheckboxToggle onClick={handleChecked} checked={toggleForm === "register"} />
+    <Col className="d-flex flex-column position-relative gap-1 justify-content-between align-items-center p-2" >
+      <PopupCloseButton onClick={ () => setPopup(null) } />
+      <CheckboxToggle onClick={ handleChecked } checked={toggleForm === "register"} />
 
       <Form
-        id={`${toggleForm}Form`}
+        id={ `${toggleForm}Form` }
         className="h-100 w-100 d-flex flex-column gap-1 justify-content-center align-items-center my-auto"
         onSubmit={ handleSubmit }
       >
@@ -100,7 +101,7 @@ function LoginRegister() {
               label={ toggleForm }
               title="Email"
               placeholder="Email"
-              onChange={handleChange}
+              onChange={ handleChange }
             />
 
             {toggleForm === "register" && (
@@ -123,7 +124,7 @@ function LoginRegister() {
                   ? ''
                   : ""
               }
-              password={passHidden}
+              password={ passHidden }
               onChange={ handleChange }
             >
               <Button
@@ -165,7 +166,7 @@ function LoginRegister() {
           </Col>
         </Row>
       </Form>
-    </div>
+    </Col>
   );
 }
 
