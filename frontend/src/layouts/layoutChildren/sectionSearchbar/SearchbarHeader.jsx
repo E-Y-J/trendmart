@@ -1,6 +1,20 @@
 import filterIcon from '/filterIcon.svg?url'
+import { useState, useCallback } from 'react'
 
-function SearchbarHeader({ searchId, placeholder, filterButton=false, sectionTitle=null }) {
+// Extended to support onSearch callback and debounced input for semantic recommendations.
+function SearchbarHeader({ searchId, placeholder, filterButton = false, sectionTitle = null, onSearch = null, debounceMs = 350 }) {
+  const [value, setValue] = useState('');
+  const [timer, setTimer] = useState(null);
+
+  const handleChange = useCallback((e) => {
+    const next = e.target.value;
+    setValue(next);
+    if (onSearch) {
+      if (timer) clearTimeout(timer);
+      const t = setTimeout(() => onSearch(next), debounceMs);
+      setTimer(t);
+    }
+  }, [onSearch, debounceMs, timer]);
   return (
     <div
       id='featuredHeader'
@@ -24,19 +38,21 @@ function SearchbarHeader({ searchId, placeholder, filterButton=false, sectionTit
         }}
       >
         <input
-          id={ searchId }
+          id={searchId}
           type='text'
-          placeholder={ placeholder }
+          placeholder={placeholder}
+          value={value}
+          onChange={handleChange}
           style={{
             height: '100%',
             width: '100%',
             boxSizing: 'border-box',
           }}
         />
-        
-        { filterButton && <input alt="filter" type="image" src={ filterIcon } style={{ height: '100%', width: 'auto' }} /> }
+
+        {filterButton && <input alt="filter" type="image" src={filterIcon} style={{ height: '100%', width: 'auto' }} />}
       </div>
-      
+
       {/* Title */}
       <div
         style={{
@@ -46,7 +62,7 @@ function SearchbarHeader({ searchId, placeholder, filterButton=false, sectionTit
           justifyContent: 'flex-end',
         }}
       >
-        { sectionTitle && <h1 style={{ margin: 0, fontSize: '1.5rem' }}>{ sectionTitle }</h1> }
+        {sectionTitle && <h1 style={{ margin: 0, fontSize: '1.5rem' }}>{sectionTitle}</h1>}
       </div>
     </div>
   )

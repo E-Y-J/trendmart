@@ -1,7 +1,7 @@
 import ProductCategories from '../layoutChildren/products/ProductCategories';
 import FeaturedProducts from '../layoutChildren/products/FeaturedProducts';
 import RecommendedProducts from '../layoutChildren/products/RecommendedProducts';
-import SearchbarHeader from '../layoutChildren/sectionSearchbar/searchbarHeader';
+import SearchbarHeader from '../layoutChildren/sectionSearchbar/SearchbarHeader';
 
 function MasterGrid() {
   return (
@@ -14,7 +14,7 @@ function MasterGrid() {
         gap: '.5rem', // Added padding for overall spacing
       }}
     >
-      
+
       {/* 2. CATEGORY COLUMN: Fixed width, occupies the left side */}
       <div
         id="category"
@@ -41,7 +41,7 @@ function MasterGrid() {
           padding: 0,
         }}
       >
-        
+
         {/* 4. FEATURED PRODUCTS ROW (Header and Content) */}
         <div
           id="featuredContainer"
@@ -53,6 +53,8 @@ function MasterGrid() {
             backgroundColor: '#717171'
           }}
         >
+          {/* Pass search header above featured products for future semantic search integration */}
+          <SearchbarHeader searchId="featuredSearch" placeholder="Search products..." sectionTitle="Featured" />
           <FeaturedProducts />
         </div>
 
@@ -66,6 +68,7 @@ function MasterGrid() {
             flexDirection: 'column',
           }}
         >
+          <SearchbarHeader searchId="recommendedSearch" placeholder="Refine recommendations..." sectionTitle="Recommended" />
           <RecommendedProducts />
         </div>
       </div>

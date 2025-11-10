@@ -1,4 +1,4 @@
-import SearchbarHeader from "../sectionSearchbar/searchbarHeader";
+import SearchbarHeader from "../sectionSearchbar/SearchbarHeader";
 
 function FeaturedProducts() {
   return (
@@ -8,7 +8,7 @@ function FeaturedProducts() {
         height: '100%,'
       }}
     >
-      <SearchbarHeader searchId="featuredSearch" placeholder="Featured Products" filterButton sectionTitle="Featured Products"/>
+      <SearchbarHeader searchId="featuredSearch" placeholder="Featured Products" filterButton sectionTitle="Featured Products" />
     </div>
   );
 }
