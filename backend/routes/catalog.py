@@ -1,9 +1,14 @@
 from flask import request, jsonify
-from schemas.catalog import ProductSchema, InventorySchema, ReviewSchema
+from schemas.catalog import (
+    ProductSchema,
+    InventorySchema,
+    ReviewSchema,
+    CategorySchema,
+    SubcategorySchema,
+)
 from extensions import db
 from flask import Blueprint
-from models.catalog import Product, Inventory, Review
-from models.catalog import Product, Inventory, Review, Subcategory
+from models.catalog import Category, Subcategory, Product, Inventory, Review
 from werkzeug.security import generate_password_hash
 from sqlalchemy import select, delete
 from marshmallow import ValidationError
@@ -85,7 +90,16 @@ def delete_product(product_id):
 
 
 # Category Routes
+# List all categories
+@categories_bp.route('', methods=['GET'])
+def list_categories():
+    categories = Category.query.all()
+    schema = CategorySchema(many=True)
+    return jsonify(schema.dump(categories)), 200
+
 # Get products by category
+
+
 @categories_bp.route('/<int:category_id>/products', methods=['GET'])
 def get_products_by_category(category_id):
     """Return products that belong to the given category via Subcategory relation.
@@ -101,6 +115,15 @@ def get_products_by_category(category_id):
     )
     product_schema = ProductSchema(many=True)
     return jsonify(product_schema.dump(products)), 200
+
+# List subcategories for a given category
+
+
+@categories_bp.route('/<int:category_id>/subcategories', methods=['GET'])
+def list_subcategories(category_id):
+    subs = Subcategory.query.filter_by(category_id=category_id).all()
+    schema = SubcategorySchema(many=True)
+    return jsonify(schema.dump(subs)), 200
 
 
 # Inventory Routes

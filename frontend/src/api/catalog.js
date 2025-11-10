@@ -34,9 +34,19 @@ export async function deleteProduct(productId) {
 
 // -------- Categories --------
 
+export async function listCategories(params = {}) {
+    const { data } = await api.get("/categories", { params });
+    return data; // Array of categories
+}
+
 export async function getProductsByCategory(categoryId, params = {}) {
     const { data } = await api.get(`/categories/${categoryId}/products`, { params });
     return data; // Array of products
+}
+
+export async function listSubcategories(categoryId, params = {}) {
+    const { data } = await api.get(`/categories/${categoryId}/subcategories`, { params });
+    return data; // Array of subcategories for the category
 }
 
 // -------- Inventory --------
