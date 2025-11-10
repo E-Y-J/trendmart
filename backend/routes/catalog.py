@@ -37,6 +37,17 @@ def get_products():
     product_schema = ProductSchema(many=True)
     return jsonify(product_schema.dump(products)), 200
 
+# Get a single product by id
+
+
+@products_bp.route('/<int:product_id>', methods=['GET'])
+def get_product(product_id):
+    product = Product.query.get(product_id)
+    if not product:
+        return jsonify({"message": "Product not found"}), 404
+    product_schema = ProductSchema()
+    return jsonify(product_schema.dump(product)), 200
+
 # Update a product
 
 
