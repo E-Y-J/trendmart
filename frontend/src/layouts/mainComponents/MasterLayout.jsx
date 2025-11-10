@@ -3,7 +3,7 @@ import NavBar from '../layoutChildren/navbar/NavBar.jsx';
 import MasterGrid from './MasterGrid.jsx';
 import PopupLayout from './PopupLayout.jsx';
 import AlertSpace from '../layoutChildren/alert/AlertSpace.jsx';
-import { Outlet, useOutlet } from 'react-router-dom';
+import { useOutlet } from 'react-router-dom';
 
 function MasterLayout({ popupChildren }) {
   const outletContent = useOutlet();

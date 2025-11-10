@@ -1,3 +1,5 @@
+import SearchbarHeader from "../sectionSearchbar/searchbarHeader";
+
 function ProductCategories({ categories }) {
   return (
     <div
@@ -13,6 +15,7 @@ function ProductCategories({ categories }) {
         backgroundColor: '#6c757d',
       }}
     >
+      <SearchbarHeader searchId="subcategorySearch" placeholder="Category"/>
       {categories.map((category, index) => (
         <div
           key={index}
@@ -22,8 +25,7 @@ function ProductCategories({ categories }) {
             alignItems: 'center',
             color: 'white',
             padding: '0.5rem', 
-            margin: '0.25rem', 
-                        width: '75%',
+            margin: '0.25rem',
             textAlign: 'center',
             fontWeight: 500,
             cursor: 'pointer',

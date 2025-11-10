@@ -17,7 +17,14 @@ function PopupLayout({ children }) {
           overflowY: 'auto',
         }}
       >
-        <div style={{backgroundColor: '#fffffb', display: 'flex', width: 'fit-content', margin: 'auto' }} >
+        <div
+          style={{
+            backgroundColor: '#f3f3ea',
+            display: 'flex',
+            width: 'fit-content',
+            margin: 'auto',
+          }}
+        >
           { children }
         </div>
       </div>

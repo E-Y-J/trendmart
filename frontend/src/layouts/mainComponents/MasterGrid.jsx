@@ -1,6 +1,7 @@
 import ProductCategories from '../layoutChildren/products/ProductCategories';
 import FeaturedProducts from '../layoutChildren/products/FeaturedProducts';
 import RecommendedProducts from '../layoutChildren/products/RecommendedProducts';
+import SearchbarHeader from '../layoutChildren/sectionSearchbar/searchbarHeader';
 
 function MasterGrid() {
   return (
@@ -25,27 +26,6 @@ function MasterGrid() {
           // Adjust min-width if categories are very long
         }}
       >
-        {/* Header Row (Search and Title) - This itself should be a row */}
-          <div
-            id='featuredHeader'
-            style={{
-              height: '6%',
-              display: 'flex',
-              flexDirection: 'row', // Display search and title side-by-side
-              alignItems: 'center',
-              padding: '.5rem',
-              backgroundColor: '#9f9f9f',
-            }}
-          >
-            {/* Search Input Group */}
-            <div style={{ marginLeft: '1%', display: 'flex', alignItems: 'center', gap: '.5rem' }}>
-              <input
-                id='categorySearch'
-                type='text'
-                placeholder='Search Subcategory'
-              />
-            </div>
-          </div>
         <ProductCategories categories={['Really long category', 'Short Category', 3, 4]} />
       </div>
 
@@ -73,42 +53,7 @@ function MasterGrid() {
             backgroundColor: '#717171'
           }}
         >
-          {/* Header Row (Search and Title) - This itself should be a row */}
-          <div
-            id='featuredHeader'
-            style={{
-              height: '10%',
-              display: 'flex',
-              flexDirection: 'row', // Display search and title side-by-side
-              alignItems: 'center',
-              padding: '.5rem',
-              backgroundColor: '#9f9f9f',
-            }}
-          >
-            {/* Search Input Group */}
-            <div style={{ marginLeft: '1%', display: 'flex', alignItems: 'center', gap: '.5rem' }}>
-              <input
-                id='featureSearch'
-                type='text'
-                placeholder='Search Featured Products'
-              />
-            </div>
-            
-            {/* Title */}
-            <div
-              style={{
-                flex: 1, // Pushes the title to the right
-                color: 'white',
-                display: 'flex',
-                justifyContent: 'flex-end', // Aligns title to the right
-                paddingRight: '1rem',
-                
-              }}
-            >
-              <h1 style={{ margin: 0, fontSize: '1.5rem' }}>Current Category Title</h1>
-            </div>
-          </div>
-            <FeaturedProducts />
+          <FeaturedProducts />
         </div>
 
         {/* 5. RECOMMENDED PRODUCTS ROW */}
@@ -121,41 +66,6 @@ function MasterGrid() {
             flexDirection: 'column',
           }}
         >
-          {/* Header Row (Search and Title) - This itself should be a row */}
-          <div
-            id='featuredHeader'
-            style={{
-              height: '15%',
-              display: 'flex',
-              flexDirection: 'row', // Display search and title side-by-side
-              alignItems: 'center',
-              padding: '.5rem',
-              backgroundColor: '#9f9f9f',
-            }}
-          >
-            {/* Search Input Group */}
-            <div style={{ marginLeft: '1%', display: 'flex', alignItems: 'center', gap: '.5rem' }}>
-              <input
-                id='recommendedSearch'
-                type='text'
-                placeholder='Search Recommended Products'
-              />
-            </div>
-            
-            {/* Title */}
-            <div
-              style={{
-                flex: 1, // Pushes the title to the right
-                color: 'white',
-                display: 'flex',
-                justifyContent: 'flex-end', // Aligns title to the right
-                paddingRight: '1rem',
-                
-              }}
-            >
-              <h1 style={{ margin: 0, fontSize: '1.5rem' }}>Highest Scoring Recommendations</h1>
-            </div>
-          </div>
           <RecommendedProducts />
         </div>
       </div>

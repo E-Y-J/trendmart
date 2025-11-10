@@ -12,14 +12,16 @@ import os
 
 SWAGGER_URL = '/api/docs'
 API_URL = '/static/swagger.yaml'  # URL to serve our swagger file from static folder
+SWAGGER_URL = "/api/docs"
+API_URL = "/api/swagger"  # URL to serve our swagger file
 
 # Create swaggerui blueprint
 swaggerui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_URL,
     config={
-        'app_name': "Trendmart API Documentation",
-    }
+        "app_name": "Trendmart API Documentation",
+    },
 )
 
 
@@ -64,6 +66,12 @@ def create_app():
     app.register_blueprint(recom_bp)
 
     @app.route('/')
+    # Route to serve swagger.yaml file
+    @app.route("/api/swagger")
+    def swagger_spec():
+        return send_from_directory("documentation", "swagger.yaml")
+
+    @app.route("/")
     def home():
         return redirect('/api/docs')
         # return "Welcome to the Trendmart API"
@@ -71,7 +79,7 @@ def create_app():
     return app
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # For local development only (not used in Docker)
     app = create_app()
     app.run(debug=True)

@@ -1,7 +1,14 @@
+import SearchbarHeader from "../sectionSearchbar/searchbarHeader";
+
 function FeaturedProducts() {
   return (
-    <div>
-      <h2 style={{ color: 'white'  }}>Featured Products Section</h2>
+    <div
+      style={{
+        width: '100%',
+        height: '100%,'
+      }}
+    >
+      <SearchbarHeader searchId="featuredSearch" placeholder="Featured Products" filterButton sectionTitle="Featured Products"/>
     </div>
   );
 }
