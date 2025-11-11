@@ -1,0 +1,1212 @@
+#app/static/swagger.yaml
+
+swagger: '2.0'
+info:
+  title: "TRENDMART API"
+  description: "API documentation for the TRENDMART application."
+  version: "1.0.0"
+host: "localhost:8000"
+basePath: "/"
+schemes:
+  - "http"
+consumes:
+  - "application/json"
+produces:
+  - "application/json"
+
+
+
+# =========================
+# Paths
+# =========================
+paths: 
+  /bulk/add:
+    post:
+      tags:
+        - Catalog
+      summary: Bulk add categories, subcategories, and products
+      description: |
+        Ingest a nested structure of categories → subcategories → products.
+        Entries are upserted to avoid duplicates:
+        - Category uniqueness by slugified main_category
+        - Subcategory uniqueness by slugified "{category-slug}-{name}"
+        - Product uniqueness by SKU (if provided) or (name + subcategory)
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/BulkAddRequest'
+      responses:
+        200:
+          description: Upsert summary and created/updated items
+          schema:
+            $ref: '#/definitions/BulkAddResponse'
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        409:
+          description: Integrity error (e.g., SKU collisions after retries)
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        500:
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /bulk/users:
+    post:
+      tags:
+        - Analytics
+      summary: Bulk ingest user analytics dataset
+      description: |
+        Accepts a dataset with products (flat), users, interactions, purchases, search queries, and sessions.
+        Notes:
+        - Products are upserted into catalog (creates categories/subcategories as needed)
+        - Users are created with synthetic emails (user{user_id}@example.com)
+        - Purchases create Orders and OrderItems and optional Reviews
+        - Interactions create views/add_to_cart and ratings (purchase interactions are ignored to avoid duplication)
+        - Search queries record result clicks as lightweight views
+        - The endpoint also accepts JS-exported payloads like `export const userData = {...};`
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/BulkUserData'
+      responses:
+        200:
+          description: Ingestion summary
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: ok
+              created:
+                type: object
+                properties:
+                  products:
+                    type: integer
+                  users:
+                    type: integer
+                  sessions:
+                    type: integer
+                  views:
+                    type: integer
+                  orders:
+                    type: integer
+                  order_items:
+                    type: integer
+                  reviews:
+                    type: integer
+              updated:
+                type: object
+                properties:
+                  products:
+                    type: integer
+                  users:
+                    type: integer
+              mapped_products:
+                type: integer
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        409:
+          description: Integrity error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        500:
+          description: Server error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /events/view:
+    post:
+      tags:
+        - Events
+      summary: Record a product view event
+      description: Creates a ProductInteraction with event_type="view".
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ProductInteractionCreate'
+      responses:
+        201:
+          description: Created
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: ok
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    get:
+      tags:
+        - Events
+      summary: Convenience GET for testing view events
+      description: Same behavior as POST; accepts optional query/body JSON (testing only).
+      responses:
+        201:
+          description: Created
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: ok
+
+  /events/cart_add:
+    post:
+      tags:
+        - Events
+      summary: Record an add-to-cart event
+      description: Creates a ProductInteraction with event_type="add_to_cart".
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ProductInteractionCreate'
+      responses:
+        201:
+          description: Created
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: ok
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /events/purchase:
+    post:
+      tags:
+        - Events
+      summary: Record a purchase interaction event
+      description: Creates a ProductInteraction with event_type="purchase" (analytics logging).
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ProductInteractionCreate'
+      responses:
+        201:
+          description: Created
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: ok
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /recommendations/related:
+    post:
+      tags:
+        - Recommendations
+      summary: Related products from seed IDs
+      description: |
+        Computes a centroid embedding of provided seed product_ids and returns the most similar other products.
+        Body: {"product_ids": [1,2], "top_k": 10, "exclude_ids": [3] }
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              product_ids:
+                type: array
+                items:
+                  type: integer
+              top_k:
+                type: integer
+              exclude_ids:
+                type: array
+                items:
+                  type: integer
+      responses:
+        200:
+          description: Related products
+          schema:
+            type: object
+            properties:
+              results:
+                type: array
+                items:
+                  $ref: '#/definitions/ProductCard'
+              count:
+                type: integer
+              elapsed_ms:
+                type: integer
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /recommendations/rerank:
+    post:
+      tags:
+        - Recommendations
+      summary: Rerank candidate products by query relevance
+      description: |
+        Body: {"query": "text", "ids": [1,2,3], "top_k": 3}
+        Returns the subset ordered by semantic similarity with score.
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              query:
+                type: string
+              ids:
+                type: array
+                items:
+                  type: integer
+              top_k:
+                type: integer
+      responses:
+        200:
+          description: Reranked products
+          schema:
+            type: object
+            properties:
+              results:
+                type: array
+                items:
+                  $ref: '#/definitions/ProductCard'
+              count:
+                type: integer
+              elapsed_ms:
+                type: integer
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /recommendations/reindex/async:
+    post:
+      tags:
+        - Recommendations
+      summary: Start async index rebuild
+      description: Spawns a background job to rebuild the product embedding index and refresh cache.
+      responses:
+        202:
+          description: Job queued
+          schema:
+            type: object
+            properties:
+              job_id:
+                type: string
+              status:
+                type: string
+
+  /recommendations/reindex/status/{job_id}:
+    get:
+      tags:
+        - Recommendations
+      summary: Get reindex job status
+      parameters:
+        - in: path
+          name: job_id
+          required: true
+          type: string
+      responses:
+        200:
+          description: Job status
+          schema:
+            type: object
+            properties:
+              job:
+                type: object
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /recommendations/reindex/jobs:
+    get:
+      tags:
+        - Recommendations
+      summary: List recent reindex jobs
+      responses:
+        200:
+          description: Jobs list
+          schema:
+            type: object
+            properties:
+              jobs:
+                type: array
+                items:
+                  type: object
+              count:
+                type: integer
+
+  /recommendations/feedback:
+    post:
+      tags:
+        - Recommendations
+      summary: Submit recommendation feedback action
+      description: Logs explicit feedback on a recommended product (clicked, converted, ignored, dismissed, pinned).
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/RecommendationFeedbackCreate'
+      responses:
+        201:
+          description: Created
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: ok
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /recommendations/health:
+    get:
+      tags:
+        - Recommendations
+      summary: Health/status for recommendation service
+      responses:
+        200:
+          description: Health info
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: ok
+              vector_store:
+                type: object
+                properties:
+                  total_products:
+                    type: integer
+                    example: 180
+                  embedding_dimension:
+                    type: integer
+                    example: 384
+                  model_name:
+                    type: string
+                    example: all-MiniLM-L6-v2
+
+  /recommendations/search:
+    post:
+      tags:
+        - Recommendations
+      summary: Semantic product search
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              query:
+                type: string
+                example: comfortable running sneakers
+              top_k:
+                type: integer
+                example: 5
+      responses:
+        200:
+          description: Search results
+          schema:
+            $ref: '#/definitions/ProductCardList'
+
+  /recommendations/similar/{product_id}:
+    get:
+      tags:
+        - Recommendations
+      summary: Find products similar to a given product id
+      parameters:
+        - in: path
+          name: product_id
+          required: true
+          type: integer
+        - in: query
+          name: top_k
+          required: false
+          type: integer
+          default: 3
+      responses:
+        200:
+          description: Similar products
+          schema:
+            $ref: '#/definitions/ProductCardList'
+
+  /recommendations/category/{name}:
+    get:
+      tags:
+        - Recommendations
+      summary: Category products (exact, semantic or hybrid)
+      parameters:
+        - in: path
+          name: name
+          required: true
+          type: string
+        - in: query
+          name: top_k
+          type: integer
+          default: 3
+        - in: query
+          name: mode
+          type: string
+          enum: [exact, semantic, hybrid]
+          default: exact
+      responses:
+        200:
+          description: Category products
+          schema:
+            $ref: '#/definitions/ProductCardList'
+
+  /recommendations/answer:
+    post:
+      tags:
+        - Recommendations
+      summary: Ask a question and get an answer with relevant products
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              question:
+                type: string
+                example: What are some waterproof trail shoes?
+              top_k:
+                type: integer
+                example: 5
+      responses:
+        200:
+          description: Answer and products
+          schema:
+            type: object
+            properties:
+              answer:
+                type: string
+              source_ids:
+                type: array
+                items:
+                  type: integer
+              products:
+                type: array
+                items:
+                  $ref: '#/definitions/ProductCard'
+              raw:
+                type: object
+              retrieved:
+                type: array
+                items:
+                  type: object
+              elapsed_ms:
+                type: integer
+
+  /recommendations/by_ids:
+    post:
+      tags:
+        - Recommendations
+      summary: Resolve product ids to product cards
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              ids:
+                type: array
+                items:
+                  type: integer
+      responses:
+        200:
+          description: Product cards
+          schema:
+            $ref: '#/definitions/ProductCardList'
+
+  /recommendations/reindex:
+  /recommendations/cold_start:
+    get:
+      tags:
+        - Recommendations
+      summary: Cold-start recommendations for new users
+      description: Returns top-selling products, with a fallback to most-viewed when no sales exist.
+      parameters:
+        - in: query
+          name: top_k
+          type: integer
+          required: false
+          default: 5
+      responses:
+        200:
+          description: Product cards
+          schema:
+            $ref: '#/definitions/ProductCardList'
+    post:
+      tags:
+        - Recommendations
+      summary: Force reload the product index file into memory
+      responses:
+        200:
+          description: Reloaded status
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: reloaded
+              stats:
+                type: object
+  
+  /auth/register: # Authentication - Register
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Create a new user account with email and password. Returns user data and JWT tokens for immediate login.
+      parameters:
+        - in: body
+          name: body
+          description: Registration data
+          required: true
+          schema:
+            $ref: '#/definitions/RegisterPayload'
+      responses:
+        201:
+          description: User registered successfully
+          schema:
+            $ref: '#/definitions/RegisterResponse'
+          examples:
+            application/json:
+              {
+                "email": "user@example.com",
+              }
+        400:
+          description: Validation error or email already exists
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              {
+                "status": "error",
+                "message": "A user with this email already exists!"
+              }
+
+  /auth/login: # Authentication - Login
+    post:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate user with email and password. Returns JWT access and refresh tokens.
+      parameters:
+        - in: body
+          name: body
+          description: Login credentials
+          required: true
+          schema:
+            $ref: '#/definitions/LoginPayload'
+      responses:
+        200:
+          description: Login successful
+          schema:
+            $ref: '#/definitions/TokenResponse'
+          examples:
+            application/json:
+              {
+                "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+                "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+                "token_type": "Bearer",
+                "expires_in": 3600
+              }
+        401:
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              {
+                "error": "Invalid credentials"
+              }
+
+  /auth/protected: # Protected Route - Test
+    get:
+      tags:
+        - Authentication
+      summary: Test protected route
+      description: Test endpoint to verify JWT authentication is working
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Authentication successful
+          schema:
+            $ref: '#/definitions/ProtectedResponse'
+          examples:
+            application/json:
+              {
+                "message": "Hello! You are successfully authenticated!",
+                "user_id": 1,
+                "email": "user@example.com",
+              }
+        401:
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+          examples:
+            application/json:
+              {
+                "msg": "Missing Authorization Header"
+              }
+          
+# =========================
+# Security Definitions
+# =========================
+securityDefinitions:
+  BearerAuth:
+    type: apiKey
+    name: Authorization
+    in: header
+    description: "Enter 'Bearer' followed by your JWT token. Example: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+
+# =========================
+# Definitions (Schemas)
+# =========================  
+definitions: 
+  # -----------------
+  # Bulk Add Schemas
+  # -----------------
+  ProductIn:
+    type: object
+    required: [name]
+    properties:
+      id:
+        type: integer
+        description: Optional id from sample data (not persisted)
+      external_id:
+        type: string
+        description: Optional external id for future use
+      sku:
+        type: string
+        description: Optional SKU. If omitted, one will be derived and truncated to 50 chars.
+      name:
+        type: string
+        example: "ASUS ZenBook X14"
+      description:
+        type: string
+        example: ""
+      price:
+        type: number
+        format: float
+        example: 1299.99
+      rating:
+        type: number
+        format: float
+        description: Not stored in DB (used for embeddings/context)
+        example: 4.5
+      tags:
+        type: array
+        items:
+          type: string
+        example: ["brand-asus", "os-windows"]
+      image_url:
+        type: string
+        example: "https://placehold.co/800x800?text=ASUS%20ZenBook%20X14"
+      image_thumb_url:
+        type: string
+        example: "https://placehold.co/300x300?text=ASUS%20ZenBook%20X14"
+      image_attribution:
+        type: string
+        example: "Placeholder"
+
+  SubcategoryIn:
+    type: object
+    required: [name]
+    properties:
+      name:
+        type: string
+        example: "Laptops"
+      products:
+        type: array
+        items:
+          $ref: '#/definitions/ProductIn'
+      related_subcategories:
+        type: array
+        items:
+          type: string
+        description: Present in sample data; not persisted
+
+  CategoryIn:
+    type: object
+    required: [main_category]
+    properties:
+      main_category:
+        type: string
+        example: "Electronics"
+      subcategories:
+        type: array
+        items:
+          $ref: '#/definitions/SubcategoryIn'
+
+  BulkAddRequest:
+    type: object
+    required: [categories]
+    properties:
+      categories:
+        type: array
+        items:
+          $ref: '#/definitions/CategoryIn'
+    example:
+      categories:
+        - main_category: Electronics
+          subcategories:
+            - name: Laptops
+              products:
+                - name: ASUS ZenBook X14
+                  price: 1299.99
+                  rating: 4.5
+                  tags: [brand-asus, os-windows]
+                  image_url: https://placehold.co/800x800?text=ASUS%20ZenBook%20X14
+                  image_thumb_url: https://placehold.co/300x300?text=ASUS%20ZenBook%20X14
+                  image_attribution: Placeholder
+
+  BulkAddProductResult:
+    type: object
+    properties:
+      id:
+        type: integer
+      sku:
+        type: string
+      name:
+        type: string
+
+  BulkAddSubcategoryResult:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      products:
+        type: array
+        items:
+          $ref: '#/definitions/BulkAddProductResult'
+
+  BulkAddCategoryResult:
+    type: object
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      subcategories:
+        type: array
+        items:
+          $ref: '#/definitions/BulkAddSubcategoryResult'
+
+  BulkAddResponse:
+    type: object
+    properties:
+      status:
+        type: string
+        example: ok
+      created:
+        type: object
+        properties:
+          categories:
+            type: integer
+            example: 1
+          subcategories:
+            type: integer
+            example: 1
+          products:
+            type: integer
+            example: 10
+      updated:
+        type: object
+        properties:
+          categories:
+            type: integer
+            example: 0
+          subcategories:
+            type: integer
+            example: 0
+          products:
+            type: integer
+            example: 0
+      results:
+        type: object
+        properties:
+          categories:
+            type: array
+            items:
+              $ref: '#/definitions/BulkAddCategoryResult'
+
+  ProductCard:
+    type: object
+    properties:
+      id:
+        type: integer
+      sku:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      price:
+        type: number
+        format: float
+      rating:
+        type: number
+        format: float
+      tags:
+        type: array
+        items:
+          type: string
+      primary_image:
+        type: string
+      thumbnail:
+        type: string
+      images:
+        type: array
+        items:
+          type: string
+      subcategory:
+        type: string
+      main_category:
+        type: string
+      category_info:
+        type: object
+      times_click_on:
+        type: integer
+      score:
+        type: number
+        format: float
+
+  ProductCardList:
+    type: object
+    properties:
+      results:
+        type: array
+        items:
+          $ref: '#/definitions/ProductCard'
+      count:
+        type: integer
+  
+  # -----------------
+  # Events Schemas
+  # -----------------
+  ProductInteractionCreate:
+    type: object
+    required: [product_id]
+    properties:
+      user_id:
+        type: integer
+        description: Optional; if omitted and JWT is present, user_id is taken from token
+      product_id:
+        type: integer
+      source:
+        type: string
+        enum: [search, similar, related, answer, cold_start]
+      session_id:
+        type: integer
+      context_json:
+        type: string
+
+  RecommendationFeedbackCreate:
+    type: object
+    required: [product_id, source, action]
+    properties:
+      user_id:
+        type: integer
+        description: Optional; if omitted and JWT is present, user_id is taken from token
+      product_id:
+        type: integer
+      source:
+        type: string
+        enum: [search, similar, related, answer, cold_start]
+      action:
+        type: string
+        enum: [clicked, converted, ignored, dismissed, pinned]
+      score_delta:
+        type: number
+        format: float
+      elapsed_ms:
+        type: integer
+  # Authentication Schemas
+  RegisterPayload:
+    type: object
+    required:
+      - email
+      - password
+    properties:
+      email:
+        type: string
+        format: email
+        example: "user@example.com"
+        description: "Valid email address for the user"
+      password:
+        type: string
+        minLength: 8
+        example: "SecurePass123!"
+        description: "Password must be at least 8 characters with uppercase, lowercase, number, and special character"
+
+  RegisterResponse:
+    type: object
+    properties:
+      email:
+        type: string
+        example: "user@example.com"
+      
+  LoginPayload:
+    type: object
+    required:
+      - email
+      - password
+    properties:
+      email:
+        type: string
+        format: email
+        example: "user@example.com"
+      password:
+        type: string
+        example: "SecurePass123!"
+
+  TokenResponse:
+    type: object
+    properties:
+      access_token:
+        type: string
+        example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+        description: "JWT access token for API authentication"
+      refresh_token:
+        type: string
+        example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+        description: "JWT refresh token for getting new access tokens"
+      token_type:
+        type: string
+        example: "Bearer"
+        description: "Token type (always 'Bearer')"
+      expires_in:
+        type: integer
+        example: 3600
+        description: "Token expiration time in seconds"
+
+  ProtectedResponse:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Hello! You are successfully authenticated!"
+      user_id:
+        type: integer
+        example: 1
+      email:
+        type: string
+        example: "user@example.com"
+
+  ErrorResponse:
+    type: object
+    properties:
+      error:
+        type: string
+        example: "Error message"
+      status:
+        type: string
+        example: "error"
+      message:
+        type: string
+        example: "Detailed error message"
+      details:
+        type: object
+        description: "Validation error details"
+
+  # -----------------
+  # Bulk User Data Schemas
+  # -----------------
+  CategoryInfoIn:
+    type: object
+    required: [main_category, subcategory]
+    properties:
+      main_category:
+        type: string
+      subcategory:
+        type: string
+
+  ProductFlatIn:
+    type: object
+    required: [id, name, price, category_info]
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      description:
+        type: string
+      price:
+        type: number
+      rating:
+        type: number
+      tags:
+        type: array
+        items:
+          type: string
+      category_info:
+        $ref: '#/definitions/CategoryInfoIn'
+
+  UserIn:
+    type: object
+    required: [user_id]
+    properties:
+      user_id:
+        type: integer
+      age:
+        type: integer
+      gender:
+        type: string
+      location:
+        type: string
+      income_range:
+        type: string
+      preferences:
+        type: array
+        items:
+          type: string
+      created_at:
+        type: string
+
+  InteractionIn:
+    type: object
+    required: [user_id, product_id, interaction_type, timestamp]
+    properties:
+      user_id:
+        type: integer
+      product_id:
+        type: integer
+      interaction_type:
+        type: string
+        enum: [view, add_to_cart, rating, purchase]
+      timestamp:
+        type: string
+      duration_seconds:
+        type: integer
+      rating_given:
+        type: number
+      quantity:
+        type: integer
+
+  PurchaseIn:
+    type: object
+    required: [user_id, product_id, purchase_date, quantity, price_paid]
+    properties:
+      user_id:
+        type: integer
+      product_id:
+        type: integer
+      purchase_date:
+        type: string
+      quantity:
+        type: integer
+      price_paid:
+        type: number
+      rating_given:
+        type: number
+      review_text:
+        type: string
+
+  SearchQueryIn:
+    type: object
+    required: [user_id, query, timestamp]
+    properties:
+      user_id:
+        type: integer
+      query:
+        type: string
+      timestamp:
+        type: string
+      results_clicked:
+        type: array
+        items:
+          type: integer
+      products_purchased:
+        type: array
+        items:
+          type: integer
+
+  SessionIn:
+    type: object
+    required: [session_id, user_id, session_start, session_end]
+    properties:
+      session_id:
+        type: integer
+      user_id:
+        type: integer
+      products_viewed:
+        type: array
+        items:
+          type: integer
+      view_durations:
+        type: array
+        items:
+          type: integer
+      session_start:
+        type: string
+      session_end:
+        type: string
+
+  BulkUserData:
+    type: object
+    properties:
+      schema_version:
+        type: string
+      generated_at:
+        type: string
+      products:
+        type: array
+        items:
+          $ref: '#/definitions/ProductFlatIn'
+      users:
+        type: array
+        items:
+          $ref: '#/definitions/UserIn'
+      interactions:
+        type: array
+        items:
+          $ref: '#/definitions/InteractionIn'
+      purchases:
+        type: array
+        items:
+          $ref: '#/definitions/PurchaseIn'
+      search_queries:
+        type: array
+        items:
+          $ref: '#/definitions/SearchQueryIn'
+      sessions:
+        type: array
+        items:
+          $ref: '#/definitions/SessionIn'
+
+
+

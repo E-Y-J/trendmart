@@ -1,5 +1,5 @@
-import {  useState } from "react";
-import TextInput from "../layouts/layoutChildren/input/textInput";
+import { useState } from "react";
+import TextInput from "../layouts/layoutChildren/input/TextInput";
 import CheckboxToggle from "../layouts/layoutChildren/input/CheckboxToggle";
 import { useNavigate } from "react-router-dom";
 import api from "../beConnection/api"
@@ -7,7 +7,7 @@ import { createUser, loginUser } from "../redux/auth/authSlice";
 
 
 function LoginRegister({ formName }) {
-  const [formData, setFormData]  = useState({ email: '', password: '', verification: '' })
+  const [formData, setFormData] = useState({ email: '', password: '', verification: '' })
   const [passHidden, setPassHidden] = useState(true)
   const navigate = useNavigate()
 
@@ -40,7 +40,7 @@ function LoginRegister({ formName }) {
     return errors;
   }
 
-  const handleSubmit = async() => {
+  const handleSubmit = async () => {
 
     // collect errors if any
     let errors = validatePassword()
@@ -48,17 +48,17 @@ function LoginRegister({ formName }) {
     // return any errors -- send to alert space
     if (errors.length) return errors
 
-    const authData = { email: formData.email, password: formData.password}
+    const authData = { email: formData.email, password: formData.password }
     console.table(authData)
-      try {
-        const response = await api.post(`auth/${formName}`, authData);
-        console.log('User created successfully:', response.data);
-        return response.data;
-      } catch (error) {
-        console.error('Error authorizing user:', error);
-        throw error;
-      }
+    try {
+      const response = await api.post(`auth/${formName}`, authData);
+      console.log('User created successfully:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error authorizing user:', error);
+      throw error;
     }
+  }
 
   return (
     <div
@@ -73,14 +73,14 @@ function LoginRegister({ formName }) {
         flexDirection: 'column',
       }}
     >
-      <CheckboxToggle name="logRegToggle" onClick={ handleChecked } checked={ formName == 'register' } />
-      
+      <CheckboxToggle name="logRegToggle" onClick={handleChecked} checked={formName == 'register'} />
+
       <form
         onSubmit={e => {
           e.preventDefault();
           handleSubmit();
         }}
-        id={ `${formName}Form` }
+        id={`${formName}Form`}
         style={{
           height: '100%',
           flexDirection: 'row',
@@ -100,32 +100,32 @@ function LoginRegister({ formName }) {
         >
           <TextInput
             inputId="email"
-            label={ formName }
+            label={formName}
             title="Email"
             placeholder="e.g. user@email.com"
-            onChange={ handleChange }
+            onChange={handleChange}
           />
-          { formName == 'register' &&
+          {formName == 'register' &&
             <TextInput
-              inputId="verification" 
+              inputId="verification"
               title="Verify Email"
               placeholder="Re-enter email"
               // disable verification email if email isn't filled out
-              disabled={ formData.email.length == 0 }
-              onChange={ handleChange }
+              disabled={formData.email.length == 0}
+              onChange={handleChange}
             />
           }
           <TextInput
             inputId="password"
             title="Password"
             placeholder="Enter your password"
-            info={ formName == 'register' ? 'Passwords must be 8-50 characters long and include at least one of each following characters are required: lowercase, uppercase, number, and !@#$%^&*(),.?":{}|<></>' : '' }
-            password={ passHidden }
-            onChange={ handleChange }
+            info={formName == 'register' ? 'Passwords must be 8-50 characters long and include at least one of each following characters are required: lowercase, uppercase, number, and !@#$%^&*(),.?":{}|<></>' : ''}
+            password={passHidden}
+            onChange={handleChange}
           >
-            <button id="showbutton" type="button" onClick={ () => setPassHidden(!passHidden) } style={{fontSize: '.4rem'}}>
+            <button id="showbutton" type="button" onClick={() => setPassHidden(!passHidden)} style={{ fontSize: '.4rem' }}>
               show
-              <br/>
+              <br />
               password
             </button>
           </TextInput>
@@ -142,7 +142,7 @@ function LoginRegister({ formName }) {
               alignContent: 'flex-end'
             }}
           >
-            { formName === 'login' ? 'Login' : 'Register' }
+            {formName === 'login' ? 'Login' : 'Register'}
           </button>
         </div>
       </form>

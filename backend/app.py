@@ -1,19 +1,23 @@
-from flask import Flask, redirect
+from flask import Flask, send_from_directory, jsonify, redirect
 from extensions import db, ma, jwt, cors, init_stripe
 from config import Config
 from routes.catalog import categories_bp, products_bp
+from routes.bulk_add import bulk_bp
+from routes.bulk_users import bulk_users_bp
 from routes.auth import auth_bp
 from routes.admin import admin_bp
 from routes.customers import customers_bp
 from routes.recommendation import recom_bp
+from routes.events import events_bp, recom_feedback_bp
+from routes import cold_start
 import models
+from models.catalog import Category, Subcategory, Product
 from flask_swagger_ui import get_swaggerui_blueprint
 import os
 
-SWAGGER_URL = '/api/docs'
-API_URL = '/static/swagger.yaml'  # URL to serve our swagger file from static folder
+# Swagger UI configuration
 SWAGGER_URL = "/api/docs"
-API_URL = "/api/swagger"  # URL to serve our swagger file
+API_URL = "/api/swagger"  # Served via send_from_directory below
 
 # Create swaggerui blueprint
 swaggerui_blueprint = get_swaggerui_blueprint(
@@ -52,6 +56,20 @@ def create_app():
     with app.app_context():
         try:
             db.create_all()
+            # Seed initial minimal catalog if empty
+            if Product.query.count() == 0:
+                cat = Category(name="Electronics", slug="electronics")
+                sub = Subcategory(name="Phones", slug="phones", category=cat)
+                prod = Product(
+                    sku="SKU-1",
+                    name="Sample Phone",
+                    description="Seed product for initial interactions",
+                    price=199.99,
+                    subcategory=sub,
+                )
+                db.session.add_all([cat, sub, prod])
+                db.session.commit()
+                print("Seeded initial catalog data (1 product).")
             print("Database tables created successfully!")
         except Exception as e:
             print(f"Database initialization error: {e}")
@@ -64,17 +82,37 @@ def create_app():
     app.register_blueprint(products_bp)
     app.register_blueprint(swaggerui_blueprint)
     app.register_blueprint(recom_bp)
+    app.register_blueprint(events_bp)
+    app.register_blueprint(recom_feedback_bp)
+    app.register_blueprint(bulk_bp)
+    app.register_blueprint(bulk_users_bp)
 
-    @app.route('/')
-    # Route to serve swagger.yaml file
+    # Serve the raw swagger.yaml
     @app.route("/api/swagger")
     def swagger_spec():
         return send_from_directory("documentation", "swagger.yaml")
 
+    # Root redirect to docs
     @app.route("/")
     def home():
         return redirect('/api/docs')
-        # return "Welcome to the Trendmart API"
+
+    # JSON error handlers for consistent API responses
+    @app.errorhandler(400)
+    def handle_400(e):
+        return jsonify({"error": "bad_request", "message": getattr(e, "description", str(e))}), 400
+
+    @app.errorhandler(404)
+    def handle_404(e):
+        return jsonify({"error": "not_found", "message": getattr(e, "description", str(e))}), 404
+
+    @app.errorhandler(405)
+    def handle_405(e):
+        return jsonify({"error": "method_not_allowed", "message": getattr(e, "description", str(e))}), 405
+
+    @app.errorhandler(500)
+    def handle_500(e):
+        return jsonify({"error": "internal_server_error", "message": "An unexpected error occurred."}), 500
 
     return app
 
