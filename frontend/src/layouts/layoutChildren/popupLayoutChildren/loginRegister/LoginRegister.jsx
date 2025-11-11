@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
@@ -17,9 +17,10 @@ function LoginRegister() {
   const [formData, setFormData] = useState({ email: "", password: "", verification: "" });
   const [toggleForm, setToggleForm] = useState("login");
   const [passHidden, setPassHidden] = useState(true);
+
+  const [, setPopup] = useOutletContext()
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const [, setPopup] = useOutletContext()
 
   const handleChange = (event) => {
     const { id, value } = event.target;
@@ -28,15 +29,6 @@ function LoginRegister() {
       [id]: value,
     }));
   };
-
-  useEffect(() => {
-    if (toggleForm === 'login' || toggleForm === 'register') {
-      navigate(`/${ toggleForm }`)
-    } else {
-      setToggleForm(null)
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [toggleForm])
 
   const handleChecked = () => {
     setToggleForm(toggleForm === "login" ? 'register' : "login");
@@ -144,8 +136,12 @@ function LoginRegister() {
               </Button>
             </TextInput>
 
-            {toggleForm === "register" && (
+            {toggleForm === "register" ? (
               <PasswordRequirements password={ formData.password } />
+            ) : (
+              <p>
+                New to TrendMart? <a onClick={ () => setToggleForm('register') }>Sign Up</a>
+              </p>
             )}
 
             <Button
