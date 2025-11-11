@@ -1,7 +1,7 @@
 from flask import Flask, send_from_directory, jsonify, redirect
 from extensions import db, ma, jwt, cors, init_stripe
 from config import Config
-from routes.catalog import categories_bp, products_bp
+from routes.catalog import categories_bp, products_bp, subcategories_bp
 from routes.bulk_add import bulk_bp
 from routes.bulk_users import bulk_users_bp
 from routes.auth import auth_bp
@@ -80,6 +80,7 @@ def create_app():
     app.register_blueprint(customers_bp)
     app.register_blueprint(categories_bp)
     app.register_blueprint(products_bp)
+    app.register_blueprint(subcategories_bp)
     app.register_blueprint(swaggerui_blueprint)
     app.register_blueprint(recom_bp)
     app.register_blueprint(events_bp)
