@@ -57,14 +57,14 @@ WORKDIR /app
 COPY --from=deps /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=deps /usr/local/bin /usr/local/bin
 
-# Copy app code
-COPY . .
-
 # Ensure appuser owns the application files and instance directory
 RUN mkdir -p /app/instance && chown -R appuser:appuser /app
 
 # Switch to non-root user for safety
 USER appuser
+
+# Copy app code
+COPY . .
 
 # Expose port 8000 for app access
 EXPOSE 8000
