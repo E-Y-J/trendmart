@@ -1,7 +1,25 @@
-import { Row, Col, Form, Image } from 'react-bootstrap';
+import Col from 'react-bootstrap/Col';
+import Form from 'react-bootstrap/Form';
+import Image from 'react-bootstrap/Image';
+import Row from 'react-bootstrap/Row';
 import filterIcon from '/filterIcon.svg?url';
+import { useState, useCallback } from 'react'
 
-function SearchbarHeader({ searchId, placeholder, filterButton = false, sm=null, sectionTitle = null }) {
+function SearchbarRow({ searchId, placeholder, filterButton = false, sectionTitle = null, onSearch = null, debounceMs = 350, sm=null }) {
+  const [value, setValue] = useState('');
+  const [timer, setTimer] = useState(null);
+
+  const handleChange = useCallback((e) => {
+    const next = e.target.value;
+    setValue(next);
+    if (onSearch) {
+      if (timer) clearTimeout(timer);
+      const t = setTimeout(() => onSearch(next), debounceMs);
+      setTimer(t);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onSearch, debounceMs, timer]);
+  
   return (
     <Row
       id="featuredHeader"
@@ -12,7 +30,9 @@ function SearchbarHeader({ searchId, placeholder, filterButton = false, sm=null,
         <Form.Control
           id={ searchId }
           type="text"
+          value={ value }
           placeholder={ placeholder }
+          onChange={ handleChange }
           className='h-100 w-100'
           style={{ boxSizing: 'border-box', fieldSizing: 'content' }}
         />
@@ -22,12 +42,14 @@ function SearchbarHeader({ searchId, placeholder, filterButton = false, sm=null,
           <Image
             alt="filter"
             src={ filterIcon }
-            style={{ height: '100%', cursor: 'pointer' }}
+            style={{ height: '100%', width: 'auto', cursor: 'pointer' }}
           />
         </Col>
       }
       {sectionTitle &&
-        <Col className="d-flex flex-grow-1 justify-content-end align-items-center text-light p-0 text-nowrap d-none d-sm-flex" style={{ fontSize: 'clamp(1rem ' }}>
+        <Col
+          className="d-flex flex-grow-1 justify-content-end align-items-center text-light m-0 p-0 text-nowrap d-none d-sm-flex fs-4"
+        >
           { sectionTitle }
         </Col>
       }
@@ -35,4 +57,4 @@ function SearchbarHeader({ searchId, placeholder, filterButton = false, sm=null,
   );
 }
 
-export default SearchbarHeader;
+export default SearchbarRow;

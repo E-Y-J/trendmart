@@ -1,4 +1,4 @@
-import api from "../beConnection/api.jsx";
+import api from "../access/api.jsx";
 
 // Helper to coerce product id to number (backend expects Int)
 function getNumericProductId(product) {
