@@ -1,7 +1,7 @@
 from marshmallow import fields, validate
 from extensions import ValidationSchema
 from models.registration import User
-from . import PASSWORD_VALIDATOR
+from .security import PASSWORD_VALIDATOR
 
 
 class LoginSchema(ValidationSchema):

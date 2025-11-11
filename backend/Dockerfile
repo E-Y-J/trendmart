@@ -40,6 +40,9 @@ FROM base AS deps
 
 # Use BuildKit mounts for caching and bind-mounting runtime requirements
 RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu torch==2.5.1
+
+RUN --mount=type=cache,target=/root/.cache/pip \
     --mount=type=bind,source=requirements.runtime.txt,target=requirements.txt \
     pip install -r requirements.txt
 
@@ -62,6 +65,9 @@ COPY . .
 
 # Switch to non-root user for safety
 USER appuser
+
+# Copy app code
+COPY . .
 
 # Expose port 8000 for app access
 EXPOSE 8000

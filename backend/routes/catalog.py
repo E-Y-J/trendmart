@@ -1,8 +1,14 @@
 from flask import request, jsonify
-from schemas.catalog import ProductSchema, InventorySchema, ReviewSchema
+from schemas.catalog import (
+    ProductSchema,
+    InventorySchema,
+    ReviewSchema,
+    CategorySchema,
+    SubcategorySchema,
+)
 from extensions import db
 from flask import Blueprint
-from models.catalog import Product, Inventory, Review
+from models.catalog import Category, Subcategory, Product, Inventory, Review
 from werkzeug.security import generate_password_hash
 from sqlalchemy import select, delete
 from marshmallow import ValidationError
@@ -13,7 +19,9 @@ products_bp = Blueprint('products', __name__, url_prefix='/products')
 
 # Product Routes
 # Create a new product
-@products_bp.route('/products', methods=['POST'])
+
+
+@products_bp.route('', methods=['POST'])
 def create_product():
     try:
         product_data = request.get_json()
@@ -24,16 +32,31 @@ def create_product():
         return jsonify(product_schema.dump(product)), 201
     except ValidationError as err:
         return jsonify(err.messages), 400
-    
+
 # Get all products
-@products_bp.route('/products', methods=['GET'])
+
+
+@products_bp.route('', methods=['GET'])
 def get_products():
     products = Product.query.all()
     product_schema = ProductSchema(many=True)
     return jsonify(product_schema.dump(products)), 200
 
+# Get a single product by id
+
+
+@products_bp.route('/<int:product_id>', methods=['GET'])
+def get_product(product_id):
+    product = Product.query.get(product_id)
+    if not product:
+        return jsonify({"message": "Product not found"}), 404
+    product_schema = ProductSchema()
+    return jsonify(product_schema.dump(product)), 200
+
 # Update a product
-@products_bp.route('/products/<int:product_id>', methods=['PATCH'])
+
+
+@products_bp.route('/<int:product_id>', methods=['PATCH'])
 def update_product(product_id):
     try:
         product = Product.query.get(product_id)
@@ -44,7 +67,8 @@ def update_product(product_id):
         # Allow partial updates
         product_schema = ProductSchema(partial=True)
         # Load into existing instance to update fields
-        updated_product = product_schema.load(product_data, instance=product, session=db.session, partial=True)
+        updated_product = product_schema.load(
+            product_data, instance=product, session=db.session, partial=True)
         db.session.add(updated_product)
         db.session.commit()
         return jsonify(product_schema.dump(updated_product)), 200
@@ -52,7 +76,9 @@ def update_product(product_id):
         return jsonify(err.messages), 400
 
 # Delete a product
-@products_bp.route('/products/<int:product_id>', methods=['DELETE'])
+
+
+@products_bp.route('/<int:product_id>', methods=['DELETE'])
 def delete_product(product_id):
     product = Product.query.get(product_id)
     if not product:
@@ -64,17 +90,45 @@ def delete_product(product_id):
 
 
 # Category Routes
+# List all categories
+@categories_bp.route('', methods=['GET'])
+def list_categories():
+    categories = Category.query.all()
+    schema = CategorySchema(many=True)
+    return jsonify(schema.dump(categories)), 200
+
 # Get products by category
-@categories_bp.route('/categories/<int:category_id>/products', methods=['GET'])
+
+
+@categories_bp.route('/<int:category_id>/products', methods=['GET'])
 def get_products_by_category(category_id):
-    products = Product.query.filter_by(category_id=category_id).all()
+    """Return products that belong to the given category via Subcategory relation.
+
+    Note: Product does not have a direct category_id. We must join through
+    Subcategory (Product.subcategory_id -> Subcategory.id -> Category.id).
+    """
+    products = (
+        Product.query
+        .join(Subcategory, Product.subcategory_id == Subcategory.id)
+        .filter(Subcategory.category_id == category_id)
+        .all()
+    )
     product_schema = ProductSchema(many=True)
     return jsonify(product_schema.dump(products)), 200
-    
-    
+
+# List subcategories for a given category
+
+
+@categories_bp.route('/<int:category_id>/subcategories', methods=['GET'])
+def list_subcategories(category_id):
+    subs = Subcategory.query.filter_by(category_id=category_id).all()
+    schema = SubcategorySchema(many=True)
+    return jsonify(schema.dump(subs)), 200
+
+
 # Inventory Routes
 # Get current stock of a product
-@products_bp.route('/products/<int:product_id>/inventory', methods=['GET'])
+@products_bp.route('/<int:product_id>/inventory', methods=['GET'])
 def get_product_inventory(product_id):
     inventory = Inventory.query.filter_by(product_id=product_id).first()
     if not inventory:
@@ -85,7 +139,7 @@ def get_product_inventory(product_id):
 
 # Review Routes
 # Add a review for a product
-@products_bp.route('/products/<int:product_id>/reviews', methods=['POST'])
+@products_bp.route('/<int:product_id>/reviews', methods=['POST'])
 def add_product_review(product_id):
     try:
         review_data = request.get_json()
@@ -99,7 +153,9 @@ def add_product_review(product_id):
         return jsonify(err.messages), 400
 
 # Get all reviews for a product
-@products_bp.route('/products/<int:product_id>/reviews', methods=['GET'])
+
+
+@products_bp.route('/<int:product_id>/reviews', methods=['GET'])
 def get_product_reviews(product_id):
     reviews = Review.query.filter_by(product_id=product_id).all()
     review_schema = ReviewSchema(many=True)

@@ -5,7 +5,7 @@ from ai_recom_system import rag_service
 
 def fake_load_index():
     class FakeStore:
-        def search_similar_products(self, query, top_k=5):
+        def search_similar_products(self, query, top_k=3):
             # return a few fake product dicts
             return [({"id": 1, "name": "Test Product A", "description": "A test product"}, 0.9), ({"id": 2, "name": "Test Product B", "description": "Another test"}, 0.8)]
 

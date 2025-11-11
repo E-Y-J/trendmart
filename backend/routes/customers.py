@@ -120,7 +120,8 @@ def add_customer_address():
             line2=address_data.get('line2'),
             city=address_data.get('city'),
             state=address_data.get('state'),
-            zip_code=address_data.get('zip_code')
+            zip_code=address_data.get('zip_code'),
+            country=address_data.get('country')
         )
         
         db.session.add(new_address)

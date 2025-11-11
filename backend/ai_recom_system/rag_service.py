@@ -2,16 +2,19 @@ import os
 import json
 import logging
 from typing import List, Dict, Any, Optional
-
+from .llm_adapter import OllamaAdapter
 from .product_vector_store import ProductVectorStore
-from .langchain_ollama import OllamaWrapper
 from . import generator
 
 logger = logging.getLogger(__name__)
 
 
-INDEX_PATH = os.environ.get(
-    "FAISS_INDEX_PATH", "./instance/product_index.json")
+# Resolve the default index path to the repository root to avoid CWD issues
+_HERE = os.path.dirname(__file__)
+_REPO_ROOT = os.path.abspath(os.path.join(_HERE, os.pardir, os.pardir))
+_DEFAULT_INDEX_PATH = os.path.join(
+    _REPO_ROOT, "instance", "product_index.json")
+INDEX_PATH = os.environ.get("FAISS_INDEX_PATH", _DEFAULT_INDEX_PATH)
 
 
 def load_simple_index():
@@ -27,23 +30,30 @@ def load_simple_index():
         payload = json.load(fh)
 
     products = payload.get("products", [])
+    embeddings = payload.get("embeddings")
     vs = ProductVectorStore()
-    # add_products expects product dicts
+    # If embeddings are present, load them directly; otherwise compute on the fly
+    if isinstance(embeddings, list) and len(embeddings) == len(products) and (len(products) > 0):
+        try:
+            vs.set_products_and_embeddings(products, embeddings)
+            return vs
+        except Exception:
+            # Fallback to compute if persisted embeddings invalid
+            pass
     vs.add_products(products)
     return vs
 
 
 def _ollama_llm_caller_factory(model: Optional[str] = None, temperature: float = 0.0):
-    wrapper = OllamaWrapper(model=model, temperature=temperature)
+    """Factory to create an Ollama LLM caller matching generator.generate_answer contract."""
+    adapter = OllamaAdapter(model=model, temperature=temperature)
 
     def _caller(messages: List[Dict[str, str]], *, model: Optional[str] = None, timeout: int = 30, temperature: float = 0.0) -> Dict[str, Any]:
-        # Build a single prompt string from messages similar to generator.call_llm
-        prompt = "\n\n".join(
-            [f"{m.get('role').upper()}: {m.get('content')}" for m in messages])
-        resp = wrapper.generate(prompt)
-        # Ensure returned shape matches generator expectations
-        return {"text": resp.get("text") if isinstance(resp, dict) else str(resp), "raw": resp.get("raw") if isinstance(resp, dict) else resp}
-
+        resp = adapter.chat(
+            messages, model=model, temperature=temperature, max_tokens=256, timeout=timeout)
+        # Normalize to generator.generate_answer expected contract
+        return {"text": resp.get("text") if isinstance(resp, dict) else str(resp),
+                "raw": resp.get("raw") if isinstance(resp, dict) else resp}
     return _caller
 
 
@@ -75,3 +85,6 @@ def answer_question(question: str, k: int = 5, temperature: float = 0.0, model: 
     res["_retrieved"] = [
         {"id": p.get("id"), "score": float(s)} for p, s in retrieved]
     return res
+
+
+# Note: Only one _ollama_llm_caller_factory is defined (adapter-based).
