@@ -16,6 +16,8 @@ from marshmallow import ValidationError
 # Define Blueprints
 categories_bp = Blueprint('categories', __name__, url_prefix='/categories')
 products_bp = Blueprint('products', __name__, url_prefix='/products')
+subcategories_bp = Blueprint(
+    'subcategories', __name__, url_prefix='/subcategories')
 
 # Product Routes
 # Create a new product
@@ -124,6 +126,14 @@ def list_subcategories(category_id):
     subs = Subcategory.query.filter_by(category_id=category_id).all()
     schema = SubcategorySchema(many=True)
     return jsonify(schema.dump(subs)), 200
+
+
+# Subcategory Routes
+@subcategories_bp.route('/<int:subcategory_id>/products', methods=['GET'])
+def get_products_by_subcategory(subcategory_id):
+    products = Product.query.filter_by(subcategory_id=subcategory_id).all()
+    product_schema = ProductSchema(many=True)
+    return jsonify(product_schema.dump(products)), 200
 
 
 # Inventory Routes

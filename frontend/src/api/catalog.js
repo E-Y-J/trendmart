@@ -53,6 +53,11 @@ export async function listSubcategories(categoryId, params = {}) {
   return data; // Array of subcategories for the category
 }
 
+export async function getProductsBySubcategory(subcategoryId, params = {}) {
+    const { data } = await api.get(`/subcategories/${subcategoryId}/products`, { params });
+    return data; // Array of products scoped to subcategory
+}
+
 // -------- Inventory --------
 
 export async function getInventory(productId) {
