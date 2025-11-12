@@ -12,7 +12,7 @@ export const createUser = createAsyncThunk(
   'auth/register',
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await api.post('auth/register', { email, password });
+      const response = await api.post('/auth/register', { email, password });
 
       return response.data;
     } catch (error) {
@@ -26,7 +26,7 @@ export const loginUser = createAsyncThunk(
   'auth/login',
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await api.post('/login', { email, password });
+      const response = await api.post('/auth/login', { email, password });
 
       return response.data;
     } catch (error) {
@@ -92,7 +92,7 @@ const authSlice = createSlice({
       .addCase(checkAuthStatus.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(checkAuthStatus.fulfilled, (state, action) => { 
+      .addCase(checkAuthStatus.fulfilled, (state, action) => {
         state.isAuthenticated = true;
         state.user = action.payload;
         state.status = 'succeeded';

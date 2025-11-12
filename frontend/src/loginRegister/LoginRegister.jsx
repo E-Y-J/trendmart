@@ -9,6 +9,7 @@ import { createUser, loginUser } from "../redux/auth/authSlice";
 function LoginRegister({ formName }) {
   const [formData, setFormData] = useState({ email: '', password: '', verification: '' })
   const [passHidden, setPassHidden] = useState(true)
+  const [errors, setErrors] = useState([])
   const navigate = useNavigate()
 
   const handleChange = (event) => {
@@ -41,22 +42,39 @@ function LoginRegister({ formName }) {
   }
 
   const handleSubmit = async () => {
+    // collect client-side validation errors
+    let clientErrors = validatePassword();
+    if (!validEmail()) clientErrors = ["Email doesn't match required format.", ...clientErrors];
+    if (formName === 'register' && formData.verification !== formData.email) {
+      clientErrors = ["Emails do not match.", ...clientErrors];
+    }
+    if (clientErrors.length) {
+      setErrors(clientErrors);
+      return; // stop submit
+    }
 
-    // collect errors if any
-    let errors = validatePassword()
-    if (!validEmail()) errors = ["Email doesn't match required format, double-check and try again.", ...errors]
-    // return any errors -- send to alert space
-    if (errors.length) return errors
-
-    const authData = { email: formData.email, password: formData.password }
-    console.table(authData)
+    const authData = { email: formData.email.trim(), password: formData.password };
     try {
-      const response = await api.post(`auth/${formName}`, authData);
-      console.log('User created successfully:', response.data);
+      const response = await api.post(`/auth/${formName}`, authData);
+      console.log('Auth success:', response.data);
+      setErrors([]);
       return response.data;
     } catch (error) {
-      console.error('Error authorizing user:', error);
-      throw error;
+      // surface backend validation (marshmallow) or duplicate email errors
+      if (error.response) {
+        const payload = error.response.data;
+        let serverErrors = [];
+        if (Array.isArray(payload)) serverErrors = payload;
+        else if (typeof payload === 'string') serverErrors = [payload];
+        else if (payload && typeof payload === 'object') {
+          serverErrors = Object.entries(payload).flatMap(([field, msgs]) => Array.isArray(msgs) ? msgs.map(m => `${field}: ${m}`) : [`${field}: ${msgs}`]);
+        }
+        setErrors(serverErrors.length ? serverErrors : ['Registration failed.']);
+        console.error('Auth failed:', error.response.status, payload);
+      } else {
+        setErrors([error.message]);
+        console.error('Network error:', error.message);
+      }
     }
   }
 
@@ -98,6 +116,11 @@ function LoginRegister({ formName }) {
             alignItems: 'center',
           }}
         >
+          {errors.length > 0 && (
+            <ul style={{ color: 'red', fontSize: '.65rem', margin: 0, padding: 0, listStyle: 'none', textAlign: 'left', maxWidth: '100%' }}>
+              {errors.map((err, i) => <li key={i}>{err}</li>)}
+            </ul>
+          )}
           <TextInput
             inputId="email"
             label={formName}
