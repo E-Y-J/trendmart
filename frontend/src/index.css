@@ -3,9 +3,17 @@ html,
 body,
 #root {
   /* Inter and Inter Tight imported in index.html head */
-  font-family: Inter Tight, Inter, system-ui, "Segoe UI", Roboto, Arial, Helvetica, sans-serif;
+  font-family:
+    Inter Tight,
+    Inter,
+    system-ui,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    Helvetica,
+    sans-serif;
 }
-  /*
+/*
 
 /* make border-box the exact dimentions of the scree /
 *,

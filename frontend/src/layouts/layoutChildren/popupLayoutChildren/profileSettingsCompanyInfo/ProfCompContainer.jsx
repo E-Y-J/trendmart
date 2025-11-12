@@ -1,10 +1,5 @@
-
-
 function ProfCompContainer() {
-    return (
-        <>
-        </>
-    )
+  return <></>;
 }
 
 export default ProfCompContainer;

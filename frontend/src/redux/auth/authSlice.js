@@ -1,26 +1,28 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../access/api';
-import { setStatus } from '../status/statusSlice';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import api from "../../api/api";
+import { setStatus } from "../status/statusSlice";
 
 const initialState = {
   user: null,
   isAuthenticated: false,
-  status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'error'
+  status: "idle", // 'idle' | 'loading' | 'succeeded' | 'error'
   error: null,
 };
 
 export const createUser = createAsyncThunk(
-  'auth/register',
+  "auth/register",
   async ({ email, password }, { rejectWithValue, dispatch }) => {
     try {
-      const response = await api.post('auth/register', { email, password });
-      dispatch(setStatus({ message: 'Registration successful!', variant: 'success' }));
+      const response = await api.post("/auth/register", { email, password });
+      dispatch(
+        setStatus({ message: "Registration successful!", variant: "success" })
+      );
       return response.data;
     } catch (error) {
       dispatch(
         setStatus({
-          message: error.response?.data?.message || 'Registration failed.',
-          variant: 'error',
+          message: error.response?.data?.message || "Registration failed.",
+          variant: "error",
         })
       );
       return rejectWithValue(error.response?.data);
@@ -29,17 +31,18 @@ export const createUser = createAsyncThunk(
 );
 
 export const loginUser = createAsyncThunk(
-  'auth/login',
+  "auth/login",
   async ({ email, password }, { rejectWithValue, dispatch }) => {
     try {
-      const response = await api.post('auth/login', { email, password });
-      dispatch(setStatus({ message: 'Login successful!', variant: 'success' }));
+      const response = await api.post("/auth/login", { email, password });
+      dispatch(setStatus({ message: "Login successful!", variant: "success" }));
       return response.data;
     } catch (error) {
       dispatch(
         setStatus({
-          message: error.response?.data?.message || 'Login failed. Check credentials.',
-          variant: 'error',
+          message:
+            error.response?.data?.message || "Login failed. Check credentials.",
+          variant: "error",
         })
       );
       return rejectWithValue(error.response?.data);
@@ -48,31 +51,38 @@ export const loginUser = createAsyncThunk(
 );
 
 export const checkAuthStatus = createAsyncThunk(
-  'auth/protected',
+  "auth/protected",
   async (_, { rejectWithValue, dispatch }) => {
     try {
-      const response = await api.get('/auth/protected');
-      dispatch(setStatus({ message: 'Session active.', variant: 'info' }));
+      const response = await api.get("/auth/protected");
+      dispatch(setStatus({ message: "Session active.", variant: "info" }));
       return response.data;
     } catch (error) {
-      dispatch(setStatus({ message: 'Session expired. Please log in again.', variant: 'error' }));
+      dispatch(
+        setStatus({
+          message: "Session expired. Please log in again.",
+          variant: "error",
+        })
+      );
       return rejectWithValue(error.response?.data);
     }
   }
 );
 
 export const logoutUser = createAsyncThunk(
-  'auth/logoutUser',
+  "auth/logoutUser",
   async (_, { rejectWithValue, dispatch }) => {
     try {
-      await api.post('/logout');
-      dispatch(setStatus({ message: 'Logged out successfully.', variant: 'info' }));
+      await api.post("/auth/logout");
+      dispatch(
+        setStatus({ message: "Logged out successfully.", variant: "info" })
+      );
       return null;
     } catch (error) {
       dispatch(
         setStatus({
-          message: error.response?.data?.message || 'Logout failed.',
-          variant: 'error',
+          message: error.response?.data?.message || "Logout failed.",
+          variant: "error",
         })
       );
       return rejectWithValue(error.response?.data);
@@ -81,55 +91,55 @@ export const logoutUser = createAsyncThunk(
 );
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
-  reducers: {  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       // Login reducers
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isAuthenticated = true;
         state.user = action.payload;
-        state.status = 'succeeded';
+        state.status = "succeeded";
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isAuthenticated = false;
         state.error = action.payload;
-        state.status = 'error';
+        state.status = "error";
       })
 
       // Registration reducers
       .addCase(createUser.fulfilled, (state, action) => {
         state.isAuthenticated = true;
         state.user = action.payload;
-        state.status = 'succeeded';
+        state.status = "succeeded";
       })
       .addCase(createUser.rejected, (state, action) => {
         state.isAuthenticated = false;
         state.error = action.payload;
-        state.status = 'error';
+        state.status = "error";
       })
 
       // Auth check reducers
       .addCase(checkAuthStatus.pending, (state) => {
-        state.status = 'loading';
+        state.status = "loading";
       })
       .addCase(checkAuthStatus.fulfilled, (state, action) => {
         state.isAuthenticated = true;
         state.user = action.payload;
-        state.status = 'succeeded';
+        state.status = "succeeded";
       })
       .addCase(checkAuthStatus.rejected, (state) => {
         state.isAuthenticated = false;
         state.user = null;
-        state.status = 'failed';
+        state.status = "failed";
       })
 
       // Logout reducers
       .addCase(logoutUser.fulfilled, (state) => {
         state.isAuthenticated = false;
         state.user = null;
-        state.status = 'idle';
+        state.status = "idle";
       });
   },
 });

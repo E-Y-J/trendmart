@@ -7,7 +7,7 @@ function CheckboxToggle({ onClick, checked }) {
       id="toggleContainer"
       direction="horizontal"
       className="d-flex flex-row justify-content-around align-items-center position-relative gap-3"
-      gap={ 3 }
+      gap={3}
       style={{
         borderRadius: ".4rem",
         boxShadow: "0 1px 1px rgb(255 255 255 / .6)",
@@ -29,8 +29,8 @@ function CheckboxToggle({ onClick, checked }) {
       <Form.Check
         type="switch"
         id="custom-switch"
-        checked={ checked }
-        onChange={ onClick }
+        checked={checked}
+        onChange={onClick}
         style={{
           transform: "scale(1.5)",
           accentColor: checked ? "#00aef0" : "#0a1f44",
