@@ -2,8 +2,8 @@ import { useState } from "react";
 import TextInput from "../layouts/layoutChildren/input/TextInput";
 import CheckboxToggle from "../layouts/layoutChildren/input/CheckboxToggle";
 import { useNavigate } from "react-router-dom";
-import api from "../beConnection/api"
-import { createUser, loginUser } from "../redux/auth/authSlice";
+import api from "../api/api"
+// import { createUser, loginUser } from "../redux/auth/authSlice";
 
 
 function LoginRegister({ formName }) {

@@ -3,7 +3,7 @@
 // Backend endpoints referenced: /products, /categories/:id/products, /products/:id/inventory, /products/:id/reviews
 // All functions return response.data directly; callers handle errors.
 
-import api from "../beConnection/api.jsx";
+import api from "./api";
 
 // -------- Products --------
 

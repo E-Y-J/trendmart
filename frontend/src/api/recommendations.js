@@ -1,4 +1,4 @@
-import api from "../beConnection/api.jsx";
+import api from "./api";
 
 // GET /recommendations/cold_start?top_k=K
 export async function getColdStart(topK = 5) {
