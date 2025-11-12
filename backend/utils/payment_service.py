@@ -1,9 +1,9 @@
 import stripe
 from flask import current_app
+from datetime import datetime
+from extensions import db
 from models.payment import Payment
 from models.shopping import Order
-from extensions import db
-from datetime import datetime
 
 
 class PaymentService:
@@ -47,26 +47,22 @@ class PaymentService:
             if order.payment:
                 raise ValueError(f"Order {order_id} already has a payment")
 
-            # Setup metadata for tracking
-            payment_metadata = {
-                'order_id': str(order_id),
-                'integration': 'trendmart'
-            }
-            if metadata:
-                payment_metadata.update(metadata)
-
-            # Create the Stripe payment intent
+            # Create Intent on Stripe
             intent = stripe.PaymentIntent.create(
                 amount=amount,
                 currency=currency,
                 automatic_payment_methods={'enabled': True},
-                metadata=payment_metadata
+                metadata={
+                    'order_id': str(order_id),
+                    'integration': 'trendmart',
+                    **(metadata or {})
+                }
             )
 
-            # Save payment info to our database
+            # Persist pending payment
             payment = Payment(
                 order_id=order_id,
-                total_amount=amount / 100,
+                total_amount=amount / 100.0,
                 currency=currency.upper(),
                 payment_method='card',  # Will update this later when we know the actual method
                 stripe_payment_intent_id=intent.id,
@@ -123,19 +119,21 @@ class PaymentService:
                     f"Can't find payment for intent {payment_intent_id}")
 
             # Update status based on what happened
-            if intent.status == 'succeeded':
+            status = intent.status
+            if status == 'succeeded':
                 payment.status = 'completed'
                 payment.paid_at = datetime.utcnow()
-                # Try to get the actual payment method used
                 if intent.charges.data:
-                    payment.payment_method = intent.charges.data[0].payment_method_details.type
-            elif intent.status == 'payment_failed':
-                payment.status = 'failed'
-            elif intent.status == 'canceled':
-                payment.status = 'canceled'
+                    ch = intent.charges.data[0]
+                    if ch.payment_method_details:
+                        payment.payment_method = ch.payment_method_details.type
+                    if hasattr(ch, 'receipt_url'):
+                        payment.receipt_url = ch.receipt_url
+            elif status in ('payment_failed', 'canceled'):
+                payment.status = 'failed' if status == 'payment_failed' else 'canceled'
             else:
                 # Just use whatever Stripe says
-                payment.status = intent.status
+                payment.status = status
 
             db.session.commit()
             return payment
@@ -165,20 +163,14 @@ class PaymentService:
         if we need to handle refunds, disputes, etc.
         """
         try:
+            t = event['type']
             # Handle the webhook events we care about
-            if event['type'] == 'payment_intent.succeeded':
-                payment_intent = event['data']['object']
-                PaymentService.confirm_payment(payment_intent['id'])
-            elif event['type'] == 'payment_intent.payment_failed':
-                payment_intent = event['data']['object']
-                PaymentService.confirm_payment(payment_intent['id'])
-            elif event['type'] == 'payment_intent.canceled':
+            if t in ('payment_intent.succeeded', 'payment_intent.payment_failed', 'payment_intent.canceled'):
                 payment_intent = event['data']['object']
                 PaymentService.confirm_payment(payment_intent['id'])
             else:
                 # Log unhandled events but don't fail
-                current_app.logger.info(
-                    f"Got unhandled event: {event['type']}")
+                current_app.logger.info(f"Unhandled Stripe event: {t}")
 
             return True
         except Exception as e:
@@ -204,17 +196,16 @@ class PaymentService:
         Raises:
             ValueError if the payment doesn't exist in our database
         """
-        payment = Payment.query.get(payment_id)
-        if not payment:
+        p = Payment.query.get(payment_id)
+        if not p:
             raise ValueError(f"Payment {payment_id} not found")
-
-        # Return the payment data as a dict
         return {
-            'id': payment.id,
-            'status': payment.status,
-            'total_amount': payment.total_amount,
-            'currency': payment.currency,
-            'payment_method': payment.payment_method,
-            'created_at': payment.created_at.isoformat(),
-            'paid_at': payment.paid_at.isoformat() if payment.paid_at else None
+            'id': p.id,
+            'status': p.status,
+            'total_amount': p.total_amount,
+            'currency': p.currency,
+            'payment_method': p.payment_method,
+            'created_at': p.created_at.isoformat(),
+            'paid_at': p.paid_at.isoformat() if p.paid_at else None,
+            'receipt_url': getattr(p, 'receipt_url', None),
         }
