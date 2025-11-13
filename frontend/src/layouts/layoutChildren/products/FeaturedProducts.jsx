@@ -1,6 +1,6 @@
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import ProductGrid from "./productsChildren/productGrid";
+import ProductGrid from "./productsChildren/ProductGrid";
 
 import SearchbarRow from "../sectionSearchbar/SearchbarRow";
 
