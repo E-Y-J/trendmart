@@ -1,13 +1,7 @@
 from flask import Blueprint, request, jsonify
 from schemas.shopping import (
-    CartSchema,
-    CartCreateSchema,
     CartItemSchema,
     CartItemCreateSchema
-)
-from schemas.catalog import (
-    ProductSchema,
-    InventorySchema
 )
 from extensions import db
 from models.shopping import Cart, CartItem
