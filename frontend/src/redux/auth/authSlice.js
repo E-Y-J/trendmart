@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../beConnection/api';
+import api from '../../api/api';
 
 const initialState = {
   user: null,
@@ -57,7 +57,7 @@ export const logoutUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       // Backend response should clear the Set-Cookie header (e.g., set expiration to past)
-      await api.post('/logout');
+      await api.post('/auth/logout');
 
       return null;
     } catch (error) {
