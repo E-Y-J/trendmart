@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import api from "../../beConnection/api";
+import api from "../../api/api";
+import { setStatus } from "../status/statusSlice";
 
 const initialState = {
   user: null,
