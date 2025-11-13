@@ -14,7 +14,6 @@ from routes.bulk_users import bulk_users_bp
 from routes.catalog import categories_bp, products_bp, subcategories_bp
 from routes.customers import customers_bp
 from routes.events import events_bp, recom_feedback_bp
-<<<<<<< HEAD
 from routes.payment import payment_bp
 from routes.shopping import order_bp
 from routes import cold_start
@@ -22,9 +21,7 @@ import models
 from models.catalog import Category, Subcategory, Product
 from flask_swagger_ui import get_swaggerui_blueprint
 import os
-=======
 from routes.recommendation import recom_bp
->>>>>>> 77a852aba404a87deef11ba2254f4d8ede8798e6
 
 # Swagger UI configuration
 SWAGGER_URL = "/api/docs"
@@ -123,13 +120,15 @@ def create_app():
     @app.errorhandler(400)
     def handle_400(e):
         return jsonify(
-            {"error": "bad_request", "message": getattr(e, "description", str(e))}
+            {"error": "bad_request", "message": getattr(
+                e, "description", str(e))}
         ), 400
 
     @app.errorhandler(404)
     def handle_404(e):
         return jsonify(
-            {"error": "not_found", "message": getattr(e, "description", str(e))}
+            {"error": "not_found", "message": getattr(
+                e, "description", str(e))}
         ), 404
 
     @app.errorhandler(405)

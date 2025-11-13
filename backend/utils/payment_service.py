@@ -43,9 +43,22 @@ class PaymentService:
             if not order:
                 raise ValueError(f"Order {order_id} not found")
 
-            # Make sure we don't double-charge
-            if order.payment:
-                raise ValueError(f"Order {order_id} already has a payment")
+            # Idempotent reuse: if there's an existing non-final payment with an intent, reuse it
+            existing = order.payment
+            if existing and existing.stripe_payment_intent_id and not PaymentService._is_final_status(existing.status):
+                try:
+                    intent = stripe.PaymentIntent.retrieve(
+                        existing.stripe_payment_intent_id)
+                    return {
+                        'client_secret': intent.client_secret,
+                        'payment_intent_id': intent.id,
+                        'payment_id': existing.id,
+                        'order_id': order_id,
+                        'status': existing.status,
+                    }
+                except Exception as e:
+                    current_app.logger.warning(
+                        f"[payments.service] Reuse failed; creating new intent: {e}")
 
             # Create Intent on Stripe
             intent = stripe.PaymentIntent.create(
@@ -59,23 +72,41 @@ class PaymentService:
                 }
             )
 
-            # Persist pending payment
-            payment = Payment(
-                order_id=order_id,
-                total_amount=amount / 100.0,
-                currency=currency.upper(),
-                payment_method='card',  # Will update this later when we know the actual method
-                stripe_payment_intent_id=intent.id,
-                status='pending'
-            )
+            # Persist pending payment (create new or update existing if present but final)
+            if existing and PaymentService._is_final_status(existing.status):
+                payment = existing
+                payment.total_amount = amount / 100.0
+                payment.currency = currency.upper()
+                payment.payment_method = 'card'
+                payment.stripe_payment_intent_id = intent.id
+                payment.status = 'pending'
+            elif existing is None:
+                payment = Payment(
+                    order_id=order_id,
+                    total_amount=amount / 100.0,
+                    currency=currency.upper(),
+                    payment_method='card',  # refined on success
+                    stripe_payment_intent_id=intent.id,
+                    status='pending'
+                )
+                db.session.add(payment)
+            else:
+                # existing present but without an intent or unknown state; refresh to new intent
+                payment = existing
+                payment.total_amount = amount / 100.0
+                payment.currency = currency.upper()
+                payment.payment_method = 'card'
+                payment.stripe_payment_intent_id = intent.id
+                payment.status = 'pending'
 
-            db.session.add(payment)
             db.session.commit()
 
             return {
                 'client_secret': intent.client_secret,
                 'payment_intent_id': intent.id,
-                'payment_id': payment.id
+                'payment_id': payment.id,
+                'order_id': order_id,
+                'status': payment.status,
             }
 
         except stripe.error.StripeError as e:
@@ -127,8 +158,9 @@ class PaymentService:
                     ch = intent.charges.data[0]
                     if ch.payment_method_details:
                         payment.payment_method = ch.payment_method_details.type
-                    if hasattr(ch, 'receipt_url'):
-                        payment.receipt_url = ch.receipt_url
+                # Sync order status on success
+                if payment.order:
+                    payment.order.status = 'paid'
             elif status in ('payment_failed', 'canceled'):
                 payment.status = 'failed' if status == 'payment_failed' else 'canceled'
             else:
@@ -201,14 +233,22 @@ class PaymentService:
             raise ValueError(f"Payment {payment_id} not found")
         return {
             'id': p.id,
+            'order_id': p.order_id,
+            'stripe_payment_intent_id': p.stripe_payment_intent_id,
             'status': p.status,
             'total_amount': p.total_amount,
             'currency': p.currency,
             'payment_method': p.payment_method,
             'created_at': p.created_at.isoformat(),
             'paid_at': p.paid_at.isoformat() if p.paid_at else None,
-            'receipt_url': getattr(p, 'receipt_url', None),
         }
+
+    @staticmethod
+    def _is_final_status(status: str) -> bool:
+        """Return True if the local payment status is considered final."""
+        if not status:
+            return False
+        return status.lower() in {"completed", "failed", "canceled", "refunded"}
 
     @staticmethod
     def create_refund(payment_id: int, amount_cents: int | None = None, reason: str | None = None):

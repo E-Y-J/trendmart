@@ -6,6 +6,7 @@ import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import logoUrl from "/logo.svg?url";
+import Image from "react-bootstrap/Image";
 
 /**
  * FocusedProduct
@@ -50,18 +51,18 @@ function FocusedProduct({
   const recs = recommendations.length
     ? recommendations
     : Array.from({ length: 12 }).map((_, i) => ({
-        id: i,
-        title:
-          i % 3 === 0
-            ? "Bought Together"
-            : "Similar Item by Different Category",
-      }));
+      id: i,
+      title:
+        i % 3 === 0
+          ? "Bought Together"
+          : "Similar Item by Different Category",
+    }));
 
   return (
     <Card
       role="dialog"
       aria-modal="true"
-      aria-label={`Details for ${ name}` }
+      aria-label={`Details for ${name}`}
       className="p-3 shadow position-relative m-auto"
       style={{
         width: "100%",
@@ -73,7 +74,7 @@ function FocusedProduct({
     >
       {/* Close button */}
       <CloseButton
-        onClick={ onClose }
+        onClick={onClose}
         aria-label="Close"
         className="position-absolute"
         style={{
@@ -104,8 +105,8 @@ function FocusedProduct({
             >
               {product?.imageUrl ? (
                 <img
-                  src={ product.imageUrl }
-                  alt={`Image of ${ name}` }
+                  src={product.imageUrl}
+                  alt={`Image of ${name}`}
                   style={{
                     maxWidth: "100%",
                     maxHeight: "100%",
@@ -114,20 +115,20 @@ function FocusedProduct({
                 />
               ) : (
                 <Image
-									src={ logoUrl }
-									alt="Logo"
-									style={{ height: "100%", maxHeight: "3rem", objectFit: "contain" }}
-								/>
+                  src={logoUrl}
+                  alt="Logo"
+                  style={{ height: "100%", maxHeight: "3rem", objectFit: "contain" }}
+                />
               )}
             </div>
 
             <div>
-              <h2 style={{ margin: 0 }}>{ name }</h2>
+              <h2 style={{ margin: 0 }}>{name}</h2>
               <div style={{ fontWeight: 600, marginTop: ".25rem" }}>
                 Description:
               </div>
               <p style={{ marginTop: ".25rem", lineHeight: 1.35 }}>
-                { description }
+                {description}
               </p>
             </div>
 
@@ -136,24 +137,24 @@ function FocusedProduct({
               <Button
                 variant="primary"
                 style={{ ...primaryBtn }}
-                onClick={ onAddToCart }
+                onClick={onAddToCart}
               >
                 Add to cart
               </Button>
-              <Button variant="dark" style={{ ...darkBtn }} onClick={ onBuyNow }>
+              <Button variant="dark" style={{ ...darkBtn }} onClick={onBuyNow}>
                 Buy
               </Button>
               <Button
                 variant="light"
                 style={{ ...mutedBtn }}
-                onClick={ onWishlist }
+                onClick={onWishlist}
               >
                 Wishlist
               </Button>
               <Button
                 variant="light"
                 style={{ ...mutedBtn }}
-                onClick={ onMoreLikeThis }
+                onClick={onMoreLikeThis}
               >
                 More Like This
               </Button>
@@ -189,7 +190,7 @@ function FocusedProduct({
                     color: "#384554",
                   }}
                 >
-                  { rec.title }
+                  {rec.title}
                 </div>
               ))}
             </div>

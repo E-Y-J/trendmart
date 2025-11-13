@@ -3,7 +3,7 @@ from werkzeug.exceptions import BadRequest
 import stripe
 from marshmallow import ValidationError
 
-from schemas.payment import PaymentIntentCreateSchema, PaymentIntentResponseSchema
+from schemas.payment import PaymentIntentCreateSchema
 from utils.payment_service import PaymentService
 from models.shopping import Order
 
@@ -11,11 +11,15 @@ from models.shopping import Order
 payment_bp = Blueprint('payments', __name__, url_prefix='/payments')
 
 
+def _error(code: str, message: str, status: int):
+    return jsonify({"error": code, "message": message}), status
+
+
 @payment_bp.route('/config', methods=['GET'])
 def get_stripe_config():
     publishable_key = current_app.config.get('STRIPE_PUBLISHABLE_KEY')
     if not publishable_key:
-        return jsonify({'error': 'Stripe publishable key not configured'}), 500
+        return _error('config_error', 'Stripe publishable key not configured', 500)
     return jsonify({'publishableKey': publishable_key}), 200
 
 
@@ -23,18 +27,18 @@ def get_stripe_config():
 @payment_bp.route('/intent', methods=['POST'])
 def create_payment_intent():
     try:
-        data = PaymentIntentCreateSchema().load(request.get_json() or {})
+        data = PaymentIntentCreateSchema().load(request.get_json(silent=True) or {})
     except ValidationError as err:
-        return jsonify({"error": "validation_error", "details": err.messages}), 400
+        return _error('validation_error', str(err), 400)
 
     order_id = data["order_id"]
     order = Order.query.get(order_id)
     if not order:
-        return jsonify({"error": "bad_request", "message": f"Order {order_id} not found"}), 400
+        return _error('order_not_found', f'Order {order_id} not found', 404)
 
     amount_cents = int(round((order.total or 0.0) * 100))
     if amount_cents <= 0:
-        return jsonify({"error": "bad_request", "message": "Order total must be greater than 0"}), 400
+        return _error('bad_request', 'Order total must be greater than 0', 400)
 
     try:
         result = PaymentService.create_payment_intent(
@@ -43,10 +47,10 @@ def create_payment_intent():
             currency=(data.get('currency') or 'usd').lower(),
             metadata={'source': 'api'}
         )
-        return PaymentIntentResponseSchema().dump(result), 201
+        # result already includes: payment_id, order_id, client_secret, status
+        return jsonify(result), 200
     except stripe.error.StripeError as e:
-        # Surface Stripe problems as 502 to distinguish from your server bugs
-        return jsonify({"error": "stripe_error", "message": str(e)}), 502
+        return _error('stripe_error', str(e), 502)
 
 
 # POST /payments/webhook
@@ -56,20 +60,20 @@ def stripe_webhook():
     sig_header = request.headers.get('Stripe-Signature')
     webhook_secret = current_app.config.get('STRIPE_WEBHOOK_SECRET')
     if not webhook_secret:
-        return jsonify({'error': 'Webhook secret not configured'}), 500
+        return _error('config_error', 'Webhook secret not configured', 500)
 
     try:
         event = stripe.Webhook.construct_event(
             payload, sig_header, webhook_secret)
     except ValueError:
-        return jsonify({'error': 'Invalid payload'}), 400
+        return _error('invalid_payload', 'Invalid payload', 400)
     except stripe.error.SignatureVerificationError:
-        return jsonify({'error': 'Invalid signature'}), 400
+        return _error('invalid_signature', 'Invalid signature', 400)
 
     ok = PaymentService.process_webhook_event(event)
     if not ok:
-        return jsonify({'error': 'Unhandled event type'}), 400
-    return jsonify({'status': 'success'}), 200
+        return _error('unhandled_event', 'Unhandled event type', 400)
+    return jsonify({'status': 'ok'}), 200
 
 
 # GET /payments/<payment_id>
@@ -77,9 +81,16 @@ def stripe_webhook():
 def get_payment_status(payment_id: int):
     try:
         data = PaymentService.get_payment_status(payment_id)
-        return jsonify(data), 200
+        # Return minimal MVP shape
+        resp = {
+            'payment_id': data['id'],
+            'order_id': data['order_id'],
+            'stripe_payment_intent_id': data['stripe_payment_intent_id'],
+            'status': data['status']
+        }
+        return jsonify(resp), 200
     except ValueError as e:
-        raise BadRequest(str(e))
+        return _error('not_found', str(e), 404)
 
 
 # POST /payments/{payment_id}/refund
@@ -94,9 +105,9 @@ def issue_refund(payment_id: int):
             payment_id, amount_cents=amount, reason=reason)
         return jsonify(result), 201
     except ValueError as e:
-        raise BadRequest(str(e))
+        return _error('not_found', str(e), 404)
     except stripe.error.StripeError as e:
-        return jsonify({"error": "stripe_error", "message": str(e)}), 400
+        return _error('stripe_error', str(e), 400)
 
 
 # GET /payments/{payment_id}/refunds
@@ -106,4 +117,4 @@ def list_refunds(payment_id: int):
         items = PaymentService.list_refunds(payment_id)
         return jsonify({"refunds": items})
     except ValueError as e:
-        raise BadRequest(str(e))
+        return _error('not_found', str(e), 404)
