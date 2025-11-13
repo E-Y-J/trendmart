@@ -209,3 +209,53 @@ class PaymentService:
             'paid_at': p.paid_at.isoformat() if p.paid_at else None,
             'receipt_url': getattr(p, 'receipt_url', None),
         }
+
+    @staticmethod
+    def create_refund(payment_id: int, amount_cents: int | None = None, reason: str | None = None):
+        """
+        Issue a refund against the Stripe PaymentIntent for this payment.
+        If amount_cents is None, a full refund is attempted.
+        """
+        p = Payment.query.get(payment_id)
+        if not p or not p.stripe_payment_intent_id:
+            raise ValueError(
+                f"Payment {payment_id} not found or missing PaymentIntent")
+
+        params = {"payment_intent": p.stripe_payment_intent_id}
+        if amount_cents is not None:
+            params["amount"] = amount_cents
+        if reason:
+            # e.g. 'requested_by_customer' or 'fraudulent'
+            params["reason"] = reason
+
+        r = stripe.Refund.create(**params)
+        return {
+            "id": r.id,
+            "status": r.status,
+            "amount": r.amount,
+            "currency": r.currency,
+            "created": r.created,
+            "payment_intent_id": r.payment_intent,
+        }
+
+    @staticmethod
+    def list_refunds(payment_id: int):
+        """
+        List refunds for the payment's PaymentIntent.
+        """
+        p = Payment.query.get(payment_id)
+        if not p or not p.stripe_payment_intent_id:
+            raise ValueError(
+                f"Payment {payment_id} not found or missing PaymentIntent")
+
+        refunds = stripe.Refund.list(payment_intent=p.stripe_payment_intent_id)
+        items = []
+        for r in refunds.auto_paging_iter():
+            items.append({
+                "id": r.id,
+                "status": r.status,
+                "amount": r.amount,
+                "currency": r.currency,
+                "created": r.created,
+            })
+        return items

@@ -20,6 +20,7 @@ produces:
 # Paths
 # =========================
 paths: 
+  
   /bulk/add:
     post:
       tags:

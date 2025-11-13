@@ -9,6 +9,8 @@ from routes.admin import admin_bp
 from routes.customers import customers_bp
 from routes.recommendation import recom_bp
 from routes.events import events_bp, recom_feedback_bp
+from routes.payment import payment_bp
+from routes.shopping import order_bp
 from routes import cold_start
 import models
 from models.catalog import Category, Subcategory, Product
@@ -87,8 +89,18 @@ def create_app():
     app.register_blueprint(recom_feedback_bp)
     app.register_blueprint(bulk_bp)
     app.register_blueprint(bulk_users_bp)
+    app.register_blueprint(payment_bp)
+    app.register_blueprint(order_bp)
+
+    # Serve product/media assets from backend/assets directory
+    @app.route("/assets/<path:filename>")
+    def assets(filename: str):
+        # Files live under backend/assets; example URL:
+        #   /assets/productImages/phones/Apple_iPhone_15.avif
+        return send_from_directory("assets", filename)
 
     # Serve the raw swagger.yaml
+
     @app.route("/api/swagger")
     def swagger_spec():
         return send_from_directory("documentation", "swagger.yaml")
