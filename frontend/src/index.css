@@ -1,27 +1,27 @@
-/* 1. Reset default browser margins and padding */
+/* Reset default browser margins and padding */
 html,
 body,
 #root {
-  /* Inter and Inter Tight imported in index.html HEAD */
-  font-family: Inter Tight, Inter, system-ui, "Segoe UI", Roboto, Arial, Helvetica, sans-serif;
-  margin: 0;
-  padding: 0;
+  /* Inter and Inter Tight imported in index.html head */
+  font-family:
+    Inter Tight,
+    Inter,
+    system-ui,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    Helvetica,
+    sans-serif;
 }
+/*
 
-/* 2. Apply a universal box-sizing for predictable sizing */
+/* make border-box the exact dimentions of the scree /
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
-
-/* 3. Ensure full-screen dimensions and hide overflow */
-html,
+*/
 body {
-  height: 100%;
-  width: 100%;
-}
-
-body {
-  overflow: hidden; /* Hide any content that exceeds viewport size */
+  overflow: hidden;
 }
