@@ -3,7 +3,7 @@
 // Backend endpoints referenced: /products, /categories/:id/products, /products/:id/inventory, /products/:id/reviews
 // All functions return response.data directly; callers handle errors.
 
-import api from "../access/api";
+import api from "./api";
 
 // -------- Products --------
 
@@ -54,8 +54,10 @@ export async function listSubcategories(categoryId, params = {}) {
 }
 
 export async function getProductsBySubcategory(subcategoryId, params = {}) {
-    const { data } = await api.get(`/subcategories/${subcategoryId}/products`, { params });
-    return data; // Array of products scoped to subcategory
+  const { data } = await api.get(`/subcategories/${subcategoryId}/products`, {
+    params,
+  });
+  return data; // Array of products scoped to subcategory
 }
 
 // -------- Inventory --------
