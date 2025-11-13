@@ -3,7 +3,6 @@ import Col from "react-bootstrap/Col";
 import Image from "react-bootstrap/Image";
 import Navbar from "react-bootstrap/Navbar";
 import NavLink from "react-bootstrap/NavLink";
-import Row from "react-bootstrap/Row";
 import logoUrl from "/logo.svg?url";
 
 function NavBar() {

@@ -5,6 +5,7 @@ import CloseButton from "react-bootstrap/CloseButton";
 import Col from "react-bootstrap/Col";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
+import logoUrl from "/logo.svg?url";
 
 /**
  * FocusedProduct
@@ -112,7 +113,11 @@ function FocusedProduct({
                   }}
                 />
               ) : (
-                <CartArtwork />
+                <Image
+									src={ logoUrl }
+									alt="Logo"
+									style={{ height: "100%", maxHeight: "3rem", objectFit: "contain" }}
+								/>
               )}
             </div>
 
@@ -223,50 +228,5 @@ const mutedBtn = {
   color: "#1f2937",
   borderColor: "#c8d3e0",
 };
-
-function CartArtwork() {
-  return (
-    <svg
-      width="200"
-      height="140"
-      viewBox="0 0 200 140"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden
-    >
-      <rect
-        x="2"
-        y="2"
-        width="196"
-        height="136"
-        rx="8"
-        stroke="#7aa4d6"
-        strokeWidth="3"
-        fill="#f0f6ff"
-      />
-      <path
-        d="M40 95h96"
-        stroke="#2f6fda"
-        strokeWidth="7"
-        strokeLinecap="round"
-      />
-      <path
-        d="M50 45h100l-12 40H55L50 45z"
-        fill="#7aa4d6"
-        stroke="#2f6fda"
-        strokeWidth="4"
-      />
-      <circle cx="70" cy="105" r="8" fill="#2f6fda" />
-      <circle cx="122" cy="105" r="8" fill="#2f6fda" />
-      <g stroke="#2f6fda" strokeWidth="3">
-        <path d="M85 30v-8" />
-        <path d="M85 22h-8" />
-        <path d="M115 30v-8" />
-        <path d="M115 22h8" />
-        <path d="M100 26v-12" />
-      </g>
-    </svg>
-  );
-}
 
 export default FocusedProduct;

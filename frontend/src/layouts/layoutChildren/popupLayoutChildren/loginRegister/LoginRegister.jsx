@@ -33,10 +33,6 @@ function LoginRegister() {
     }));
   };
 
-  const handleChecked = () => {
-    setToggleForm(toggleForm === "login" ? "register" : "login");
-  };
-
   const validEmail = () => /.+@.+[.](.+){2,4}/.test(formData.email);
 
   const validatePassword = () => {
