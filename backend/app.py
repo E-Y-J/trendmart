@@ -1,19 +1,20 @@
-from flask import Flask, send_from_directory, jsonify, redirect
-from extensions import db, ma, jwt, cors, init_stripe
+import os
+
+import models
 from config import Config
-from routes.catalog import categories_bp, products_bp, subcategories_bp
+from extensions import cors, db, init_stripe, jwt, ma
+from flask import Flask, jsonify, redirect, send_from_directory
+from flask_swagger_ui import get_swaggerui_blueprint
+from models.catalog import Category, Product, Subcategory
+from routes import cold_start
+from routes.admin import admin_bp
+from routes.auth import auth_bp
 from routes.bulk_add import bulk_bp
 from routes.bulk_users import bulk_users_bp
-from routes.auth import auth_bp
-from routes.admin import admin_bp
+from routes.catalog import categories_bp, products_bp, subcategories_bp
 from routes.customers import customers_bp
-from routes.recommendation import recom_bp
 from routes.events import events_bp, recom_feedback_bp
-from routes import cold_start
-import models
-from models.catalog import Category, Subcategory, Product
-from flask_swagger_ui import get_swaggerui_blueprint
-import os
+from routes.recommendation import recom_bp
 
 # Swagger UI configuration
 SWAGGER_URL = "/api/docs"
@@ -96,24 +97,38 @@ def create_app():
     # Root redirect to docs
     @app.route("/")
     def home():
-        return redirect('/api/docs')
+        return redirect("/api/docs")
 
     # JSON error handlers for consistent API responses
     @app.errorhandler(400)
     def handle_400(e):
-        return jsonify({"error": "bad_request", "message": getattr(e, "description", str(e))}), 400
+        return jsonify(
+            {"error": "bad_request", "message": getattr(e, "description", str(e))}
+        ), 400
 
     @app.errorhandler(404)
     def handle_404(e):
-        return jsonify({"error": "not_found", "message": getattr(e, "description", str(e))}), 404
+        return jsonify(
+            {"error": "not_found", "message": getattr(e, "description", str(e))}
+        ), 404
 
     @app.errorhandler(405)
     def handle_405(e):
-        return jsonify({"error": "method_not_allowed", "message": getattr(e, "description", str(e))}), 405
+        return jsonify(
+            {
+                "error": "method_not_allowed",
+                "message": getattr(e, "description", str(e)),
+            }
+        ), 405
 
     @app.errorhandler(500)
     def handle_500(e):
-        return jsonify({"error": "internal_server_error", "message": "An unexpected error occurred."}), 500
+        return jsonify(
+            {
+                "error": "internal_server_error",
+                "message": "An unexpected error occurred.",
+            }
+        ), 500
 
     return app
 
