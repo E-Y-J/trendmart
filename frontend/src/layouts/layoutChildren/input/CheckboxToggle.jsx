@@ -1,5 +1,5 @@
-import Form from "react-bootstrap/Form";
-import Stack from "react-bootstrap/Stack";
+import Form from 'react-bootstrap/Form';
+import Stack from 'react-bootstrap/Stack';
 
 function CheckboxToggle({ onClick, checked }) {
   return (
@@ -9,17 +9,17 @@ function CheckboxToggle({ onClick, checked }) {
       className="d-flex flex-row justify-content-around align-items-center position-relative gap-3"
       gap={3}
       style={{
-        borderRadius: ".4rem",
-        boxShadow: "0 1px 1px rgb(255 255 255 / .6)",
-        fontSize: "1rem",
-        padding: "0.5rem 1rem",
+        borderRadius: '.4rem',
+        boxShadow: '0 1px 1px rgb(255 255 255 / .6)',
+        fontSize: '1rem',
+        padding: '0.5rem 1rem',
       }}
     >
       <h4
         style={{
-          color: checked ? "#00aef0" : "#0a1f44",
+          color: checked ? '#00aef0' : '#0a1f44',
           opacity: checked ? 0.6 : 1,
-          transition: "all 0.3s ease",
+          transition: 'all 0.3s ease',
           margin: 0,
         }}
       >
@@ -32,17 +32,17 @@ function CheckboxToggle({ onClick, checked }) {
         checked={checked}
         onChange={onClick}
         style={{
-          transform: "scale(1.5)",
-          accentColor: checked ? "#00aef0" : "#0a1f44",
-          cursor: "pointer",
+          transform: 'scale(1.5)',
+          accentColor: checked ? '#00aef0' : '#0a1f44',
+          cursor: 'pointer',
         }}
       />
 
       <h4
         style={{
-          color: checked ? "#00aef0" : "#0a1f44",
+          color: checked ? '#00aef0' : '#0a1f44',
           opacity: checked ? 1 : 0.6,
-          transition: "all 0.3s ease",
+          transition: 'all 0.3s ease',
           margin: 0,
         }}
       >

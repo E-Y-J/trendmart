@@ -1,5 +1,5 @@
-import Form from "react-bootstrap/Form";
-import InputGroup from "react-bootstrap/InputGroup";
+import Form from 'react-bootstrap/Form';
+import InputGroup from 'react-bootstrap/InputGroup';
 
 function TextInput({
   children,
@@ -11,10 +11,13 @@ function TextInput({
   password = false,
 }) {
   return (
-    <Form.Group style={{ width: "100%" }} controlId={inputId}>
+    <Form.Group
+      style={{ width: '100%' }}
+      controlId={inputId}
+    >
       <InputGroup>
         <Form.Control
-          type={password ? "password" : "text"}
+          type={password ? 'password' : 'text'}
           placeholder={placeholder}
           disabled={disabled}
           onChange={onChange}
@@ -25,7 +28,7 @@ function TextInput({
       </InputGroup>
       {info && (
         <Form.Text
-          style={{ padding: ".1rem 1rem 1rem 1rem", marginBottom: "1rem" }}
+          style={{ padding: '.1rem 1rem 1rem 1rem', marginBottom: '1rem' }}
         >
           <em>{info}</em>
         </Form.Text>

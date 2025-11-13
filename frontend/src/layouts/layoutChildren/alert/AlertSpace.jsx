@@ -1,22 +1,22 @@
-import Alert from "react-bootstrap/Alert";
-import CloseButton from "react-bootstrap/CloseButton";
-import Col from "react-bootstrap/Col";
-import Row from "react-bootstrap/Row";
-import { useDispatch } from "react-redux";
-import { clearStatus } from "../../../redux/status/statusSlice";
+import Alert from 'react-bootstrap/Alert';
+import CloseButton from 'react-bootstrap/CloseButton';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import { useDispatch } from 'react-redux';
+import { clearStatus } from '../../../redux/status/statusSlice';
 
-function AlertSpace({ alertMessage, variant = "success" }) {
+function AlertSpace({ alertMessage, variant = 'success' }) {
   const dispatch = useDispatch();
 
   return (
     <Alert
       key={variant}
-      variant={variant === "error" ? "danger" : variant}
+      variant={variant === 'error' ? 'danger' : variant}
       className="h-100 m-0 p-0 w-100 justify-content-center align-items-center"
       style={{
-        height: "6vh",
-        display: "flex",
-        color: "#0a1f44",
+        height: '6vh',
+        display: 'flex',
+        color: '#0a1f44',
       }}
     >
       <Row className="w-100 d-flex flex-row">

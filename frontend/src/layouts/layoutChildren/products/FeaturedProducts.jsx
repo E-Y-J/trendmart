@@ -1,8 +1,8 @@
-import Col from "react-bootstrap/Col";
-import Row from "react-bootstrap/Row";
-import ProductGrid from "./productsChildren/ProductGrid";
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import ProductGrid from './productsChildren/ProductGrid';
 
-import SearchbarRow from "../sectionSearchbar/SearchbarRow";
+import SearchbarRow from '../sectionSearchbar/SearchbarRow';
 
 function FeaturedProducts() {
   return (
