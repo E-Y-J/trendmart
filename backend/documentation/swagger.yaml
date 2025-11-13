@@ -854,7 +854,271 @@ paths:
               {
                 "msg": "Missing Authorization Header"
               }
-          
+  # -----------------
+  # Orders Endpoints
+  # -----------------
+  /orders:
+    post:
+      tags:
+        - Orders
+      summary: Create a new order
+      description: Create a new order for a user with specified products and quantities.
+      security:
+        - BearerAuth: []
+      responses:
+        201:
+          description: Order created successfully
+          schema:
+            $ref: '#/definitions/OrderResponse'
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /orders/{order_id}:
+    get:
+      tags:
+        - Orders
+      summary: Get order details
+      description: Retrieve details of an order by its ID.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: order_id
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Order details retrieved successfully
+          schema:
+            $ref: '#/definitions/OrderResponse'
+        404:
+          description: Order not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  
+  /orders/user/{user_id}:
+    get:
+      tags:
+        - Orders
+      summary: Get orders for a user
+      description: Retrieve all orders placed by a specific user.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          type: integer
+      responses:
+        200:
+          description: User orders retrieved successfully
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/OrderResponse'
+        404:
+          description: User not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  
+  # -----------------
+  # Reviews Endpoints
+  # -----------------
+  /products/{product_id}/reviews:
+    post:
+      tags:
+        - Reviews
+      summary: Add a review for a product
+      description: Submit a review for a specific product.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: product_id
+          required: true
+          type: integer
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ReviewCreatePayload'
+          examples:
+            application/json:
+              {
+                "rating": 5,
+                "title": "Great product!",
+                "body": "Highly recommend!"
+              }
+      responses:
+        201:
+          description: Review created successfully
+          schema:
+            $ref: '#/definitions/ReviewCreateResponse'
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        404:
+          description: Product not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    get:
+      tags:
+        - Reviews
+      summary: Get all reviews for a product
+      description: Retrieve all reviews for a specific product.
+      parameters:
+        - in: path
+          name: product_id
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Reviews retrieved successfully
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ReviewResponse'
+        404:
+          description: Product not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    patch:
+      tags:
+        - Reviews
+      summary: Update a review for a product
+      description: Update an existing review for a specific product.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: product_id
+          required: true
+          type: integer
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ReviewUpdatePayload'
+      responses:
+        200:
+          description: Review updated successfully
+          schema:
+            $ref: '#/definitions/ReviewCreateResponse'
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        404:
+          description: Product or Review not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /products/{product_id}/reviews/my:
+    get:
+      tags:
+        - Reviews
+      summary: Get my review for a product
+      description: Retrieve the authenticated user's review for a specific product.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: product_id
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Review retrieved successfully
+          schema:
+            $ref: '#/definitions/ReviewResponse'
+        404:
+          description: Product or Review not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /products/{product_id}/reviews/{review_id}:
+    patch:
+      tags:
+        - Reviews
+      summary: Update a specific review for a product
+      description: Update an existing review identified by review_id for a specific product.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: product_id
+          required: true
+          type: integer
+        - in: path
+          name: review_id
+          required: true
+          type: integer
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/ReviewUpdatePayload'
+      responses:
+        200:
+          description: Review updated successfully
+          schema:
+            $ref: '#/definitions/ReviewCreateResponse'
+        400:
+          description: Validation error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        404:
+          description: Product or Review not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+    delete:
+      tags:
+        - Reviews
+      summary: Delete a review for a product
+      description: Delete an existing review for a specific product.
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: product_id
+          required: true
+          type: integer
+        - in: path
+          name: review_id
+          required: true
+          type: integer
+      responses:
+        204:
+          description: Review deleted successfully
+        404:
+          description: Product or Review not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+  /products/{product_id}/rating_summary:
+    get:
+      tags:
+        - Reviews
+      summary: Get rating summary for a product
+      description: Retrieve the rating summary (average rating, total reviews) for a specific product.
+      parameters:
+        - in: path
+          name: product_id
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Rating summary retrieved successfully
+          schema:
+            $ref: '#/definitions/RatingSummaryResponse'
+        404:
+          description: Product not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
 # =========================
 # Security Definitions
 # =========================
@@ -1470,4 +1734,103 @@ definitions:
           $ref: '#/definitions/SessionIn'
 
 
-
+  # -----------------
+  # Orders Schemas
+  # -----------------
+  OrderResponse:
+    type: object
+    properties:
+      id:
+        type: integer
+      user_id:
+        type: integer
+      total:
+        type: number
+        format: float
+      subtotal:
+        type: number
+        format: float
+      tax_total:
+        type: number
+        format: float
+      status:
+        type: string
+      created_at:
+        type: string
+      placed_at:
+        type: string
+      items:
+        type: array
+        items:
+          type: object
+          properties:
+            product_id:
+              type: integer
+            quantity:
+              type: integer
+            price_per_unit:
+              type: number
+              format: float
+            order_id:
+              type: integer
+      
+  # -----------------
+  # Reviews Schemas
+  # -----------------
+  ReviewCreatePayload:
+    type: object
+    properties:
+      rating:
+        type: integer
+        minimum: 1
+        maximum: 5
+      title:
+        type: string
+      comment:
+        type: string
+  ReviewUpdatePayload:
+    type: object
+    properties:
+      rating:
+        type: integer
+        minimum: 1
+        maximum: 5
+      title:
+        type: string
+      comment:
+        type: string
+  ReviewResponse:
+    type: object
+    properties:
+      id:
+        type: integer
+      # user_id:
+      #   type: integer
+      # product_id:
+      #   type: integer
+      rating:
+        type: integer
+      title:
+        type: string
+      comment:
+        type: string
+      created_at:
+        type: string
+  ReviewCreateResponse:
+    type: object
+    properties:
+      message:
+        type: string
+      review:
+        $ref: '#/definitions/ReviewResponse'
+  RatingSummaryResponse:
+    type: object
+    properties:
+      average_rating:
+        type: number
+        format: float
+      count:
+        type: integer
+      product:
+        $ref: '#/definitions/ProductCard'
+          

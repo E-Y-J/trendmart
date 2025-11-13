@@ -22,6 +22,8 @@ from models.catalog import Category, Subcategory, Product
 from flask_swagger_ui import get_swaggerui_blueprint
 import os
 from routes.recommendation import recom_bp
+from routes.orders import orders_bp, checkout_bp
+from routes.shopping import cart_bp
 
 # Swagger UI configuration
 SWAGGER_URL = "/api/docs"
@@ -104,6 +106,9 @@ def create_app():
         # Files live under backend/assets; example URL:
         #   /assets/productImages/phones/Apple_iPhone_15.avif
         return send_from_directory("assets", filename)
+    app.register_blueprint(orders_bp)
+    app.register_blueprint(checkout_bp)
+    app.register_blueprint(cart_bp)
 
     # Serve the raw swagger.yaml
 
