@@ -1,21 +1,22 @@
-from flask import Flask, send_from_directory, jsonify, redirect
-from extensions import db, ma, jwt, cors, init_stripe
+import os
+
+import models
 from config import Config
-from routes.catalog import categories_bp, products_bp
+from extensions import cors, db, init_stripe, jwt, ma
+from flask import Flask, jsonify, redirect, send_from_directory
+from flask_swagger_ui import get_swaggerui_blueprint
+from models.catalog import Category, Product, Subcategory
+from routes import cold_start
+from routes.admin import admin_bp
+from routes.auth import auth_bp
 from routes.bulk_add import bulk_bp
 from routes.bulk_users import bulk_users_bp
-from routes.auth import auth_bp
-from routes.admin import admin_bp
+from routes.catalog import categories_bp, products_bp, subcategories_bp
 from routes.customers import customers_bp
+from routes.events import events_bp, recom_feedback_bp
+from routes.recommendation import recom_bp
 from routes.orders import orders_bp, checkout_bp
 from routes.shopping import cart_bp
-from routes.recommendation import recom_bp
-from routes.events import events_bp, recom_feedback_bp
-from routes import cold_start
-import models
-from models.catalog import Category, Subcategory, Product
-from flask_swagger_ui import get_swaggerui_blueprint
-import os
 
 # Swagger UI configuration
 SWAGGER_URL = "/api/docs"
@@ -82,6 +83,7 @@ def create_app():
     app.register_blueprint(customers_bp)
     app.register_blueprint(categories_bp)
     app.register_blueprint(products_bp)
+    app.register_blueprint(subcategories_bp)
     app.register_blueprint(swaggerui_blueprint)
     app.register_blueprint(recom_bp)
     app.register_blueprint(events_bp)

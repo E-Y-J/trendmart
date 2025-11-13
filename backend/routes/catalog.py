@@ -8,8 +8,8 @@ from schemas.catalog import (
 )
 from extensions import db
 from flask import Blueprint
-from models.registration import User
 from models.catalog import Category, Subcategory, Product, Inventory, Review
+from models.registration import User
 from werkzeug.security import generate_password_hash
 from sqlalchemy import select, delete
 from marshmallow import ValidationError
@@ -18,22 +18,16 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 # Define Blueprints
 categories_bp = Blueprint('categories', __name__, url_prefix='/categories')
 products_bp = Blueprint('products', __name__, url_prefix='/products')
+subcategories_bp = Blueprint(
+    'subcategories', __name__, url_prefix='/subcategories')
 
 # Product Routes
 # Create a new product
 
 
-@products_bp.route('/', methods=['POST'])
-@jwt_required()
+@products_bp.route('', methods=['POST'])
 def create_product():
     try:
-        current_user_id = int(get_jwt_identity())
-        user = User.query.get(current_user_id)
-        if not user:
-            return jsonify({"error": "User not found"}), 404
-        if not user.is_admin:
-            return jsonify({"error": "Admin privileges required"}), 403
-        
         product_data = request.get_json()
         product_schema = ProductSchema()
         product = product_schema.load(product_data, session=db.session)
@@ -44,13 +38,17 @@ def create_product():
         return jsonify(err.messages), 400
 
 # Get all products
-@products_bp.route('/', methods=['GET'])
+
+
+@products_bp.route('', methods=['GET'])
 def get_products():
     products = Product.query.all()
     product_schema = ProductSchema(many=True)
     return jsonify(product_schema.dump(products)), 200
 
 # Get a single product by id
+
+
 @products_bp.route('/<int:product_id>', methods=['GET'])
 def get_product(product_id):
     product = Product.query.get(product_id)
@@ -132,6 +130,14 @@ def list_subcategories(category_id):
     return jsonify(schema.dump(subs)), 200
 
 
+# Subcategory Routes
+@subcategories_bp.route('/<int:subcategory_id>/products', methods=['GET'])
+def get_products_by_subcategory(subcategory_id):
+    products = Product.query.filter_by(subcategory_id=subcategory_id).all()
+    product_schema = ProductSchema(many=True)
+    return jsonify(product_schema.dump(products)), 200
+
+
 # Inventory Routes
 # Get current stock of a product
 @products_bp.route('/<int:product_id>/inventory', methods=['GET'])
@@ -142,34 +148,30 @@ def get_product_inventory(product_id):
     inventory_schema = InventorySchema()
     return jsonify(inventory_schema.dump(inventory)), 200
 
-#Create inventory
-@products_bp.route('/<int:product_id>/inventory', methods=['POST'])
-@jwt_required()
-def create_product_inventory(product_id):
+
+# Review Routes
+# Add a review for a product
+@products_bp.route('/<int:product_id>/reviews', methods=['POST'])
+def add_product_review(product_id):
     try:
-        current_user_id = int(get_jwt_identity())
-        user = User.query.get(current_user_id)
-        if not user:
-            return jsonify({"error": "User not found"}), 404
-     
-        inventory_data = request.get_json()
-        quantity = inventory_data.get('quantity', 0)
-        if quantity < 1:
-            return jsonify({"error": "Quantity cannot be negative"}), 400
-        
-        # Validate and load data
-        inventory = Inventory(
-            product_id=product_id,
-            quantity=quantity,
-            restock=inventory_data.get('restock', 0)
-        )
-
-        db.session.add(inventory)
+        review_data = request.get_json()
+        review_data['product_id'] = product_id
+        review_schema = ReviewSchema()
+        review = review_schema.load(review_data, session=db.session)
+        db.session.add(review)
         db.session.commit()
-        return jsonify(InventorySchema().dump(inventory)), 201
-
+        return jsonify(review_schema.dump(review)), 201
     except ValidationError as err:
         return jsonify(err.messages), 400
+
+# Get all reviews for a product
+
+
+@products_bp.route('/<int:product_id>/reviews', methods=['GET'])
+def get_product_reviews(product_id):
+    reviews = Review.query.filter_by(product_id=product_id).all()
+    review_schema = ReviewSchema(many=True)
+    return jsonify(review_schema.dump(reviews)), 200
 
 # Review Routes
 # Add a review for a product
