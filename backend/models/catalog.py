@@ -49,11 +49,13 @@ class Product(db.Model):
     __tablename__ = 'products'
 
     id = db.Column(db.Integer, primary_key=True)
-    sku = db.Column(db.String(50), unique=True, nullable=False, index=True)
+    sku = db.Column(db.String(250), unique=True, nullable=False, index=True)
     name = db.Column(db.String(255), nullable=True, index=True)
     description = db.Column(db.Text)
     price = db.Column(db.Float, nullable=False)
-    product_img = db.Column(db.String(500))
+    image_url = db.Column(db.String(500))
+    image_thumb_url = db.Column(db.String(500))
+    image_attribution = db.Column(db.String(255))
     times_click_on = db.Column(db.Integer, default=0, nullable=False)
     tags = db.Column(db.String(255))
 

@@ -1,42 +1,27 @@
-/* 0 margins */
+/* Reset default browser margins and padding */
 html,
 body,
 #root {
-  /* Inter and Inter Tight imported in index.html HEAD */
-  font-family: Inter Tight, Inter, system-ui, "Segoe UI", Roboto, Arial, Helvetica, sans-serif;
-  margin: 0;
-  padding: 0;
+  /* Inter and Inter Tight imported in index.html head */
+  font-family:
+    Inter Tight,
+    Inter,
+    system-ui,
+    "Segoe UI",
+    Roboto,
+    Arial,
+    Helvetica,
+    sans-serif;
 }
+/*
 
-/* Force 100% to Single screen */
+/* make border-box the exact dimentions of the scree /
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
-
-html,
-body {
-  height: 100%;
-  width: 100%;
-}
-
-/* Force no scrollbars */
+*/
 body {
   overflow: hidden;
-}
-
-#root {
-  background: 
-    /* Base gradient */
-    linear-gradient(to right, #fffffb, #f3f3ea),
-    /* Noise layer - subtle repeating lines */
-    repeating-linear-gradient(
-      45deg, 
-      rgba(255, 255, 255, 0.05), 
-      rgba(255, 255, 255, 0.5) 1px, 
-      transparent 1px, 
-      transparent 2px
-    );
-  background-blend-mode: overlay; /* Or multiply, soft-light, etc. */
 }

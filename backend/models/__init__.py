@@ -4,6 +4,7 @@ from .shopping import Cart, CartItem, Order, OrderItem
 from .payment import Payment
 from .recommendation import Recommendation
 from .analytics import UserSession, ProductView
+from .recommendation_feedback import ProductInteraction, RecommendationFeedback
 from .serializers import product_to_dict
 
 __all__ = [
@@ -12,5 +13,6 @@ __all__ = [
     'Cart', 'CartItem', 'Order', 'OrderItem',
     'Payment',
     'Recommendation',
-    'UserSession', 'ProductView'
+    'UserSession', 'ProductView',
+    'ProductInteraction', 'RecommendationFeedback'
 ]

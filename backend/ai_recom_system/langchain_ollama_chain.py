@@ -50,27 +50,27 @@ class OllamaLLM:
     def _call_http(self, messages: List[Dict[str, str]], max_tokens: int = 256, temperature: float = 0.0, timeout: int = 30) -> Dict[str, Any]:
         import requests
 
-        base = os.environ.get("LOCAL_LLM_URL", "http://localhost:8080")
+        base = os.environ.get("OLLAMA_HOST") or os.environ.get(
+            "LOCAL_LLM_URL") or "http://localhost:11434"
         model = self.model or os.environ.get("OLLAMA_MODEL")
         if not model:
             raise RuntimeError("OLLAMA_MODEL not configured")
 
-        url = f"{base}/models/{model}:generate"
-        # Flatten messages into a single input for simple instruction-following models
-        prompt = "\n\n".join(
-            [f"{m.get('role').upper()}: {m.get('content')}" for m in messages])
-        payload = {"inputs": prompt, "parameters": {
-            "temperature": float(temperature), "max_new_tokens": int(max_tokens)}}
+        # Use Ollama's /api/chat with messages
+        url = f"{base}/api/chat"
+        payload = {
+            "model": model,
+            "messages": messages,
+            "stream": False,
+            "options": {"temperature": float(temperature), "num_predict": int(max_tokens)}
+        }
         r = requests.post(url, json=payload, timeout=timeout)
         r.raise_for_status()
         out = r.json()
-        # normalize typical TGI/ollama-like response shapes
+        # Typical chat response: { message: { role, content }, ... }
         if isinstance(out, dict):
-            if "outputs" in out and isinstance(out["outputs"], list) and out["outputs"]:
-                text = out["outputs"][0].get(
-                    "generated_text") or out["outputs"][0].get("text", "")
-            else:
-                text = out.get("generated_text") or out.get("text") or str(out)
+            msg = out.get("message") or {}
+            text = msg.get("content") or out.get("response") or str(out)
         else:
             text = str(out)
         return {"text": text, "raw": out}

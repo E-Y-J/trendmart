@@ -29,25 +29,27 @@ class OllamaWrapper:
     def _call_ollama_http(self, prompt: str) -> Dict[str, Any]:
         import requests
 
-        base = os.environ.get("LOCAL_LLM_URL") or "http://localhost:8080"
+        # Prefer OLLAMA_HOST used by the python client; fall back to LOCAL_LLM_URL
+        base = os.environ.get("OLLAMA_HOST") or os.environ.get(
+            "LOCAL_LLM_URL") or "http://localhost:11434"
         model = self.model or os.environ.get("OLLAMA_MODEL")
         if not model:
             raise RuntimeError("No Ollama model configured (OLLAMA_MODEL)")
 
-        url = f"{base}/models/{model}:generate"
-        payload = {"inputs": prompt, "parameters": {
-            "temperature": float(self.temperature), "max_new_tokens": 256}}
+        # Use Ollama's HTTP generate API
+        url = f"{base}/api/generate"
+        payload = {
+            "model": model,
+            "prompt": prompt,
+            "stream": False,
+            "options": {"temperature": float(self.temperature), "num_predict": 256}
+        }
         r = requests.post(url, json=payload, timeout=30)
         r.raise_for_status()
         out = r.json()
-        # pick best text field from TGI-like responses
+        # Response typically contains a 'response' field with the text
         if isinstance(out, dict):
-            if "outputs" in out and isinstance(out["outputs"], list) and out["outputs"]:
-                text = out["outputs"][0].get(
-                    "generated_text") or out["outputs"][0].get("text", "")
-            else:
-                text = out.get("generated_text") or out.get(
-                    "text") or json.dumps(out)
+            text = out.get("response") or out.get("text") or json.dumps(out)
         else:
             text = str(out)
         return {"text": text, "raw": out}

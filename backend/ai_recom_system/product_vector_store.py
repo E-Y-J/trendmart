@@ -48,6 +48,32 @@ class ProductVectorStore:
         print(
             f"Successfully added {len(products)} products. Total products: {len(self.products)}")
 
+    def set_products_and_embeddings(self, products: List[Dict[str, Any]], embeddings: List[List[float]]):
+        """Directly set products and their precomputed embeddings.
+
+        Args:
+            products: List of product dicts.
+            embeddings: List of embedding vectors aligned by index with products.
+
+        Raises:
+            ValueError: if lengths don't match or embeddings are malformed.
+        """
+        if len(products) != len(embeddings):
+            raise ValueError(
+                "products and embeddings must have the same length")
+        # Basic validation that each embedding is a list/sequence of numbers
+        for i, emb in enumerate(embeddings):
+            if not isinstance(emb, (list, tuple)) or (emb and not isinstance(emb[0], (int, float))):
+                raise ValueError(
+                    f"embedding at index {i} is not a numeric vector")
+
+        self.products = list(products)
+        self.product_embeddings = [list(vec) for vec in embeddings]
+        self.id_to_index = {}
+        for idx, p in enumerate(self.products):
+            if 'id' in p:
+                self.id_to_index[p['id']] = idx
+
     def create_product_text(self, product: Dict[str, Any]) -> str:
         """Delegate to the helper text builder to compose embedding text."""
         return create_product_text(product)

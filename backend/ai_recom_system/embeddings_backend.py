@@ -47,15 +47,40 @@ class OllamaEmbedBackend(BaseEmbeddingBackend):
                 "ollama python client not installed for embeddings") from exc
 
         out = ollama.embed(model=self.model_name, input=list(batched))
-        # API returns dict with key 'embeddings': List[List[float]]
-        vectors = out.get("embeddings") if isinstance(out, dict) else None
+        # Normalize various possible return shapes from ollama python client
+        vectors = None
+        if isinstance(out, dict):
+            # Prefer batch key, then singular
+            vectors = out.get("embeddings") or out.get("embedding")
         if vectors is None:
-            # Fallback: return as-is
+            # Some client versions return custom mapping/objects
+            try:
+                vectors = getattr(out, "embeddings", None) or getattr(
+                    out, "embedding", None)
+            except Exception:
+                vectors = None
+        if vectors is None:
+            # Last resort, take the object itself
             vectors = out
+
+        # If caller passed a batch, return list-of-vectors
         if isinstance(inputs, (list, tuple)):
-            return vectors
-        # single input: return single vector
-        return vectors[0] if vectors else []
+            # If we somehow got a single vector (list of floats), wrap it
+            if isinstance(vectors, (list, tuple)) and vectors and isinstance(vectors[0], (int, float)):
+                return [list(vectors)]
+            return list(vectors) if not isinstance(vectors, (list, tuple)) else vectors
+
+        # Single input: return a single vector (list[float])
+        if isinstance(vectors, (list, tuple)):
+            # If it's a list of lists, take the first; otherwise assume it's already a vector
+            if vectors and isinstance(vectors[0], (list, tuple)):
+                return list(vectors[0])
+            return list(vectors)
+        # Make a best effort to coerce to list
+        try:
+            return list(vectors)
+        except Exception:
+            return []
 
 
 logger = logging.getLogger(__name__)

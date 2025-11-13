@@ -7,6 +7,7 @@ from models.registration import User, CustomerProfile
 from werkzeug.security import generate_password_hash, check_password_hash
 from marshmallow import ValidationError
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt, get_jwt_identity
+from datetime import datetime
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
@@ -20,7 +21,17 @@ def login():
         # Authenticate user (check email/password)
         user = User.query.filter_by(email=login_data['email']).first()
         if not user or not check_password_hash(user.password_hash, login_data['password']):
+            # Update failed login attempts if user exists
+            if user:
+                user.failed_logins += 1
+                db.session.commit()
             return jsonify({"error": "Invalid credentials"}), 401
+
+        # Update login tracking
+        user.logins_count += 1
+        user.last_login_at = datetime.utcnow()
+        user.failed_logins = 0  # Reset failed login counter on successful login
+        db.session.commit()
 
         # Create JWT tokens
         access_token = create_access_token(identity=str(user.id))
@@ -30,11 +41,11 @@ def login():
             'access_token': access_token,
             'refresh_token': refresh_token,
             'token_type': 'Bearer',
-            'expires_in': 3600  # 1 hour
+            'expires_in': 3600,  # 1 hour
+            'user': UserSchema().dump(user)  # Include user data
         }
 
-        token_response = TokenResponseSchema().dump(response_data)
-        return jsonify(token_response), 200
+        return jsonify(response_data), 200
 
     except ValidationError as err:
         return jsonify(err.messages), 400
