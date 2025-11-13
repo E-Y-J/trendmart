@@ -7,6 +7,8 @@ from routes.bulk_users import bulk_users_bp
 from routes.auth import auth_bp
 from routes.admin import admin_bp
 from routes.customers import customers_bp
+from routes.orders import orders_bp, checkout_bp
+from routes.shopping import cart_bp
 from routes.recommendation import recom_bp
 from routes.events import events_bp, recom_feedback_bp
 from routes import cold_start
@@ -86,6 +88,9 @@ def create_app():
     app.register_blueprint(recom_feedback_bp)
     app.register_blueprint(bulk_bp)
     app.register_blueprint(bulk_users_bp)
+    app.register_blueprint(orders_bp)
+    app.register_blueprint(checkout_bp)
+    app.register_blueprint(cart_bp)
 
     # Serve the raw swagger.yaml
     @app.route("/api/swagger")
