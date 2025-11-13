@@ -1,0 +1,109 @@
+from flask import Blueprint, request, jsonify, current_app
+from werkzeug.exceptions import BadRequest
+import stripe
+from marshmallow import ValidationError
+
+from schemas.payment import PaymentIntentCreateSchema, PaymentIntentResponseSchema
+from utils.payment_service import PaymentService
+from models.shopping import Order
+
+# PLURAL prefix to match your desired routes
+payment_bp = Blueprint('payments', __name__, url_prefix='/payments')
+
+
+@payment_bp.route('/config', methods=['GET'])
+def get_stripe_config():
+    publishable_key = current_app.config.get('STRIPE_PUBLISHABLE_KEY')
+    if not publishable_key:
+        return jsonify({'error': 'Stripe publishable key not configured'}), 500
+    return jsonify({'publishableKey': publishable_key}), 200
+
+
+# POST /payments/intent
+@payment_bp.route('/intent', methods=['POST'])
+def create_payment_intent():
+    try:
+        data = PaymentIntentCreateSchema().load(request.get_json() or {})
+    except ValidationError as err:
+        return jsonify({"error": "validation_error", "details": err.messages}), 400
+
+    order_id = data["order_id"]
+    order = Order.query.get(order_id)
+    if not order:
+        return jsonify({"error": "bad_request", "message": f"Order {order_id} not found"}), 400
+
+    amount_cents = int(round((order.total or 0.0) * 100))
+    if amount_cents <= 0:
+        return jsonify({"error": "bad_request", "message": "Order total must be greater than 0"}), 400
+
+    try:
+        result = PaymentService.create_payment_intent(
+            order_id=order_id,
+            amount=amount_cents,
+            currency=(data.get('currency') or 'usd').lower(),
+            metadata={'source': 'api'}
+        )
+        return PaymentIntentResponseSchema().dump(result), 201
+    except stripe.error.StripeError as e:
+        # Surface Stripe problems as 502 to distinguish from your server bugs
+        return jsonify({"error": "stripe_error", "message": str(e)}), 502
+
+
+# POST /payments/webhook
+@payment_bp.route('/webhook', methods=['POST'])
+def stripe_webhook():
+    payload = request.get_data(as_text=True)
+    sig_header = request.headers.get('Stripe-Signature')
+    webhook_secret = current_app.config.get('STRIPE_WEBHOOK_SECRET')
+    if not webhook_secret:
+        return jsonify({'error': 'Webhook secret not configured'}), 500
+
+    try:
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, webhook_secret)
+    except ValueError:
+        return jsonify({'error': 'Invalid payload'}), 400
+    except stripe.error.SignatureVerificationError:
+        return jsonify({'error': 'Invalid signature'}), 400
+
+    ok = PaymentService.process_webhook_event(event)
+    if not ok:
+        return jsonify({'error': 'Unhandled event type'}), 400
+    return jsonify({'status': 'success'}), 200
+
+
+# GET /payments/<payment_id>
+@payment_bp.route('/<int:payment_id>', methods=['GET'])
+def get_payment_status(payment_id: int):
+    try:
+        data = PaymentService.get_payment_status(payment_id)
+        return jsonify(data), 200
+    except ValueError as e:
+        raise BadRequest(str(e))
+
+
+# POST /payments/{payment_id}/refund
+@payment_bp.route('/<int:payment_id>/refund', methods=['POST'])
+def issue_refund(payment_id: int):
+    body = request.get_json(silent=True) or {}
+    amount = body.get("amount_cents")  # optional
+    reason = body.get("reason")        # optional
+
+    try:
+        result = PaymentService.create_refund(
+            payment_id, amount_cents=amount, reason=reason)
+        return jsonify(result), 201
+    except ValueError as e:
+        raise BadRequest(str(e))
+    except stripe.error.StripeError as e:
+        return jsonify({"error": "stripe_error", "message": str(e)}), 400
+
+
+# GET /payments/{payment_id}/refunds
+@payment_bp.route('/<int:payment_id>/refunds', methods=['GET'])
+def list_refunds(payment_id: int):
+    try:
+        items = PaymentService.list_refunds(payment_id)
+        return jsonify({"refunds": items})
+    except ValueError as e:
+        raise BadRequest(str(e))
