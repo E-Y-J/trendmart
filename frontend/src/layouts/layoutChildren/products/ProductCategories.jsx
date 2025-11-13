@@ -1,49 +1,33 @@
-import SearchbarHeader from "../sectionSearchbar/SearchbarHeader";
+import Stack from 'react-bootstrap/Stack';
+import SearchbarRow from '../sectionSearchbar/SearchbarRow';
+import { Container } from 'react-bootstrap';
 
 function ProductCategories({ categories }) {
   return (
-    <div
-      id="categoryContainer"
-      style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-        alignItems: 'center',
-        gap: '0.5rem',
-        backgroundColor: '#6c757d',
-      }}
+    <Container
+      fluid
+      className="p-0 m-0"
+      style={{ height: '100%' }}
     >
-      <SearchbarHeader searchId="subcategorySearch" placeholder="Category" />
-      {categories.map((category, index) => (
-        <div
-          key={index}
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            color: 'white',
-            padding: '0.5rem',
-            margin: '0.25rem',
-            textAlign: 'center',
-            fontWeight: 500,
-            cursor: 'pointer',
-            transition: 'transform 0.2s ease, background-color 0.2s ease',
-          }}
-        >
-          <div
-            style={{
-
-              width: '100%',
-              padding: '0.25rem',
-            }}
+      <Stack
+        direction="vertical"
+        className="gap-2"
+      >
+        <SearchbarRow
+          searchId="subcategorySearch"
+          placeholder="Category"
+          sm={12}
+        />
+        {categories.map((category, index) => (
+          <h3
+            key={index}
+            className="bg-white m-0"
           >
-            <h3 style={{ margin: 0 }}>{category}</h3>
-          </div>
-        </div>
-      ))}
-    </div>
+            {category}
+          </h3>
+        ))}
+      </Stack>
+    </Container>
   );
 }
 

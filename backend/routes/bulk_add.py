@@ -221,8 +221,20 @@ def bulk_add():
                     created["products"] += int(prod_created)
                     updated["products"] += int(not prod_created)
 
+                    # Option A: include richer product fields in response for client convenience
+                    tags_list = [t.strip() for t in (
+                        product.tags or "").split(",") if t and t.strip()]
                     sub_out["products"].append(
-                        {"id": product.id, "sku": product.sku, "name": product.name}
+                        {
+                            "id": product.id,
+                            "sku": product.sku,
+                            "name": product.name,
+                            "price": product.price,
+                            "description": product.description,
+                            "tags": tags_list,
+                            "image_url": product.image_url,
+                            "image_thumb_url": product.image_thumb_url,
+                        }
                     )
 
                 cat_out["subcategories"].append(sub_out)

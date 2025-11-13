@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../beConnection/api';
+import api from '../../api/api';
+import { setStatus } from '../status/statusSlice';
 
 const initialState = {
   user: null,
@@ -10,58 +11,79 @@ const initialState = {
 
 export const createUser = createAsyncThunk(
   'auth/register',
-  async ({ email, password }, { rejectWithValue }) => {
+  async ({ email, password }, { rejectWithValue, dispatch }) => {
     try {
-      const response = await api.post('auth/register', { email, password });
+      const response = await api.post('/auth/register', { email, password });
 
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      dispatch(
+        setStatus({
+          message: error.response?.data?.message || 'Registration failed.',
+          variant: 'error',
+        })
+      );
+      return rejectWithValue(error.response?.data);
     }
   }
 );
 
-// Async thunk for user login (backend sets the http-only cookie in response)
 export const loginUser = createAsyncThunk(
   'auth/login',
-  async ({ email, password }, { rejectWithValue }) => {
+  async ({ email, password }, { rejectWithValue, dispatch }) => {
     try {
-      const response = await api.post('/login', { email, password });
+      const response = await api.post('/auth/login', { email, password });
 
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      dispatch(
+        setStatus({
+          message:
+            error.response?.data?.message || 'Login failed. Check credentials.',
+          variant: 'error',
+        })
+      );
+      return rejectWithValue(error.response?.data);
     }
   }
 );
 
-// Async thunk to check auth status on app load or page refresh
 export const checkAuthStatus = createAsyncThunk(
   'auth/protected',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     try {
-      // Call a protected endpoint that requires the cookie
       const response = await api.get('/auth/protected');
-
-      return response.data; // Should contain user details if authenticated
+      dispatch(setStatus({ message: 'Session active.', variant: 'info' }));
+      return response.data;
     } catch (error) {
-      // If the call fails (e.g., 401), the cookie is invalid or missing
-      return rejectWithValue(error.response.data);
+      dispatch(
+        setStatus({
+          message: 'Session expired. Please log in again.',
+          variant: 'error',
+        })
+      );
+      return rejectWithValue(error.response?.data);
     }
   }
 );
 
-// Async thunk for logging out (backend clears the cookie)
 export const logoutUser = createAsyncThunk(
   'auth/logoutUser',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     try {
-      // Backend response should clear the Set-Cookie header (e.g., set expiration to past)
-      await api.post('/logout');
-
+      await api.post('/auth/logout');
+      dispatch(
+        setStatus({ message: 'Logged out successfully.', variant: 'info' })
+      );
       return null;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      dispatch(
+        setStatus({
+          message: error.response?.data?.message || 'Logout failed.',
+          variant: 'error',
+        })
+      );
+      return rejectWithValue(error.response?.data);
     }
   }
 );
@@ -72,11 +94,6 @@ const authSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(createUser.fulfilled, (state, action) => {
-        state.isAuthenticated = true;
-        state.user = action.payload;
-        state.status = 'succeeded'
-      })
       // Login reducers
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isAuthenticated = true;
@@ -88,11 +105,24 @@ const authSlice = createSlice({
         state.error = action.payload;
         state.status = 'error';
       })
-      // Check status reducers
+
+      // Registration reducers
+      .addCase(createUser.fulfilled, (state, action) => {
+        state.isAuthenticated = true;
+        state.user = action.payload;
+        state.status = 'succeeded';
+      })
+      .addCase(createUser.rejected, (state, action) => {
+        state.isAuthenticated = false;
+        state.error = action.payload;
+        state.status = 'error';
+      })
+
+      // Auth check reducers
       .addCase(checkAuthStatus.pending, (state) => {
         state.status = 'loading';
       })
-      .addCase(checkAuthStatus.fulfilled, (state, action) => { 
+      .addCase(checkAuthStatus.fulfilled, (state, action) => {
         state.isAuthenticated = true;
         state.user = action.payload;
         state.status = 'succeeded';
@@ -102,6 +132,7 @@ const authSlice = createSlice({
         state.user = null;
         state.status = 'failed';
       })
+
       // Logout reducers
       .addCase(logoutUser.fulfilled, (state) => {
         state.isAuthenticated = false;

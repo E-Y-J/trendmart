@@ -102,24 +102,38 @@ def create_app():
     # Root redirect to docs
     @app.route("/")
     def home():
-        return redirect('/api/docs')
+        return redirect("/api/docs")
 
     # JSON error handlers for consistent API responses
     @app.errorhandler(400)
     def handle_400(e):
-        return jsonify({"error": "bad_request", "message": getattr(e, "description", str(e))}), 400
+        return jsonify(
+            {"error": "bad_request", "message": getattr(e, "description", str(e))}
+        ), 400
 
     @app.errorhandler(404)
     def handle_404(e):
-        return jsonify({"error": "not_found", "message": getattr(e, "description", str(e))}), 404
+        return jsonify(
+            {"error": "not_found", "message": getattr(e, "description", str(e))}
+        ), 404
 
     @app.errorhandler(405)
     def handle_405(e):
-        return jsonify({"error": "method_not_allowed", "message": getattr(e, "description", str(e))}), 405
+        return jsonify(
+            {
+                "error": "method_not_allowed",
+                "message": getattr(e, "description", str(e)),
+            }
+        ), 405
 
     @app.errorhandler(500)
     def handle_500(e):
-        return jsonify({"error": "internal_server_error", "message": "An unexpected error occurred."}), 500
+        return jsonify(
+            {
+                "error": "internal_server_error",
+                "message": "An unexpected error occurred.",
+            }
+        ), 500
 
     return app
 

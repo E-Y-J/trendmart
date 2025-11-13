@@ -1065,6 +1065,19 @@ definitions:
         type: string
       name:
         type: string
+      description:
+        type: string
+      price:
+        type: number
+        format: float
+      tags:
+        type: array
+        items:
+          type: string
+      image_url:
+        type: string
+      image_thumb_url:
+        type: string
 
   BulkAddSubcategoryResult:
     type: object
