@@ -4,12 +4,11 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { useOutletContext } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
+import { useOutletContext, Link } from "react-router-dom";
 import { loginUser, createUser } from "../../../../redux/auth/authSlice";
 import { setStatus, clearStatus } from "../../../../redux/status/statusSlice";
 import TextInput from "../../input/TextInput";
-import CheckboxToggle from "../../input/CheckboxToggle";
 import PasswordRequirements from "./PasswordRequirements";
 import PopupCloseButton from "../../button/CloseButton";
 
@@ -91,21 +90,17 @@ function LoginRegister() {
 
   return (
     <Col
-      className="d-flex flex-column position-relative gap-1 justify-content-between align-items-center p-2"
-      style={{ height: '50vh', width: '50vw' }}
+      className="d-inline-flex flex-column flex-grow-0 position-relative justify-content-between align-items-center gap-1 px-2 py-4 m-auto"
+      style={{ minHeight: '50vh', minWidth: '50vw', backgroundColor: '#f3f3ea' }}
     >
       <PopupCloseButton onClick={() => setPopup(null)} />
-      <CheckboxToggle
-        onClick={ handleChecked }
-        checked={toggleForm === "register"}
-      />
-
+      <h1 className="text-center">{ toggleForm == 'login' ? 'Login' : 'Register' }</h1>
       <Form
         id={ `${ toggleForm }Form` }
         className="h-100 w-100 d-flex flex-column gap-1 justify-content-center align-items-center my-auto"
         onSubmit={ handleSubmit }
       >
-        <Row style={{ width: "100%", justifyContent: "center" }}>
+        <Row className="h-100 justify-content-center">
           <Col
             className="d-flex flex-column gap-1"
             style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
@@ -157,31 +152,31 @@ function LoginRegister() {
             {toggleForm === "register" ? (
               <PasswordRequirements password={ formData.password } />
             ) : (
-              <p>
-                New to TrendMart?{" "}
-                <a onClick={() => setToggleForm("register")}>Sign Up</a>
+              <p className="ps-2">
+                New to TrendMart?&nbsp;
+                <Link onClick={() => setToggleForm("register")}>Sign Up</Link>
               </p>
             )}
-
-            <Button
-              type="submit"
-              className="w-50 align-self-center fw-bold border-1"
-              style={{
-                borderRadius: "0.5rem",
-                backgroundColor: toggleForm === "login" ? "#0a1f44" : "#00aef0",
-              }}
-              disabled={
-                formData.email === "" ||
-                formData.password.length < 8 ||
-                (toggleForm === "register" &&
-                  formData.verification !== formData.email)
-              }
-            >
-              {toggleForm === "login" ? "Login" : "Register"}
-            </Button>
+            <div className="d-flex flex-grow-1 h-100" />
           </Col>
         </Row>
       </Form>
+      <Button
+        type="submit"
+        className="w-50 align-self-center fw-bold border-1 align-self-end"
+        style={{
+          borderRadius: "0.5rem",
+          backgroundColor: toggleForm === "login" ? "#0a1f44" : "#00aef0",
+        }}
+        disabled={
+          formData.email === "" ||
+          formData.password.length < 8 ||
+          (toggleForm === "register" &&
+            formData.verification !== formData.email)
+        }
+      >
+        {toggleForm === "login" ? "Login" : "Register"}
+      </Button>
     </Col>
   );
 }
