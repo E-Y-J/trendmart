@@ -93,23 +93,22 @@ function FocusedProduct({
               }}
             >
               {product?.imageUrl ? (
-                <img
+                <Card.Img
                   src={product.imageUrl}
                   alt={`Image of ${name}`}
                   style={{
                     maxWidth: '100%',
                     maxHeight: '100%',
-                    objectFit: 'contain',
+                    objectFit: 'cover',
                   }}
                 />
               ) : (
-                <Image
+                <Card.img
                   src={logoUrl}
                   alt="Logo"
                   style={{
                     height: '100%',
-                    maxHeight: '3rem',
-                    objectFit: 'contain',
+                    objectFit: 'cover',
                   }}
                 />
               )}
