@@ -42,8 +42,11 @@ swaggerui_blueprint = get_swaggerui_blueprint(
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    # Early test override: if running under pytest and DATABASE_URL is set (e.g. sqlite path), force it
+    if os.environ.get('PYTEST_CURRENT_TEST') and os.environ.get('DATABASE_URL'):
+        app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 
-    # Initialize extensions
+    # Initialize extensions (after potential test DB override)
     db.init_app(app)
     ma.init_app(app)
     jwt.init_app(app)
