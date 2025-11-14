@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-import { useEffect } from "react";
-import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
-import CloseButton from "react-bootstrap/CloseButton";
-import Col from "react-bootstrap/Col";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import logoUrl from "/logo.svg?url";
-import Image from "react-bootstrap/Image";
-=======
 import { useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
@@ -17,7 +6,6 @@ import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import logoUrl from '/logo.svg?url';
->>>>>>> cac20981c44c9c063b71d018d7c283e2bea94dc3
 
 function FocusedProduct({
   product = {},
@@ -46,21 +34,12 @@ function FocusedProduct({
   const recs = recommendations.length
     ? recommendations
     : Array.from({ length: 12 }).map((_, i) => ({
-<<<<<<< HEAD
-      id: i,
-      title:
-        i % 3 === 0
-          ? "Bought Together"
-          : "Similar Item by Different Category",
-    }));
-=======
         id: i,
         title:
           i % 3 === 0
             ? 'Bought Together'
             : 'Similar Item by Different Category',
       }));
->>>>>>> cac20981c44c9c063b71d018d7c283e2bea94dc3
 
   return (
     <Card
@@ -114,45 +93,33 @@ function FocusedProduct({
               }}
             >
               {product?.imageUrl ? (
-                <img
+                <Card.Img
                   src={product.imageUrl}
                   alt={`Image of ${name}`}
                   style={{
                     maxWidth: '100%',
                     maxHeight: '100%',
-                    objectFit: 'contain',
+                    objectFit: 'cover',
                   }}
                 />
               ) : (
-                <Image
+                <Card.img
                   src={logoUrl}
                   alt="Logo"
-<<<<<<< HEAD
-                  style={{ height: "100%", maxHeight: "3rem", objectFit: "contain" }}
-=======
                   style={{
                     height: '100%',
-                    maxHeight: '3rem',
-                    objectFit: 'contain',
+                    objectFit: 'cover',
                   }}
->>>>>>> cac20981c44c9c063b71d018d7c283e2bea94dc3
                 />
               )}
             </div>
 
             <div>
               <h2 style={{ margin: 0 }}>{name}</h2>
-<<<<<<< HEAD
-              <div style={{ fontWeight: 600, marginTop: ".25rem" }}>
-                Description:
-              </div>
-              <p style={{ marginTop: ".25rem", lineHeight: 1.35 }}>
-=======
               <div style={{ fontWeight: 600, marginTop: '.25rem' }}>
                 Description:
               </div>
               <p style={{ marginTop: '.25rem', lineHeight: 1.35 }}>
->>>>>>> cac20981c44c9c063b71d018d7c283e2bea94dc3
                 {description}
               </p>
             </div>
@@ -166,15 +133,11 @@ function FocusedProduct({
               >
                 Add to cart
               </Button>
-<<<<<<< HEAD
-              <Button variant="dark" style={{ ...darkBtn }} onClick={onBuyNow}>
-=======
               <Button
                 variant="dark"
                 style={{ ...darkBtn }}
                 onClick={onBuyNow}
               >
->>>>>>> cac20981c44c9c063b71d018d7c283e2bea94dc3
                 Buy
               </Button>
               <Button
