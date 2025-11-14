@@ -1,19 +1,18 @@
-from flask import request, jsonify
+from extensions import db
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
+from marshmallow import ValidationError
+from models.catalog import Category, Inventory, Product, Review, Subcategory
+from models.registration import User
 from schemas.catalog import (
-    ProductSchema,
-    InventorySchema,
-    ReviewSchema,
     CategorySchema,
+    InventorySchema,
+    ProductSchema,
+    ReviewSchema,
     SubcategorySchema,
 )
-from extensions import db
-from flask import Blueprint
-from models.catalog import Category, Subcategory, Product, Inventory, Review
-from models.registration import User
+from sqlalchemy import delete, select
 from werkzeug.security import generate_password_hash
-from sqlalchemy import select, delete
-from marshmallow import ValidationError
-from flask_jwt_extended import jwt_required, get_jwt_identity
 
 # Define Blueprints
 categories_bp = Blueprint('categories', __name__, url_prefix='/categories')
@@ -148,31 +147,6 @@ def get_product_inventory(product_id):
     inventory_schema = InventorySchema()
     return jsonify(inventory_schema.dump(inventory)), 200
 
-
-# Review Routes
-# Add a review for a product
-@products_bp.route('/<int:product_id>/reviews', methods=['POST'])
-def add_product_review(product_id):
-    try:
-        review_data = request.get_json()
-        review_data['product_id'] = product_id
-        review_schema = ReviewSchema()
-        review = review_schema.load(review_data, session=db.session)
-        db.session.add(review)
-        db.session.commit()
-        return jsonify(review_schema.dump(review)), 201
-    except ValidationError as err:
-        return jsonify(err.messages), 400
-
-# Get all reviews for a product
-
-
-@products_bp.route('/<int:product_id>/reviews', methods=['GET'])
-def get_product_reviews(product_id):
-    reviews = Review.query.filter_by(product_id=product_id).all()
-    review_schema = ReviewSchema(many=True)
-    return jsonify(review_schema.dump(reviews)), 200
-
 # Review Routes
 # Add a review for a product
 @products_bp.route('/<int:product_id>/reviews', methods=['POST','PATCH'])
@@ -264,7 +238,7 @@ def get_product_reviews(product_id):
     return jsonify(review_schema.dump(reviews)), 200
 
 # Get current user's reviews for a product
-@products_bp.route('/<int:product_id>/reviews/my', methods=['GET'])
+@products_bp.route('/<int:product_id>/reviews/my-reviews', methods=['GET'])
 @jwt_required()
 def get_my_review(product_id):
     
