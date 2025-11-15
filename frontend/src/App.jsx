@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Routes, Route, Outlet } from 'react-router-dom';
-import MasterLayout from './layouts/mainComponents/MasterLayout';
-import LoginRegister from './layouts/layoutChildren/popupLayoutChildren/loginRegister/LoginRegister';
-import FocusedProduct from './layouts/layoutChildren/popupLayoutChildren/focusedProduct/FocusedProduct';
-import Profile from './layouts/layoutChildren/popupLayoutChildren/profileSettingsCompanyInfo/Profile';
-import ProtectedURLs from './layouts/layoutChildren/securityWrapper/ProtectedURLs';
+import MasterLayout from '@main/MasterLayout';
+import LoginRegister from '@children/popupLayoutChildren/loginRegister/LoginRegister';
+import FocusedProduct from '@children/popupLayoutChildren/focusedProduct/FocusedProduct';
+import Profile from '@children/popupLayoutChildren/profileSettingsCompanyInfo/Profile';
+import ProtectedURLs from '@children/securityWrapper/ProtectedURLs';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -28,8 +28,15 @@ function App() {
             element={<LoginRegister />}
           />
           <Route
-            path="/product"
-            element={<FocusedProduct />}
+            path="/product/:int"
+            element={
+              <FocusedProduct
+                onAddToCart={null}
+                onBuyNow={null}
+                onWishlist={null}
+                onMoreLikeThis={null}
+                onClose={null}
+              /> }
           />
           <Route element={<ProtectedURLs />}>
             <Route
