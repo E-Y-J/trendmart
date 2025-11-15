@@ -130,13 +130,6 @@ function FocusedProduct({
               <Button
                 variant="light"
                 style={{ ...mutedBtn }}
-                onClick={onWishlist}
-              >
-                Wishlist
-              </Button>
-              <Button
-                variant="light"
-                style={{ ...mutedBtn }}
                 onClick={onMoreLikeThis}
               >
                 More Like This
@@ -149,37 +142,6 @@ function FocusedProduct({
             md={7}
             className="overflow-auto"
           >
-            <div
-              className="d-grid"
-              style={{
-                gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-                gap: '1rem',
-                alignContent: 'start',
-                height: '100%',
-              }}
-            >
-              {recs.map((rec, idx) => (
-                <div
-                  key={rec.id ?? idx}
-                  style={{
-                    minHeight: 72,
-                    background: '#f3f5f7',
-                    border: '1px dashed #b9c3cf',
-                    borderRadius: 6,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    textAlign: 'center',
-                    padding: '.75rem',
-                    fontSize: 12,
-                    fontWeight: 700,
-                    color: '#384554',
-                  }}
-                >
-                  {rec.title}
-                </div>
-              ))}
-            </div>
           </Col>
         </Row>
       </Card.Body>
