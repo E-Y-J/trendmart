@@ -112,6 +112,26 @@ paths:
           schema:
             $ref: '#/definitions/ErrorResponse'
 
+  /payments/by-order/{order_id}:
+    get:
+      tags:
+        - Payments
+      summary: Get payment status by order id
+      parameters:
+        - in: path
+          name: order_id
+          required: true
+          type: integer
+      responses:
+        200:
+          description: Payment status
+          schema:
+            $ref: '#/definitions/PaymentStatusResponse'
+        404:
+          description: Not found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
   /payments/{payment_id}/refund:
     post:
       tags:
@@ -1506,6 +1526,9 @@ definitions:
       currency:
         type: string
         example: usd
+      metadata:
+        type: object
+        description: Optional metadata; user_id automatically included when available.
 
   PaymentIntentResponse:
     type: object
@@ -1521,6 +1544,13 @@ definitions:
       status:
         type: string
         example: pending
+      amount_cents:
+        type: integer
+        description: Convenience amount in cents (derived)
+      total_amount:
+        type: number
+        format: float
+        description: Payment amount in dollars
 
   PaymentStatusResponse:
     type: object
@@ -1533,6 +1563,11 @@ definitions:
         type: string
       status:
         type: string
+      amount_cents:
+        type: integer
+      total_amount:
+        type: number
+        format: float
 
   RefundCreate:
     type: object

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { useEffect } from "react";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -8,7 +7,6 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import logoUrl from "/logo.svg?url";
 import Image from "react-bootstrap/Image";
-=======
 import { useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
@@ -17,7 +15,6 @@ import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import logoUrl from '/logo.svg?url';
->>>>>>> cac20981c44c9c063b71d018d7c283e2bea94dc3
 
 function FocusedProduct({
   product = {},
@@ -46,21 +43,13 @@ function FocusedProduct({
   const recs = recommendations.length
     ? recommendations
     : Array.from({ length: 12 }).map((_, i) => ({
-<<<<<<< HEAD
       id: i,
       title:
         i % 3 === 0
-          ? "Bought Together"
-          : "Similar Item by Different Category",
+          ? 'Bought Together'
+          : 'Similar Item by Different Category',
     }));
-=======
-        id: i,
-        title:
-          i % 3 === 0
-            ? 'Bought Together'
-            : 'Similar Item by Different Category',
-      }));
->>>>>>> cac20981c44c9c063b71d018d7c283e2bea94dc3
+
 
   return (
     <Card
@@ -127,32 +116,22 @@ function FocusedProduct({
                 <Image
                   src={logoUrl}
                   alt="Logo"
-<<<<<<< HEAD
                   style={{ height: "100%", maxHeight: "3rem", objectFit: "contain" }}
-=======
                   style={{
                     height: '100%',
                     maxHeight: '3rem',
                     objectFit: 'contain',
                   }}
->>>>>>> cac20981c44c9c063b71d018d7c283e2bea94dc3
                 />
               )}
             </div>
 
             <div>
               <h2 style={{ margin: 0 }}>{name}</h2>
-<<<<<<< HEAD
-              <div style={{ fontWeight: 600, marginTop: ".25rem" }}>
-                Description:
-              </div>
-              <p style={{ marginTop: ".25rem", lineHeight: 1.35 }}>
-=======
               <div style={{ fontWeight: 600, marginTop: '.25rem' }}>
                 Description:
               </div>
               <p style={{ marginTop: '.25rem', lineHeight: 1.35 }}>
->>>>>>> cac20981c44c9c063b71d018d7c283e2bea94dc3
                 {description}
               </p>
             </div>
@@ -166,15 +145,11 @@ function FocusedProduct({
               >
                 Add to cart
               </Button>
-<<<<<<< HEAD
-              <Button variant="dark" style={{ ...darkBtn }} onClick={onBuyNow}>
-=======
               <Button
                 variant="dark"
                 style={{ ...darkBtn }}
                 onClick={onBuyNow}
               >
->>>>>>> cac20981c44c9c063b71d018d7c283e2bea94dc3
                 Buy
               </Button>
               <Button
@@ -192,10 +167,10 @@ function FocusedProduct({
                 More Like This
               </Button>
             </div>
-          </Col>
+          </Col >
 
           {/* Right column: recommendations grid */}
-          <Col
+          < Col
             md={7}
             className="overflow-auto"
           >
@@ -230,40 +205,40 @@ function FocusedProduct({
                 </div>
               ))}
             </div>
-          </Col>
-        </Row>
-      </Container>
-    </Card>
+          </Col >
+        </Row >
+      </Container >
+    </Card >
   );
-}
 
-// Reusable button styles
-const baseBtn = {
-  border: '1px solid transparent',
-  borderRadius: 6,
-  padding: '.5rem .9rem',
-  cursor: 'pointer',
-  fontWeight: 700,
-};
 
-const primaryBtn = {
-  ...baseBtn,
-  background: '#4c8bf5',
-  borderColor: '#2f6fda',
-  color: 'white',
-};
+  // Reusable button styles
+  const baseBtn = {
+    border: '1px solid transparent',
+    borderRadius: 6,
+    padding: '.5rem .9rem',
+    cursor: 'pointer',
+    fontWeight: 700,
+  };
 
-const darkBtn = {
-  ...baseBtn,
-  background: '#1f2937',
-  color: 'white',
-};
+  const primaryBtn = {
+    ...baseBtn,
+    background: '#4c8bf5',
+    borderColor: '#2f6fda',
+    color: 'white',
+  };
 
-const mutedBtn = {
-  ...baseBtn,
-  background: '#e8eef6',
-  color: '#1f2937',
-  borderColor: '#c8d3e0',
-};
+  const darkBtn = {
+    ...baseBtn,
+    background: '#1f2937',
+    color: 'white',
+  };
 
-export default FocusedProduct;
+  const mutedBtn = {
+    ...baseBtn,
+    background: '#e8eef6',
+    color: '#1f2937',
+    borderColor: '#c8d3e0',
+  };
+
+  export default FocusedProduct;
