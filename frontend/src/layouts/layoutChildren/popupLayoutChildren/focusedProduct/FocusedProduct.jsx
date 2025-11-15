@@ -8,10 +8,9 @@ import { primaryBtn, darkBtn, mutedBtn } from '@styles/reusableStyles'
 import logoUrl from '/logo.svg?url';
 
 function FocusedProduct({
-  productId,
+  product={},
   onAddToCart,
   onBuyNow,
-  onWishlist,
   onMoreLikeThis,
   onClose,
 }) {
