@@ -6,13 +6,13 @@ import {
   getColdStart,
   searchRecommendations,
   getSimilarById,
-} from '../../../api/recommendations';
+} from '@api/recommendations';
 import {
   logView,
   logCartAdd,
   sendRecommendationFeedback,
-} from '../../../api/events';
-import PopupLayout from '../../mainComponents/PopupLayout';
+} from '@api/events';
+import PopupLayout from '@main/PopupLayout';
 
 function RecommendedProducts() {
   const [state, setState] = useState({ loading: true, error: null, items: [] });

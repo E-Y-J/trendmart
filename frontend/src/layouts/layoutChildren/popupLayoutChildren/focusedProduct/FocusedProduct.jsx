@@ -1,15 +1,14 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import CloseButton from 'react-bootstrap/CloseButton';
 import Col from 'react-bootstrap/Col';
-import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
+import { primaryBtn, darkBtn, mutedBtn } from '@styles/reusableStyles'
 import logoUrl from '/logo.svg?url';
 
 function FocusedProduct({
-  product = {},
-  recommendations = [],
+  productId,
   onAddToCart,
   onBuyNow,
   onWishlist,
@@ -29,17 +28,6 @@ function FocusedProduct({
   const description =
     product?.description ||
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus vel sem magna. Vivamus velit iaculis, luctus libero vel, porta tincidunt magna. Ut placerat sagittis massa, at laoreet velit vehicula ut.';
-
-  // sample recommendations
-  const recs = recommendations.length
-    ? recommendations
-    : Array.from({ length: 12 }).map((_, i) => ({
-        id: i,
-        title:
-          i % 3 === 0
-            ? 'Bought Together'
-            : 'Similar Item by Different Category',
-      }));
 
   return (
     <Card
@@ -71,7 +59,7 @@ function FocusedProduct({
         }}
       />
 
-      <Container
+      <Card.Body
         fluid
         className="h-100"
       >
@@ -103,7 +91,7 @@ function FocusedProduct({
                   }}
                 />
               ) : (
-                <Card.img
+                <Card.Img
                   src={logoUrl}
                   alt="Logo"
                   style={{
@@ -195,38 +183,9 @@ function FocusedProduct({
             </div>
           </Col>
         </Row>
-      </Container>
+      </Card.Body>
     </Card>
   );
 }
-
-// Reusable button styles
-const baseBtn = {
-  border: '1px solid transparent',
-  borderRadius: 6,
-  padding: '.5rem .9rem',
-  cursor: 'pointer',
-  fontWeight: 700,
-};
-
-const primaryBtn = {
-  ...baseBtn,
-  background: '#4c8bf5',
-  borderColor: '#2f6fda',
-  color: 'white',
-};
-
-const darkBtn = {
-  ...baseBtn,
-  background: '#1f2937',
-  color: 'white',
-};
-
-const mutedBtn = {
-  ...baseBtn,
-  background: '#e8eef6',
-  color: '#1f2937',
-  borderColor: '#c8d3e0',
-};
 
 export default FocusedProduct;
