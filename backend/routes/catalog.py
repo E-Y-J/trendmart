@@ -1,19 +1,18 @@
-from flask import request, jsonify
+from extensions import db
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import get_jwt_identity, jwt_required
+from marshmallow import ValidationError
+from models.catalog import Category, Inventory, Product, Review, Subcategory
+from models.registration import User
 from schemas.catalog import (
-    ProductSchema,
-    InventorySchema,
-    ReviewSchema,
     CategorySchema,
+    InventorySchema,
+    ProductSchema,
+    ReviewSchema,
     SubcategorySchema,
 )
-from extensions import db
-from flask import Blueprint
-from models.catalog import Category, Subcategory, Product, Inventory, Review
-from models.registration import User
+from sqlalchemy import delete, select
 from werkzeug.security import generate_password_hash
-from sqlalchemy import select, delete
-from marshmallow import ValidationError
-from flask_jwt_extended import jwt_required, get_jwt_identity
 
 # Define Blueprints
 categories_bp = Blueprint('categories', __name__, url_prefix='/categories')
@@ -148,8 +147,10 @@ def get_product_inventory(product_id):
     inventory_schema = InventorySchema()
     return jsonify(inventory_schema.dump(inventory)), 200
 
+# Review Routes
+# Add a review for a product
 
-# Review Routes (Secure, consolidated)
+
 @products_bp.route('/<int:product_id>/reviews', methods=['POST', 'PATCH'])
 @jwt_required()
 def add_product_review(product_id):
@@ -242,7 +243,7 @@ def get_product_reviews(product_id):
 # Get current user's reviews for a product
 
 
-@products_bp.route('/<int:product_id>/reviews/my', methods=['GET'])
+@products_bp.route('/<int:product_id>/reviews/my-reviews', methods=['GET'])
 @jwt_required()
 def get_my_review(product_id):
 

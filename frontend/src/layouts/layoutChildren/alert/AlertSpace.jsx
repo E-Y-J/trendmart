@@ -3,7 +3,7 @@ import CloseButton from 'react-bootstrap/CloseButton';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { useDispatch } from 'react-redux';
-import { clearStatus } from '../../../redux/status/statusSlice';
+import { clearStatus } from '@redux/status/statusSlice';
 
 function AlertSpace({ alertMessage, variant = 'success' }) {
   const dispatch = useDispatch();
