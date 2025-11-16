@@ -1,3 +1,7 @@
+// Cart API clients
+// Endpoints: /cart (GET, POST), /cart/items (POST), /cart/items/:itemId (PATCH, DELETE), /cart/clear (DELETE)
+// All endpoints require JWT (withCredentials enabled in api instance).
+
 import api from './api';
 
 // Create a new cart
