@@ -14,7 +14,12 @@ export const createUser = createAsyncThunk(
   async ({ email, password }, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.post('/auth/register', { email, password });
-
+      dispatch(
+        setStatus({
+          message: 'Registration successful. You are now logged in.',
+          variant: 'success',
+        })
+      );
       return response.data;
     } catch (error) {
       dispatch(
@@ -33,7 +38,7 @@ export const loginUser = createAsyncThunk(
   async ({ email, password }, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.post('/auth/login', { email, password });
-
+      dispatch(setStatus({ message: 'Login successful.', variant: 'success' }));
       return response.data;
     } catch (error) {
       dispatch(
