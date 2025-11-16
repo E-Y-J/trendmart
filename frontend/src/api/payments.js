@@ -1,3 +1,8 @@
+// Payments API client
+// Endpoints: /payments/config, /payments/intent, /payments/:id, /payments/by-order/:orderId,
+//            /payments/:id/refund, /payments/:id/refunds
+// All functions return response.data; caller handles errors
+
 import api from './api';
 
 //Get Stripe configuration from the backend
