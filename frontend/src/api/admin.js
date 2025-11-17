@@ -1,3 +1,11 @@
+// Admin API Client (JWT; admin role required)
+// Endpoints:
+//   POST   /admin/register               -> registerAdmin
+//   GET    /admin/manage_users           -> listUsers
+//   GET    /admin/manage_users/:userId   -> getUserById
+//   PATCH  /admin/manage_users/:userId   -> updateUser
+//   DELETE /admin/manage_users/:userId   -> deleteUser
+// All functions return response.data; caller handles errors
 import api from './api';
 
 export async function registerAdmin(payload) {
