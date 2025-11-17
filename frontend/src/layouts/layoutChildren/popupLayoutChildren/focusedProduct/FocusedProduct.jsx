@@ -8,7 +8,7 @@ import logoUrl from '/logo.svg?url';
 import CloseButton from '../../button/CloseButton';
 
 function FocusedProduct({
-  product={},
+  product = {},
   onAddToCart,
   onBuyNow,
   onMoreLikeThis,
@@ -132,10 +132,10 @@ function FocusedProduct({
                 More Like This
               </Button>
             </div>
-          </Col>
+          </Col >
 
           {/* Right column: recommendations grid */}
-          <Col
+          < Col
             md={7}
             className="overflow-auto"
           >
@@ -145,5 +145,4 @@ function FocusedProduct({
     </Card>
   );
 }
-
 export default FocusedProduct;
