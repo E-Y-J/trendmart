@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
-import CloseButton from 'react-bootstrap/CloseButton';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import { primaryBtn, darkBtn, mutedBtn } from '@styles/reusableStyles'
+import { useTheme } from '@styles/themeContext';
 import logoUrl from '/logo.svg?url';
+import CloseButton from '../../button/CloseButton';
 
 function FocusedProduct({
   product={},
@@ -14,6 +14,8 @@ function FocusedProduct({
   onMoreLikeThis,
   onClose,
 }) {
+
+  const { theme } = useTheme()
   // Close on esc
   useEffect(() => {
     const handler = (e) => {
@@ -57,9 +59,7 @@ function FocusedProduct({
           fontWeight: 600,
         }}
       />
-
       <Card.Body
-        fluid
         className="h-100"
       >
         <Row className="h-100">
@@ -84,8 +84,6 @@ function FocusedProduct({
                   src={product.imageUrl}
                   alt={`Image of ${name}`}
                   style={{
-                    maxWidth: '100%',
-                    maxHeight: '100%',
                     objectFit: 'cover',
                   }}
                 />
@@ -94,14 +92,13 @@ function FocusedProduct({
                   src={logoUrl}
                   alt="Logo"
                   style={{
-                    height: '100%',
                     objectFit: 'cover',
                   }}
                 />
               )}
             </div>
 
-            <div>
+            <div className='d-none'>
               <h2 style={{ margin: 0 }}>{name}</h2>
               <div style={{ fontWeight: 600, marginTop: '.25rem' }}>
                 Description:
@@ -115,21 +112,21 @@ function FocusedProduct({
             <div className="mt-auto d-flex flex-wrap gap-2">
               <Button
                 variant="primary"
-                style={{ ...primaryBtn }}
+                style={{ ...theme.buttons.contrast }}
                 onClick={onAddToCart}
               >
                 Add to cart
               </Button>
               <Button
                 variant="dark"
-                style={{ ...darkBtn }}
+                style={{ ...theme.buttons.splash }}
                 onClick={onBuyNow}
               >
                 Buy
               </Button>
               <Button
                 variant="light"
-                style={{ ...mutedBtn }}
+                style={{ ...theme.buttons.muted }}
                 onClick={onMoreLikeThis}
               >
                 More Like This

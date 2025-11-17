@@ -3,14 +3,17 @@ import FeaturedProducts from '../layoutChildren/products/FeaturedProducts';
 import RecommendedProducts from '../layoutChildren/products/RecommendedProducts';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { useTheme } from '@styles/themeContext';
 
 function MasterGrid() {
+  const { theme } = useTheme();
+
   return (
     <Row className="w-100 h-100 d-flex flex-row m-0 p-0 gap-2">
       <Col
         id="leftCol"
-        className="flex-column bg-black m-0 p-0 h-100 d-none d-sm-flex flex-grow-0-ns"
-        style={{ maxWidth: '20%' }}
+        className="flex-column m-0 p-0 h-100 d-none d-sm-flex flex-grow-0-ns"
+        style={{ maxWidth: '20%', ...theme.schemes.highlight }}
       >
         <ProductCategories
           categories={['Really long category', 'Short Cat...', 3, 4]}
@@ -23,13 +26,13 @@ function MasterGrid() {
         <Row
           id="featuredRow"
           className="d-flex flex-row"
-          style={{ height: '55%' }}
+          style={{ height: '55%', ...theme.schemes.highlight }}
         >
           <FeaturedProducts />
         </Row>
         <Row
           className="d-flex flex-row"
-          style={{ height: '45%' }}
+          style={{ height: '45%', ...theme.schemes.highlight }}
         >
           <RecommendedProducts />
         </Row>

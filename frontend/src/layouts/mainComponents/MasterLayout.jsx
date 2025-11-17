@@ -1,4 +1,4 @@
-// import { useState } from "react";
+import { useState } from "react";
 import { useOutlet } from 'react-router-dom';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
@@ -7,22 +7,25 @@ import GlobalAlert from '../layoutChildren/alert/GlobalAlert.jsx';
 import MasterGrid from './MasterGrid.jsx';
 import NavBar from '../layoutChildren/navbar/NavBar.jsx';
 import PopupLayout from './PopupLayout.jsx';
+import { useTheme } from '@styles/themeContext';
 
-function MasterLayout({ popupChildren }) {
-  const outletContent = useOutlet();
+function MasterLayout() {
+  const routedPopup = useOutlet();
+  const { theme } = useTheme();
+  const [popup, setPopup] = useState(null);
 
   return (
     <Container
       id="superContainer"
       fluid
       className="v-100 justify-content-center align-items-center"
-      style={{ height: '100vh', backgroundColor: '#f3f3ea' }}
+      style={{ height: '100vh', ...theme.schemes.darkText }}
     >
       <Row
         id="navbarContainer"
         style={{ height: '10vh', minWidth: '100%' }}
       >
-        <NavBar />
+        <NavBar setPopup={setPopup}/>
       </Row>
 
       <Container
@@ -47,7 +50,12 @@ function MasterLayout({ popupChildren }) {
             <MasterGrid />
           </Col>
 
-          {outletContent && <PopupLayout>{popupChildren}</PopupLayout>}
+          {/* State-based popup (NOT routed) */}
+          {popup && <PopupLayout>{popup}</PopupLayout>}
+
+          {/* Route-based popup (via URL) */}
+          {routedPopup && <PopupLayout>{routedPopup}</PopupLayout>}
+
         </Row>
       </Container>
     </Container>

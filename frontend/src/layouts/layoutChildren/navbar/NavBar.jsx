@@ -1,38 +1,40 @@
-import { useNavigate } from 'react-router-dom';
+import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import Navbar from 'react-bootstrap/Navbar';
-import NavLink from 'react-bootstrap/NavLink';
+import LoginRegister from '@children/popupLayoutChildren/loginRegister/LoginRegister';
+import { useTheme } from '@styles/themeContext';
 import logoUrl from '/logo.svg?url';
 
-function NavBar() {
-  const navigate = useNavigate();
+function NavBar({ setPopup }) {
+  const { theme } = useTheme();
 
-  const LogRegLinkCol = () => (
+  const LogRegLinkBtn = () => (
     <Col
       className="d-flex flex-column flex-grow-0 w-100 justify-content-end"
-      style={{ minWidth: '10rem' }}
+      style={{ minWidth: '10rem', }}
     >
-      <NavLink
-        className="bg-white align-t h-100"
-        onClick={() => navigate('/login')}
+      <Button
+        className="align-text-center h-100"
+        onClick={() => setPopup(<LoginRegister setPopup={setPopup} />)}
+        style={{ ...theme.schemes.contrast }}
       >
-        Login
-      </NavLink>
+        Login / Signup
+      </Button>
     </Col>
   );
 
   return (
     <Navbar
-      bg="secondary"
       expand="lg"
       className="h-100 w-100 m-0 p-0"
+      style={{ ...theme.schemes.emphasis, }}
     >
       <Col className="d-flex align-items-center flex-grow-1">
         <Image
           src={logoUrl}
           alt="Logo"
-          style={{ height: '100%', maxHeight: '3rem', objectFit: 'contain' }}
+          style={{ height: '100%', maxHeight: '3rem', objectFit: 'cover' }}
         />
         <h1
           id="title"
@@ -42,7 +44,7 @@ function NavBar() {
           TrendMart
         </h1>
       </Col>
-      <LogRegLinkCol />
+      <LogRegLinkBtn />
     </Navbar>
   );
 }

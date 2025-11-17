@@ -1,9 +1,10 @@
+import { useState, useCallback } from 'react';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import filterIcon from '/filterIcon.svg?url';
-import { useState, useCallback } from 'react';
+import { useTheme } from '@styles/themeContext';
 
 function SearchbarRow({
   searchId,
@@ -16,6 +17,7 @@ function SearchbarRow({
 }) {
   const [value, setValue] = useState('');
   const [timer, setTimer] = useState(null);
+  const { theme } = useTheme();
 
   const handleChange = useCallback(
     (e) => {
@@ -35,7 +37,7 @@ function SearchbarRow({
     <Row
       id="featuredHeader"
       className="d-flex flex-grow-0 align-items-center m-0 w-100 px-1 py-0 px-sm-1 gap-1"
-      style={{ height: '2.5rem', backgroundColor: '#9f9f9f' }}
+      style={{ height: '2.5rem', ...theme.schemes.emphasis }}
     >
       <Col
         xs={10}
@@ -65,7 +67,10 @@ function SearchbarRow({
         </Col>
       )}
       {sectionTitle && (
-        <Col className="d-flex flex-grow-1 justify-content-end align-items-center text-light m-0 p-0 text-nowrap d-none d-sm-flex fs-4">
+        <Col
+          className="d-flex flex-grow-1 justify-content-end align-items-center m-0 p-0 text-nowrap d-none d-sm-flex fs-4"
+          style={{ color: theme.colors.text }}
+        >
           {sectionTitle}
         </Col>
       )}
