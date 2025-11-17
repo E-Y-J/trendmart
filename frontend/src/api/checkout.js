@@ -7,7 +7,7 @@ import api from './api';
 
 // Validate the current user's cart for checkout
 export async function validateCheckout() {
-    const { data } = await api.get('/checkout/validate');
+    const { data } = await api.post('/checkout/validate');
     return data;
 }
 
