@@ -18,7 +18,7 @@ export async function getCart() {
 
 // Add an item to the cart
 export async function addToCart(productId, quantity = 1) {
-    const { data } = await api.post(`/cart/items/$`, {
+    const { data } = await api.post(`/cart/items`, {
         product_id: productId,
         quantity,
     });
@@ -27,7 +27,7 @@ export async function addToCart(productId, quantity = 1) {
 
 // Update the quantity of a specific item in the cart
 export async function updateCartItem(itemId, quantity) {
-    const { data } = await api.put(`/cart/items/${itemId}`, {
+    const { data } = await api.patch(`/cart/items/${itemId}`, {
         quantity,
     });
     return data;
