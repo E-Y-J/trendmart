@@ -17,7 +17,7 @@ function App() {
         <Route path='/styleguide' element={<StyleGuide/>}/>
         <Route
           path="/"
-          element={<MasterLayout state={popup, setPopup} />}
+          element={<MasterLayout state={{popup, setPopup}} />}
         >
           <Route
             path="/product/:int"

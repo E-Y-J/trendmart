@@ -15,12 +15,12 @@ export const colorPalette = {
     text: '#fffffb',
   },
   dark: {
+    bg: '#0a1f44',
     contrast: '#f3f3ea',
-    emphasis: '#9fcecb',
-    splash: '#00aef0',
-    highlight: '#0a1f44',
-    bg: '#135c8b',
-    text: '#00aef0',
+    emphasis: '#00aef0',
+    highlight: '#135c8b',
+    splash: '#9fcecb',
+    text: '#fffffb',
   },
 };
 
