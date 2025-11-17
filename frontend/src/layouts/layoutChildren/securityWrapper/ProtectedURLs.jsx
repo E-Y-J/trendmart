@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { checkAuthStatus } from '@redux/auth/authSlice';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { setStatus } from '@redux/status/statusSlice';
 
 function ProtectedURLs() {
   const dispatch = useDispatch();
@@ -10,23 +11,21 @@ function ProtectedURLs() {
   const { isAuthenticated, status } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    // Runs once on mount, verifies session
     dispatch(checkAuthStatus());
   }, [dispatch]);
 
   useEffect(() => {
-    // If checkAuthStatus fails, redirect to login
+    
     if (status === 'failed' || (!isAuthenticated && status !== 'loading')) {
-      navigate('/login');
+      navigate('/');
+      
     }
   }, [isAuthenticated, status, navigate]);
-
-  // Optional: show loading screen while verifying session
+  
   if (status === 'loading') {
-    return <div className="text-center mt-5">Checking session...</div>;
+    dispatch(setStatus('Checking session...'));
   }
 
-  // Authenticated users can access nested routes
   return <Outlet />;
 }
 

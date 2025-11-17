@@ -13,8 +13,11 @@ import {
   sendRecommendationFeedback,
 } from '@api/events';
 import PopupLayout from '@main/PopupLayout';
+import { useTheme } from '@styles/themeContext';
+import { Button } from 'react-bootstrap';
 
 function RecommendedProducts() {
+  const { theme } = useTheme();
   const [state, setState] = useState({ loading: true, error: null, items: [] });
   const [searchState, setSearchState] = useState({
     query: '',
@@ -76,7 +79,7 @@ function RecommendedProducts() {
   return (
     <Col
       className="d-flex flex-column justify-content-start align-items-center m-0 p-0"
-      style={{ width: '100%', height: '100%', backgroundColor: '#d9d9d9' }}
+      style={{ width: '100%', height: '100%' }}
     >
       <SearchbarRow
         searchId="recommendedSearch"
@@ -357,8 +360,9 @@ function RecommendedProducts() {
                   </div>
                 )}
                 <div className="mt-3 flex gap-2">
-                  <button
-                    className="px-3 py-1 rounded bg-blue-600 text-white text-sm"
+                  <Button
+                    className="text-sm"
+                    style={{ ...theme.buttons.emphasis }}
                     onClick={async () => {
                       try {
                         const source = 'search';
@@ -374,9 +378,10 @@ function RecommendedProducts() {
                     }}
                   >
                     View
-                  </button>
-                  <button
-                    className="px-3 py-1 rounded bg-emerald-600 text-white text-sm"
+                  </Button>
+                  <Button
+                    className="text-sm"
+                    style={{ ...theme.buttons.splash }}
                     onClick={async () => {
                       try {
                         const source = 'search';
@@ -392,7 +397,7 @@ function RecommendedProducts() {
                     }}
                   >
                     Add to Cart
-                  </button>
+                  </Button>
                 </div>
               </div>
             ))}

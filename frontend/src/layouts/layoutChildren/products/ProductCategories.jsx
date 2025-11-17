@@ -1,8 +1,11 @@
 import Stack from 'react-bootstrap/Stack';
 import SearchbarRow from '../sectionSearchbar/SearchbarRow';
 import { Container } from 'react-bootstrap';
+import { useTheme } from '@styles/themeContext';
 
 function ProductCategories({ categories }) {
+  const { theme } = useTheme();
+
   return (
     <Container
       fluid
@@ -21,7 +24,8 @@ function ProductCategories({ categories }) {
         {categories.map((category, index) => (
           <h3
             key={index}
-            className="bg-white m-0"
+            className="m-0"
+            style={{ ...theme.buttons.splash }}
           >
             {category}
           </h3>

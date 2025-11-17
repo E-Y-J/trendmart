@@ -4,15 +4,15 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import { useDispatch } from 'react-redux';
-// import { useNavigate } from "react-router-dom";
-import { useOutletContext, Link } from 'react-router-dom';
-import { loginUser, createUser } from '../../../../redux/auth/authSlice';
-import { setStatus, clearStatus } from '../../../../redux/status/statusSlice';
-import TextInput from '../../input/TextInput';
+import { Link,  } from 'react-router-dom';
+import { loginUser, createUser } from '@redux/auth/authSlice';
+import { setStatus, clearStatus } from '@redux/status/statusSlice';
+import TextInput from '@children/input/TextInput';
 import PasswordRequirements from './PasswordRequirements';
-import PopupCloseButton from '../../button/CloseButton';
+import PopupCloseButton from '@children/button/CloseButton';
+import { useTheme } from '@styles/themeContext';
 
-function LoginRegister() {
+function LoginRegister({ setPopup }) {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -21,9 +21,8 @@ function LoginRegister() {
   const [toggleForm, setToggleForm] = useState('login');
   const [passHidden, setPassHidden] = useState(true);
 
-  const [, setPopup] = useOutletContext();
   const dispatch = useDispatch();
-  // const navigate = useNavigate();
+  const { theme } = useTheme();
 
   const handleChange = (event) => {
     const { id, value } = event.target;
@@ -78,9 +77,11 @@ function LoginRegister() {
     if (toggleForm === 'login') {
       const result = await dispatch(loginUser(authData)).unwrap();
       console.log('Login successful:', result);
+      setPopup(null);
     } else {
       const result = await dispatch(createUser(authData)).unwrap();
       console.log('Registration successful:', result);
+      setPopup(null);
     }
   };
 
@@ -90,12 +91,12 @@ function LoginRegister() {
       style={{
         minHeight: '50vh',
         minWidth: '50vw',
-        backgroundColor: '#f3f3ea',
+        ...theme.schemes.darkText,
       }}
     >
       <PopupCloseButton onClick={() => setPopup(null)} />
       <h1 className="text-center">
-        {toggleForm == 'login' ? 'Login' : 'Register'}
+        {toggleForm === 'login' ? 'Login' : 'Register'}
       </h1>
       <Form
         id={`${toggleForm}Form`}
@@ -151,34 +152,32 @@ function LoginRegister() {
               </Button>
             </TextInput>
 
-            {toggleForm === 'register' ? (
-              <PasswordRequirements password={formData.password} />
-            ) : (
-              <p className="ps-2">
-                New to TrendMart?&nbsp;
-                <Link onClick={() => setToggleForm('register')}>Sign Up</Link>
-              </p>
-            )}
+            { toggleForm === 'register' &&  <PasswordRequirements password={formData.password} /> }
+                <p className="mx-auto my-0 p-0" style={{ fontSize: '.8rem' }}>
+                  { toggleForm === 'register' ? 'Have an account? ' : 'New to TrendMart? ' }
+                  <Link onClick={() => setToggleForm(toggleForm === 'login' ? 'register' : 'login')} style={{ cursor: 'pointer' }}>
+                    { toggleForm === 'login' ? 'Register' : 'Login ' }
+                  </Link>
+                </p>
             <div className="d-flex flex-grow-1 h-100" />
           </Col>
         </Row>
+        <Button
+          type="submit"
+          className="w-50 align-self-center fw-bold border-1 align-self-end"
+          style={{
+            ...(toggleForm === 'login' ? theme.buttons.contrast : theme.buttons.splash)
+          }}
+          disabled={
+            formData.email === '' ||
+            formData.password.length < 8 ||
+            (toggleForm === 'register' &&
+              formData.verification !== formData.email)
+            }
+            >
+          {toggleForm === 'login' ? 'Login' : 'Register'}
+        </Button>
       </Form>
-      <Button
-        type="submit"
-        className="w-50 align-self-center fw-bold border-1 align-self-end"
-        style={{
-          borderRadius: '0.5rem',
-          backgroundColor: toggleForm === 'login' ? '#0a1f44' : '#00aef0',
-        }}
-        disabled={
-          formData.email === '' ||
-          formData.password.length < 8 ||
-          (toggleForm === 'register' &&
-            formData.verification !== formData.email)
-        }
-      >
-        {toggleForm === 'login' ? 'Login' : 'Register'}
-      </Button>
     </Col>
   );
 }

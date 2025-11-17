@@ -1,12 +1,12 @@
-import { useState } from 'react';
 import { Routes, Route, Outlet } from 'react-router-dom';
 import MasterLayout from '@main/MasterLayout';
-import LoginRegister from '@children/popupLayoutChildren/loginRegister/LoginRegister';
 import FocusedProduct from '@children/popupLayoutChildren/focusedProduct/FocusedProduct';
 import Profile from '@children/popupLayoutChildren/profileSettingsCompanyInfo/Profile';
 import ProtectedURLs from '@children/securityWrapper/ProtectedURLs';
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useState } from 'react';
+import StyleGuide from '@styles/StyleGuide';
 
 function App() {
   const [popup, setPopup] = useState(null);
@@ -14,19 +14,11 @@ function App() {
   return (
     <>
       <Routes>
+        <Route path='/styleguide' element={<StyleGuide/>}/>
         <Route
           path="/"
-          element={
-            <MasterLayout
-              popupChildren={<Outlet context={[popup, setPopup]} />}
-              setPopup={setPopup}
-            />
-          }
+          element={<MasterLayout state={{popup, setPopup}} />}
         >
-          <Route
-            path="/login"
-            element={<LoginRegister />}
-          />
           <Route
             path="/product/:int"
             element={
@@ -38,6 +30,7 @@ function App() {
                 onClose={null}
               /> }
           />
+          
           <Route element={<ProtectedURLs />}>
             <Route
               path="/profile"
