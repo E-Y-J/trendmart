@@ -33,8 +33,7 @@ function SearchbarRow({
 
   return (
     <Row
-      id="featuredHeader"
-      className="d-flex flex-grow-1 align-items-center m-0 w-100 px-1 py-0 ps-sm-4 gap-1"
+      className="d-flex flex-row align-items-center m-0 w-100 px py-0 gap-1"
       style={{ height: '2.5rem' }}
     >
       {sectionTitle && (
@@ -47,24 +46,24 @@ function SearchbarRow({
       )}
       {filterButton && (
         <Col
-          className="d-flex flex-grow-0 flex-column p-0"
+          className="d-flex flex-grow-0 flex-column p-0 justify-content-center align-content-center"
           style={{ height: '2.5rem' }}
         >
           <Image
             alt="filter"
             src={filterIcon}
-            style={{ height: '100%', width: 'auto', cursor: 'pointer' }}
+            style={{ height: '2rem', width: 'auto', cursor: 'pointer', alignSelf: 'center' }}
           />
         </Col>
       )}
-      <Col className="d-flex flex-grow-0 flex-shrink-1 align-items-center p-0">
+      <Col className="d-flex justify-content-center align-items-center p-0">
         <Form.Control
           id={searchId}
           type="text"
           value={value}
           placeholder={placeholder}
           onChange={handleChange}
-          className="d-flex h-100 justify-content-center align-self-start"
+          className="d-flex flex-row h-100 w-100"
           style={{ boxSizing: 'border-box', fieldSizing: 'content', borderRadius: '.3rem', borderWidth: '.13rem', borderColor: '#e8e8e8e8' }}
         />
       </Col>

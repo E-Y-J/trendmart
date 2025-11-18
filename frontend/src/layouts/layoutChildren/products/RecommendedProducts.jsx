@@ -77,10 +77,7 @@ function RecommendedProducts() {
   }, []);
 
   return (
-    <Col
-      className="d-flex flex-column justify-content-start align-items-center m-0 p-0"
-      style={{ width: '100%', height: '100%' }}
-    >
+    <Col className="d-flex flex-column w-100 p-0">
       <SearchbarRow
         searchId="recommendedSearch"
         placeholder="Search..."

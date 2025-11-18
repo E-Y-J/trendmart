@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import Stack from 'react-bootstrap/Stack';
-import Row from 'react-bootstrap/Row';
 import SearchbarRow from '../sectionSearchbar/SearchbarRow';
 import { Container } from 'react-bootstrap';
-import { useTheme } from '@styles/themeContext';
+// import { useTheme } from '@styles/themeContext';
 import { listCategories } from '@api/catalog';
 import HoverCategory from './productsChildren/HoverCategory';
 
 function ProductCategories() {
-  const { theme } = useTheme();
+  // const { theme } = useTheme();
   const [categories, setCategories] = useState(null); // null = loading
 
   useEffect(() => {
@@ -30,12 +29,18 @@ function ProductCategories() {
   const displayedCategories = categories?.length ? categories : placeholderCategories;
 
   return (
-    <Container fluid className="p-0 m-0" style={{ height: '100%' }}>
-      <Stack direction="vertical" className="d-flex justify-content-start gap-2 m-0 p-0 w-100">
-        
-        <Row className='d-flex flex-row align-self-start'>
+    <Container
+      fluid
+      className="p-0 m-0"
+      style={{ height: '100%' }}
+    >
+      <Stack
+        direction="vertical"
+        className="d-flex justify-content-start align-items-center gap-2 m-0 p-0 w-100"
+      >
+        <div className='d-flex flex-column ms-3 justify-content-center align-items-center align-self-start'>
           <SearchbarRow searchId="subcategorySearch" placeholder="Category" />
-        </Row>
+        </div>
 
         {displayedCategories.map((cat) => (
           <HoverCategory key={cat.id} linksTo={`/catalog/${cat.slug}`}>
