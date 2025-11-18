@@ -93,6 +93,8 @@ function LoginRegister({ setPopup }) {
         minHeight: '50vh',
         minWidth: '50vw',
         ...theme.schemes.darkText,
+        borderRadius: theme.props.bR_less,
+        filter: 'drop-shadow(.5rem .5rem 1rem #0a1f44e8)'
       }}
     >
       <PopupCloseButton onClick={() => setPopup(null)} />
@@ -107,7 +109,11 @@ function LoginRegister({ setPopup }) {
         <Row className="h-100 justify-content-center">
           <Col
             className="d-flex flex-column gap-1"
-            style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem'
+            }}
           >
             <TextInput
               inputId="email"
@@ -137,9 +143,9 @@ function LoginRegister({ setPopup }) {
               onChange={handleChange}
             >
               <Button
-                variant="secondary"
                 onClick={() => setPassHidden(!passHidden)}
                 style={{
+                  backgroundColor: theme.colors.emphasis,
                   fontSize: '.6rem',
                   lineHeight: '1rem',
                   padding: 0,
