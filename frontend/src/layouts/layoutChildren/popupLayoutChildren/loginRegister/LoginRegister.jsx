@@ -11,7 +11,7 @@ import TextInput from '@children/input/TextInput';
 import PasswordRequirements from './PasswordRequirements';
 import PopupCloseButton from '@children/button/CloseButton';
 import { useTheme } from '@styles/themeContext';
-import PasswordVisibleButton from './passwordVisibleButton';
+import PasswordVisibleButton from './PasswordVisibleButton';
 
 function LoginRegister({ setPopup }) {
   const [formData, setFormData] = useState({
