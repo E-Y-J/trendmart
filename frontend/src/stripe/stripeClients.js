@@ -14,5 +14,5 @@ export function getStripe(publishableKey) {
 
 export function StripeProvider({ publishableKey, children }) {
     if (!publishableKey) return null;
-    return <Elements stripe={getStripe(publishableKey)}>{children}</Elements>;
+    return React.createElement(Elements, { stripe: getStripe(publishableKey) }, children);
 }
