@@ -1,5 +1,6 @@
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
+import { useTheme } from '@styles/themeContext';
 
 function TextInput({
   children,
@@ -10,6 +11,8 @@ function TextInput({
   info = null,
   password = false,
 }) {
+  const { theme } = useTheme();
+
   return (
     <Form.Group
       style={{ width: '100%' }}
@@ -23,6 +26,11 @@ function TextInput({
           onChange={onChange}
           name={inputId}
           autoComplete="on"
+          style={{
+            color: theme.colors.contrast,
+            backgroundColor: theme.colors.highlight,
+            borderColor: theme.colors.splash,
+          }}
         />
         {children}
       </InputGroup>

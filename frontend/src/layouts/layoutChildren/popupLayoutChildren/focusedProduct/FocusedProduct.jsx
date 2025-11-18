@@ -41,7 +41,7 @@ function FocusedProduct({
         height: '100%',
         backgroundColor: '#fffffb',
         color: '#222',
-        borderRadius: 4,
+        borderRadius: theme.props.bR_less,
       }}
     >
       {/* Close button */}
@@ -54,7 +54,7 @@ function FocusedProduct({
           top: 8,
           background: '#e8eef6',
           border: '1px solid #9ab',
-          borderRadius: 4,
+          borderRadius: theme.props.bR_less,
           padding: '.25rem .5rem',
           fontWeight: 600,
         }}

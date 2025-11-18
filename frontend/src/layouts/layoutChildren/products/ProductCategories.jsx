@@ -1,34 +1,46 @@
+import { useState, useEffect } from 'react';
 import Stack from 'react-bootstrap/Stack';
+import Row from 'react-bootstrap/Row';
 import SearchbarRow from '../sectionSearchbar/SearchbarRow';
 import { Container } from 'react-bootstrap';
 import { useTheme } from '@styles/themeContext';
+import { listCategories } from '@api/catalog';
+import HoverCategory from './productsChildren/HoverCategory';
 
-function ProductCategories({ categories }) {
+function ProductCategories() {
   const { theme } = useTheme();
+  const [categories, setCategories] = useState(null); // null = loading
+
+  useEffect(() => {
+    async function fetchData() {
+      const result = await listCategories();
+      setCategories(result);
+    }
+    fetchData();
+  }, []);
+
+  // Placeholder mode
+  const placeholderCategories = [
+    { id: 'ph-1', name: 'Category 1', slug: 'category-1' },
+    { id: 'ph-2', name: 'Category 2', slug: 'category-2' },
+    { id: 'ph-3', name: 'Category 3', slug: 'category-3' },
+    { id: 'ph-4', name: 'Category 4', slug: 'category-4' },
+  ];
+
+  const displayedCategories = categories?.length ? categories : placeholderCategories;
 
   return (
-    <Container
-      fluid
-      className="p-0 m-0"
-      style={{ height: '100%' }}
-    >
-      <Stack
-        direction="vertical"
-        className="gap-2"
-      >
-        <SearchbarRow
-          searchId="subcategorySearch"
-          placeholder="Category"
-          sm={12}
-        />
-        {categories.map((category, index) => (
-          <h3
-            key={index}
-            className="m-0"
-            style={{ ...theme.buttons.splash }}
-          >
-            {category}
-          </h3>
+    <Container fluid className="p-0 m-0" style={{ height: '100%' }}>
+      <Stack direction="vertical" className="d-flex justify-content-start gap-2 m-0 p-0 w-100">
+        
+        <Row className='d-flex flex-row align-self-start'>
+          <SearchbarRow searchId="subcategorySearch" placeholder="Category" />
+        </Row>
+
+        {displayedCategories.map((cat) => (
+          <HoverCategory key={cat.id} linksTo={`/catalog/${cat.slug}`}>
+            {cat.name}
+          </HoverCategory>
         ))}
       </Stack>
     </Container>

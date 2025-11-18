@@ -31,12 +31,12 @@ function App() {
               /> }
           />
           
-          <Route element={<ProtectedURLs />}>
+          {/* <Route element={<ProtectedURLs />}> */}
             <Route
               path="/profile"
               element={<Profile />}
             />
-          </Route>
+          {/* </Route> */}
         </Route>
       </Routes>
     </>

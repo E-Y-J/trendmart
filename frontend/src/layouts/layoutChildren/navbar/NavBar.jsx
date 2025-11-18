@@ -1,49 +1,63 @@
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
-import Image from 'react-bootstrap/Image';
 import Navbar from 'react-bootstrap/Navbar';
+import Nav from 'react-bootstrap/Nav';
 import LoginRegister from '@children/popupLayoutChildren/loginRegister/LoginRegister';
 import { useTheme } from '@styles/themeContext';
-import logoUrl from '/logo.svg?url';
+import Logo from '../logo/Logo';
+import HoverLink from './HoverLink';
+
+
 
 function NavBar({ setPopup }) {
   const { theme } = useTheme();
 
   const LogRegLinkBtn = () => (
-    <Col
-      className="d-flex flex-column flex-grow-0 w-100 justify-content-end"
-      style={{ minWidth: '10rem', }}
+    <Button
+      onClick={() => setPopup(<LoginRegister setPopup={setPopup} />)}
+      className="px-3"
+      style={{ ...theme.schemes.contrast, fontSize: '.9rem' }}
     >
-      <Button
-        className="align-text-center h-100"
-        onClick={() => setPopup(<LoginRegister setPopup={setPopup} />)}
-        style={{ ...theme.schemes.contrast }}
-      >
-        Login / Signup
-      </Button>
-    </Col>
+      Login / Signup
+    </Button>
   );
 
   return (
     <Navbar
-      expand="lg"
-      className="h-100 w-100 m-0 p-0"
-      style={{ ...theme.schemes.emphasis, }}
+      expand="md"
+      className="d-flex w-100 h-100 m-0 p-0 px-2 d-flex align-items-center"
+      style={{
+        backgroundColor: theme.colors.darkBg,
+        borderRadius: `${Array(2).fill(theme.props.borderRadius).join(' ') } 0 0`,
+      }}
     >
-      <Col className="d-flex align-items-center flex-grow-1">
-        <Image
-          src={logoUrl}
-          alt="Logo"
-          style={{ height: '100%', maxHeight: '3rem', objectFit: 'cover' }}
-        />
+      {/* LEFT: Logo + Brand */}
+      <Col className="d-flex align-items-center flex-grow-1 gap-3">
+        <Navbar.Brand
+          className="d-flex align-items-center p-0 m-0"
+          style={{ height: '8vh' }}
+        >
+          <Logo variant='white' />
+        </Navbar.Brand>
         <h1
           id="title"
-          className="ms-3 d-none d-sm-flex text-dark mb-0"
-          style={{ height: '100%' }}
+          className="mb-0 fs-3"
+          style={{ fontWeight: 700, color: theme.colors.lightBg }}
         >
           TrendMart
         </h1>
       </Col>
+
+      {/* CENTER HoverLinkS */}
+      <Nav className="d-none d-md-flex gap-4 ms-auto me-4">
+        <HoverLink linksTo="/" >
+          Home
+        </HoverLink >
+        <HoverLink linksTo="/profile">Profile</HoverLink>
+        <HoverLink linksTo="/contact">Contact</HoverLink>
+      </Nav>
+
+      {/* RIGHT: Login Button */}
       <LogRegLinkBtn />
     </Navbar>
   );

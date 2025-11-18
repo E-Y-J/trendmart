@@ -11,6 +11,7 @@ import TextInput from '@children/input/TextInput';
 import PasswordRequirements from './PasswordRequirements';
 import PopupCloseButton from '@children/button/CloseButton';
 import { useTheme } from '@styles/themeContext';
+import PasswordVisibleButton from './passwordVisibleButton';
 
 function LoginRegister({ setPopup }) {
   const [formData, setFormData] = useState({
@@ -61,7 +62,7 @@ function LoginRegister({ setPopup }) {
     }
     // return password criteria errors
     const errors = validatePassword();
-    if (errors.length) {
+    if (errors.length && toggleForm === 'register') {
       dispatch(
         setStatus({
           message: `Unmet password criteria: ${errors.join(', ')}.`,
@@ -136,7 +137,7 @@ function LoginRegister({ setPopup }) {
               onChange={handleChange}
             >
               <Button
-                variant="danger"
+                variant="secondary"
                 onClick={() => setPassHidden(!passHidden)}
                 style={{
                   fontSize: '.6rem',
@@ -146,9 +147,7 @@ function LoginRegister({ setPopup }) {
                   textDecoration: 'none',
                 }}
               >
-                {passHidden ? 'show' : 'hide'}
-                <br />
-                password
+                <PasswordVisibleButton show={ !passHidden } />
               </Button>
             </TextInput>
 

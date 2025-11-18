@@ -83,10 +83,9 @@ function RecommendedProducts() {
     >
       <SearchbarRow
         searchId="recommendedSearch"
-        placeholder="Search recommended products"
+        placeholder="Search..."
         sectionTitle="Recommended Products"
         onSearch={performSearch}
-        sm={6}
       />
       <Row className="m-0 p-1">
         {state.loading && (
