@@ -24,6 +24,8 @@ function PaymentPopup() {
             <Card.Body className='h-100 d-flex flex-column gap-3'>
                 <h3 className='m-0'>Payment</h3>
                 <StripePaymentSection
+                    orderId={orderId}
+                    currency="usd"
                     onBack={() => navigate(-1)}
                     onNext={() => { navigate(-1); }} // this is for testing purposes only will change to navigate to /checkout/confirmation/${orderId}
                 />
