@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom';
 
 function NavBar({ setPopup }) {
   const { theme } = useTheme();
-  const navigate = useNavigate(); // for testing shipping pop up navigation
 
   const LogRegLinkBtn = () => (
     <Button
@@ -30,7 +29,7 @@ function NavBar({ setPopup }) {
       className="d-flex w-100 h-100 m-0 p-0 px-2 d-flex align-items-center"
       style={{
         backgroundColor: theme.colors.darkBg,
-        borderRadius: `${Array(2).fill(theme.props.borderRadius).join(' ')} 0 0`,
+        borderRadius: `${Array(2).fill(theme.props.bR_more).join(' ')} 0 0`,
       }}
     >
       {/* LEFT: Logo + Brand */}
@@ -61,14 +60,6 @@ function NavBar({ setPopup }) {
 
       {/* RIGHT: Login Button */}
       <LogRegLinkBtn />
-      <Button
-        className="ms-3"
-        variant="dark"
-        style={{ ...theme.buttons?.splash }}
-        onClick={() => navigate('/checkout/shipping')}
-      >{/* temporary: test shipping popup */}
-        Checkout
-      </Button>
     </Navbar>
   );
 }
