@@ -18,7 +18,11 @@ function ShippingAddressForm({ onNext, onBack }) {
         setLoading(true);
         try {
             const data = await getAddresses();
-            setAddresses(data || []);
+            const list = Array.isArray(data) ? data : [];
+            setAddresses(list);
+            if (list.length === 0) {
+                setUseNew(true);
+            }
         } finally {
             setLoading(false);
         }
@@ -51,34 +55,35 @@ function ShippingAddressForm({ onNext, onBack }) {
                 <div>Loading addresses…</div>
             ) : (
                 <>
-                    {addresses.length > 0 && (
-                        <div className='d-flex flex-column gap-2'>
-                            {addresses.map((a) => (
-                                <Form.Check
-                                    key={a.id}
-                                    type='radio'
-                                    name='address'
-                                    id={`address-${a.id}`}
-                                    label={`${a.line1}, ${a.city}, ${a.state} ${a.zip_code}`}
-                                    checked={!useNew && selected === a.id}
-                                    onChange={() => { setUseNew(false); setSelected(a.id); }}
-                                />
-                            ))}
+                    <div className='d-flex flex-column gap-2'>
+                        {addresses.length > 0 && addresses.map((a) => (
                             <Form.Check
+                                key={a.id}
                                 type='radio'
-                                name='addr'
-                                id='address-new'
-                                label='Use a new address'
-                                checked={useNew}
-                                onChange={() => { setUseNew(true); setSelected(null); }}
+                                name='address'
+                                id={`address-${a.id}`}
+                                label={`${a.line1}, ${a.city}, ${a.state} ${a.zip_code}`}
+                                checked={!useNew && selected === a.id}
+                                onChange={() => { setUseNew(false); setSelected(a.id); }}
                             />
-                        </div>
-                    )}
+                        ))}
+                        <Form.Check
+                            type='radio'
+                            name='addr'
+                            id='address-new'
+                            label='Use a new address'
+                            checked={useNew}
+                            onChange={() => { setUseNew(true); setSelected(null); }}
+                        />
+                    </div>
 
                     {useNew && (
                         <Row className="g-2">
                             <Col md={8}>
                                 <Form.Control placeholder='Address line 1' value={newAddress.line1} onChange={(e) => setNewAddress({ ...newAddress, line1: e.target.value })} />
+                            </Col>
+                            <Col md={8}>
+                                <Form.Control placeholder='Address line 2 (optional)' value={newAddress.line2} onChange={(e) => setNewAddress({ ...newAddress, line2: e.target.value })} />
                             </Col>
 
                             <Col md={4}>
@@ -97,8 +102,8 @@ function ShippingAddressForm({ onNext, onBack }) {
                     )}
 
                     <div className='d-flex justify-content-between mt-2'>
-                        <Button variant='outline-secondary' onClick={onBack} style={{ ...theme.buttons.muted }}>Back</Button>
-                        <Button type='submit' variant='dark' style={{ ...theme.buttons.splash }}>Continue to Payment</Button>
+                        <Button variant='outline-secondary' onClick={onBack} style={{ ...theme.buttons?.muted }}>Back</Button>
+                        <Button type='submit' variant='dark' style={{ ...theme.buttons?.splash }} disabled={!useNew && !selected}>Continue to Payment</Button>
                     </div>
                 </>
             )}
