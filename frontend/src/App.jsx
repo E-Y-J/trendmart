@@ -15,6 +15,7 @@ function App() {
     <>
       <Routes>
         <Route path='/styleguide' element={<StyleGuide/>}/>
+        <Route element={<ProtectedURLs />}>
         <Route
           path="/"
           element={<MasterLayout state={{popup, setPopup}} />}
@@ -31,12 +32,12 @@ function App() {
               /> }
           />
           
-          {/* <Route element={<ProtectedURLs />}> */}
+          
             <Route
               path="/profile"
-              element={<Profile />}
+              element={<Profile state={{popup, setPopup}}/>}
             />
-          {/* </Route> */}
+          </Route>
         </Route>
       </Routes>
     </>

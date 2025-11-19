@@ -4,6 +4,7 @@ import { setStatus } from '../status/statusSlice';
 
 const initialState = {
   user: null,
+  token: null,
   isAuthenticated: false,
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'error'
   error: null,
@@ -45,7 +46,7 @@ export const loginUser = createAsyncThunk(
       dispatch(setStatus({ message: 'Login successful.', variant: 'success' }));
 
       // Expect { user: {...} }
-      return response.data.user;
+      return response.data;
     } catch (error) {
       dispatch(
         setStatus({
@@ -100,19 +101,42 @@ export const logoutUser = createAsyncThunk(
 const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {},
+  reducers: {
+    initializeAuth: (state) => {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        state.token = token;
+        state.isAuthenticated = true;
+        state.status = 'succeeded';
+        // Note: user will be set when checkAuthStatus is called
+      }
+    },
+    clearAuth: (state) => {
+      state.user = null;
+      state.token = null;
+      state.isAuthenticated = false;
+      state.status = 'idle';
+      state.error = null;
+      localStorage.removeItem('access_token');
+    },
+  },
   extraReducers: (builder) => {
     builder
       // LOGIN
       .addCase(loginUser.fulfilled, (state, action) => {
+        console.log('🚀 loginUser.fulfilled action.payload:', action.payload);
         state.isAuthenticated = true;
-        state.user = action.payload;
+        state.user = action.payload.user;
+        state.token = action.payload.access_token;
         state.status = 'succeeded';
+        // Store token in localStorage
+        localStorage.setItem('access_token', action.payload.access_token);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isAuthenticated = false;
         state.user = null;
         state.error = action.payload;
+        state.token = null;
         state.status = 'error';
       })
 
@@ -148,9 +172,13 @@ const authSlice = createSlice({
       .addCase(logoutUser.fulfilled, (state) => {
         state.isAuthenticated = false;
         state.user = null;
+        state.token = null;
         state.status = 'idle';
+        // Remove token from localStorage
+        localStorage.removeItem('access_token');
       });
   },
 });
 
+export const { initializeAuth, clearAuth } = authSlice.actions;
 export default authSlice.reducer;
