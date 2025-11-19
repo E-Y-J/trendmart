@@ -5,9 +5,11 @@ import Navbar from 'react-bootstrap/Navbar';
 import LoginRegister from '@children/popupLayoutChildren/loginRegister/LoginRegister';
 import { useTheme } from '@styles/themeContext';
 import logoUrl from '/logo.svg?url';
+import { useNavigate } from 'react-router-dom'; // for testing shipping pop up navigation
 
 function NavBar({ setPopup }) {
   const { theme } = useTheme();
+  const navigate = useNavigate(); // for testing shipping pop up navigation
 
   const LogRegLinkBtn = () => (
     <Col
@@ -45,6 +47,14 @@ function NavBar({ setPopup }) {
         </h1>
       </Col>
       <LogRegLinkBtn />
+      <Button
+        className="ms-3"
+        variant="dark"
+        style={{ ...theme.buttons?.splash }}
+        onClick={() => navigate('/checkout/shipping')}
+      > // this button is for testing shipping pop up, will be removed later
+        Checkout
+      </Button>
     </Navbar>
   );
 }
