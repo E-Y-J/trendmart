@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom';
 
 function NavBar({ setPopup }) {
   const { theme } = useTheme();
-  const navigate = useNavigate(); // for testing shipping pop up navigation
 
   const LogRegLinkBtn = () => (
     <Button
@@ -61,14 +60,6 @@ function NavBar({ setPopup }) {
 
       {/* RIGHT: Login Button */}
       <LogRegLinkBtn />
-      <Button
-        className="ms-3"
-        variant="dark"
-        style={{ ...theme.buttons?.splash }}
-        onClick={() => navigate('/checkout/shipping')}
-      >{/* temporary: test shipping popup */}
-        Checkout
-      </Button>
     </Navbar>
   );
 }
