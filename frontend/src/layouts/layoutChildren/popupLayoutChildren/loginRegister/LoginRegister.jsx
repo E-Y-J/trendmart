@@ -11,6 +11,7 @@ import TextInput from '@children/input/TextInput';
 import PasswordRequirements from './PasswordRequirements';
 import PopupCloseButton from '@children/button/CloseButton';
 import { useTheme } from '@styles/themeContext';
+import PasswordVisibleButton from './PasswordVisibleButton';
 
 function LoginRegister({ setPopup }) {
   const [formData, setFormData] = useState({
@@ -61,7 +62,7 @@ function LoginRegister({ setPopup }) {
     }
     // return password criteria errors
     const errors = validatePassword();
-    if (errors.length) {
+    if (errors.length && toggleForm === 'register') {
       dispatch(
         setStatus({
           message: `Unmet password criteria: ${errors.join(', ')}.`,
@@ -92,6 +93,8 @@ function LoginRegister({ setPopup }) {
         minHeight: '50vh',
         minWidth: '50vw',
         ...theme.schemes.darkText,
+        borderRadius: theme.props.bR_less,
+        filter: 'drop-shadow(.5rem .5rem 1rem #0a1f44e8)'
       }}
     >
       <PopupCloseButton onClick={() => setPopup(null)} />
@@ -106,7 +109,11 @@ function LoginRegister({ setPopup }) {
         <Row className="h-100 justify-content-center">
           <Col
             className="d-flex flex-column gap-1"
-            style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1rem'
+            }}
           >
             <TextInput
               inputId="email"
@@ -136,9 +143,9 @@ function LoginRegister({ setPopup }) {
               onChange={handleChange}
             >
               <Button
-                variant="danger"
                 onClick={() => setPassHidden(!passHidden)}
                 style={{
+                  backgroundColor: theme.colors.emphasis,
                   fontSize: '.6rem',
                   lineHeight: '1rem',
                   padding: 0,
@@ -146,9 +153,7 @@ function LoginRegister({ setPopup }) {
                   textDecoration: 'none',
                 }}
               >
-                {passHidden ? 'show' : 'hide'}
-                <br />
-                password
+                <PasswordVisibleButton show={ !passHidden } />
               </Button>
             </TextInput>
 

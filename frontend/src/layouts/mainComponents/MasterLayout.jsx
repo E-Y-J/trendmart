@@ -18,35 +18,30 @@ function MasterLayout() {
     <Container
       id="superContainer"
       fluid
-      className="v-100 justify-content-center align-items-center"
-      style={{ height: '100vh', ...theme.schemes.darkText }}
+      className="m-0 justify-content-center align-items-center p-0 py-sm-3 px-sm-4"
+      style={{ height: '100vh', backgroundColor: theme.colors.lightBg }}
     >
-      <Row
+      <Col
         id="navbarContainer"
-        style={{ height: '10vh', minWidth: '100%' }}
+        style={{ height: '16vh', minWidth: '100%', marginBottom: '4vh' }}
       >
-        <NavBar setPopup={setPopup}/>
-      </Row>
-
-      <Container
-        id="alert-mGrid-popupContainer"
-        fluid
-        className="h-100 m-0 px-2"
-      >
-        <Row
-          id="alertContainer"
-          className="py-2"
-          style={{ height: '8vh' }}
-        >
+        <Row className="h-50" style={{ borderRadius: `${Array(2).fill(theme.props.bR_more).join(' ') } 0 0`, overflow: 'hidden' }}>
+          <NavBar setPopup={setPopup}/>
+        </Row>
+        <Row className="h-50" style={{ backgroundColor: theme.alerts.success, borderRadius: `0 0 ${Array(2).fill(theme.props.bR_more).join(' ') }` }}>
           <GlobalAlert />
         </Row>
+      </Col>
 
         <Row
           id="mGrid-popupContainer"
           className="pb-2"
-          style={{ height: '81vh' }}
+          style={{ height: '77vh' }}
         >
-          <Col className="w-100 h-100 m-0 p-0">
+          <Col 
+            className="w-100 h-100 m-0 p-0"
+            style={{ borderRadius: theme.props.bR_more, overflow: 'hidden' }}
+          >
             <MasterGrid />
           </Col>
 
@@ -58,7 +53,6 @@ function MasterLayout() {
 
         </Row>
       </Container>
-    </Container>
   );
 }
 

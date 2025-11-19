@@ -13,7 +13,6 @@ function SearchbarRow({
   sectionTitle = null,
   onSearch = null,
   debounceMs = 350,
-  sm = null,
 }) {
   const [value, setValue] = useState('');
   const [timer, setTimer] = useState(null);
@@ -28,52 +27,46 @@ function SearchbarRow({
         const t = setTimeout(() => onSearch(next), debounceMs);
         setTimer(t);
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
     [onSearch, debounceMs, timer]
   );
 
   return (
     <Row
-      id="featuredHeader"
-      className="d-flex flex-grow-0 align-items-center m-0 w-100 px-1 py-0 px-sm-1 gap-1"
-      style={{ height: '2.5rem', ...theme.schemes.emphasis }}
+      className="d-flex flex-row align-items-center m-0 w-100 px py-0 gap-1"
+      style={{ height: '2.5rem' }}
     >
-      <Col
-        xs={10}
-        sm={sm}
-        className="d-flex flex-grow-0 flex-shrink-1 align-items-center p-0"
-      >
+      {sectionTitle && (
+        <Col
+          className="d-flex flex-column flex-grow-1 justify-content-start align-items-start m-0 p-0 text-nowrap d-none d-sm-flex fs-4 align-self-end"
+          style={{ color: theme.colors.contrast, fontWeight: '700',  }}
+        >
+          {sectionTitle}
+        </Col>
+      )}
+      {filterButton && (
+        <Col
+          className="d-flex flex-grow-0 flex-column p-0 justify-content-center align-content-center"
+          style={{ height: '2.5rem' }}
+        >
+          <Image
+            alt="filter"
+            src={filterIcon}
+            style={{ height: '2rem', width: 'auto', cursor: 'pointer', alignSelf: 'center' }}
+          />
+        </Col>
+      )}
+      <Col className="d-flex justify-content-center align-items-center p-0">
         <Form.Control
           id={searchId}
           type="text"
           value={value}
           placeholder={placeholder}
           onChange={handleChange}
-          className="h-100 w-100"
-          style={{ boxSizing: 'border-box', fieldSizing: 'content' }}
+          className="d-flex flex-row h-100 w-100"
+          style={{ boxSizing: 'border-box', fieldSizing: 'content', borderRadius: '.3rem', borderWidth: '.13rem', borderColor: '#e8e8e8e8' }}
         />
       </Col>
-      {filterButton && (
-        <Col
-          className="p-0"
-          style={{ height: '2.5rem' }}
-        >
-          <Image
-            alt="filter"
-            src={filterIcon}
-            style={{ height: '100%', width: 'auto', cursor: 'pointer' }}
-          />
-        </Col>
-      )}
-      {sectionTitle && (
-        <Col
-          className="d-flex flex-grow-1 justify-content-end align-items-center m-0 p-0 text-nowrap d-none d-sm-flex fs-4"
-          style={{ color: theme.colors.text }}
-        >
-          {sectionTitle}
-        </Col>
-      )}
     </Row>
   );
 }
