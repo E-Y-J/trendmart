@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import PopupCloseButton from '@children/button/CloseButton';
 import { useTheme } from '@styles/themeContext';
 import ShippingAddressForm from './ShippingAddressForm';
+import { createOrder } from '@api/orders';
 
 function ShippingPopup() {
     const { theme } = useTheme();
@@ -24,7 +25,16 @@ function ShippingPopup() {
                 <h3 className='m-0'>Shipping Address</h3>
                 <ShippingAddressForm
                     onBack={() => navigate(-1)}
-                    onNext={() => { navigate(-1); }} // this is for testing purposes only will change to navigate to /checkout/payment/${orderId}
+                    onNext={async () => {
+                        try {
+                            const res = await createOrder(); // { message, order }
+                            const orderId = res?.order?.id || res?.order?._id;
+                            if (orderId) navigate(`/checkout/payment/${orderId}`);
+                            else navigate(-1);
+                        } catch {
+                            navigate(-1);
+                        }
+                    }}
                 />
             </Card.Body>
         </Card>
