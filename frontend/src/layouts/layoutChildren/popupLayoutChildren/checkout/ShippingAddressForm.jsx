@@ -100,31 +100,26 @@ function ShippingAddressForm({ onNext, onBack }) {
                     </div>
 
                     {useNew && (
-                        <div className="d-flex flex-column gap-2">
+                        <div className='d-flex flex-column gap-2'>
                             <Form.Control placeholder='Address line 1' value={newAddress.line1} onChange={(e) => setNewAddress({ ...newAddress, line1: e.target.value })} />
                             <Form.Control placeholder='Address line 2 (optional)' value={newAddress.line2} onChange={(e) => setNewAddress({ ...newAddress, line2: e.target.value })} />
 
-                            <Row className="g-2">
+                            <Row className='g-2'>
                                 <Col md={6}>
                                     <Form.Control placeholder='City' value={newAddress.city} onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })} />
                                 </Col>
                                 <Col md={6}>
-                                    <Form.Label className='mb-1'>State</Form.Label>
-                                    <div style={{ maxHeight: 160, overflowY: 'auto', border: '1px solid #ddd', borderRadius: 4, padding: '0.5rem', background: '#fff' }}>
-                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '0.25rem 0.75rem' }}>
-                                            {US_STATES.map((s) => (
-                                                <Form.Check
-                                                    key={s.abbr}
-                                                    type='radio'
-                                                    name='state'
-                                                    id={`state-${s.abbr}`}
-                                                    label={`${s.name} (${s.abbr})`}
-                                                    checked={newAddress.state === s.abbr}
-                                                    onChange={() => setNewAddress({ ...newAddress, state: s.abbr })}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
+                                    <Form.Label className='mb-1'></Form.Label>
+                                    <Form.Select
+                                        aria-label='Select state'
+                                        value={newAddress.state}
+                                        onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
+                                    >
+                                        <option value="">Select state</option>
+                                        {US_STATES.map((s) => (
+                                            <option key={s.abbr} value={s.abbr}>{s.name} ({s.abbr})</option>
+                                        ))}
+                                    </Form.Select>
                                 </Col>
                             </Row>
 

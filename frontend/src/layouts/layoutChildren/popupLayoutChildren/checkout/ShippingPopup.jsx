@@ -12,8 +12,8 @@ function ShippingPopup() {
     return (
         <Card className='p-3 shadow position-relative m-auto'
             style={{
-                width: '100%',
-                height: '100%',
+                width: 'min(92vw, 640px)',
+                maxHeight: '90vh',
                 backgroundColor: '#fffffb',
                 color: '#222',
                 borderRadius: 4,
@@ -21,7 +21,7 @@ function ShippingPopup() {
             }}
         >
             <PopupCloseButton onClick={() => navigate(-1)} />
-            <Card.Body className='h-100 d-flex flex-column gap-3'>
+            <Card.Body className='d-flex flex-column gap-3' style={{ overflowY: 'auto' }}>
                 <h3 className='m-0'>Shipping Address</h3>
                 <ShippingAddressForm
                     onBack={() => navigate(-1)}
