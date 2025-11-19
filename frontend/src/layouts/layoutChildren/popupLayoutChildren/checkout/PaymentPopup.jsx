@@ -27,7 +27,7 @@ function PaymentPopup() {
                     orderId={orderId}
                     currency="usd"
                     onBack={() => navigate(-1)}
-                    onNext={() => { navigate(-1); }} // this is for testing purposes only will change to navigate to /checkout/confirmation/${orderId}
+                    onPaymentComplete={() => { navigate(-1); }}
                 />
             </Card.Body>
         </Card>
