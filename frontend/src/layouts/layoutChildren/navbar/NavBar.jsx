@@ -6,6 +6,7 @@ import LoginRegister from '@children/popupLayoutChildren/loginRegister/LoginRegi
 import { useTheme } from '@styles/themeContext';
 import Logo from '../logo/Logo';
 import HoverLink from './HoverLink';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -65,7 +66,7 @@ function NavBar({ setPopup }) {
         variant="dark"
         style={{ ...theme.buttons?.splash }}
         onClick={() => navigate('/checkout/shipping')}
-      > // this button is for testing shipping pop up, will be removed later
+      >{/* temporary: test shipping popup */}
         Checkout
       </Button>
     </Navbar>
