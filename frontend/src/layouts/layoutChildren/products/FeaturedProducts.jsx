@@ -10,7 +10,6 @@ function FeaturedProducts() {
         placeholder="Search Featured"
         sectionTitle="Featured Products"
         filterButton
-        sm={6}
       />
       <ProductGrid />
     </Col>

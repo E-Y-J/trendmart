@@ -6,22 +6,38 @@
 // EGGSHELL_: #f3f3ea
 
 export const colorPalette = {
+  variant: {
+    error: '#ccadab',
+    info: '#b4c7e4',
+    success: '#9fcecb',
+  },
   light: {
     contrast: '#0a1f44',
     emphasis: '#135c8b',
     splash: '#00aef0',
     highlight: '#9fcecb',
-    bg: '#f3f3ea',
+    darkBg: '#0a1f44',
+    lightBg: '#f3f3ea',
     text: '#fffffb',
+    details: '#e8e8e8e8',
   },
   dark: {
-    bg: '#0a1f44',
     contrast: '#f3f3ea',
     emphasis: '#00aef0',
-    highlight: '#135c8b',
     splash: '#9fcecb',
+    highlight: '#f3f3ea',
+    darkBg: '#135c8b',
+    lightBg: '#1d2235',
     text: '#fffffb',
+    details: '#9fcecbe8',
   },
+};
+
+const styleValues = {
+  bR_more: '0.5rem',
+  bR_less: '0.3rem',
+  boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+  transition: 'all 0.3s ease-in-out',
 };
 
 const baseBtn = {
@@ -63,19 +79,21 @@ const emphasis = (mode) => ({
 });
 
 const darkText = (mode) => ({
-  background: colorPalette[mode].bg,
+  background: colorPalette[mode].lightBg,
   color: colorPalette[mode].contrast,
   borderColor: colorPalette[mode].splash,
 });
 
 const lightText = (mode) => ({
-  background: colorPalette[mode].bg,
+  background: colorPalette[mode].darkBg,
   color: colorPalette[mode].text,
   borderColor: colorPalette[mode].splash,
 });
 
 export const buildTheme = (mode) => ({
   colors: colorPalette[mode],
+  alerts: colorPalette.variant,
+  props: styleValues,
   buttons: {
     contrast: { ...contrast(mode), ...baseBtn },
     splash: { ...splash(mode), ...baseBtn },

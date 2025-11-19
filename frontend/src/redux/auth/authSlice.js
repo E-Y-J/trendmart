@@ -37,16 +37,15 @@ export const createUser = createAsyncThunk(
   async ({ email, password }, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.post('/auth/register', { email, password });
-      // Attach token immediately
-      const token = response.data?.access_token;
-      if (token) setAuthToken(token);
       dispatch(
         setStatus({
           message: 'Registration successful. You are now logged in.',
           variant: 'success',
         })
       );
-      return response.data;
+
+      // Expect { user: {...} }
+      return response.data.user;
     } catch (error) {
       dispatch(
         setStatus({
@@ -59,35 +58,33 @@ export const createUser = createAsyncThunk(
   }
 );
 
+
 export const checkAuthStatus = createAsyncThunk(
-  'auth/protected',
-  async (_, { rejectWithValue, dispatch }) => {
+  'auth/check',
+  async (_, { rejectWithValue }) => {
     try {
       // If the page was refreshed, api.js bootstraps from localStorage already.
       const response = await api.get('/auth/protected');
-      dispatch(setStatus({ message: 'Session active.', variant: 'info' }));
-      return response.data;
+
+      // Expect { user }
+      return response.data.user;
     } catch (error) {
-      dispatch(
-        setStatus({
-          message: 'Session expired. Please log in again.',
-          variant: 'error',
-        })
-      );
-      // Clear token if the server says unauthorized
-      if (error?.response?.status === 401) setAuthToken(null);
       return rejectWithValue(error.response?.data);
     }
   }
 );
 
 export const logoutUser = createAsyncThunk(
-  'auth/logoutUser',
+  'auth/logout',
   async (_, { rejectWithValue, dispatch }) => {
     try {
       await api.post('/auth/logout');
-      setAuthToken(null); // clear header + storage
-      dispatch(setStatus({ message: 'Logged out successfully.', variant: 'info' }));
+      dispatch(
+        setStatus({
+          message: "Logged out successfully. We'll see you next time!",
+          variant: 'info',
+        })
+      );
       return null;
     } catch (error) {
       dispatch(
@@ -107,7 +104,7 @@ const authSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Login reducers
+      // LOGIN
       .addCase(loginUser.fulfilled, (state, action) => {
         state.isAuthenticated = true;
         state.user = action.payload;
@@ -115,11 +112,12 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isAuthenticated = false;
+        state.user = null;
         state.error = action.payload;
         state.status = 'error';
       })
 
-      // Registration reducers
+      // REGISTER
       .addCase(createUser.fulfilled, (state, action) => {
         state.isAuthenticated = true;
         state.user = action.payload;
@@ -127,11 +125,12 @@ const authSlice = createSlice({
       })
       .addCase(createUser.rejected, (state, action) => {
         state.isAuthenticated = false;
+        state.user = null;
         state.error = action.payload;
         state.status = 'error';
       })
 
-      // Auth check reducers
+      // CHECK SESSION
       .addCase(checkAuthStatus.pending, (state) => {
         state.status = 'loading';
       })
@@ -143,10 +142,10 @@ const authSlice = createSlice({
       .addCase(checkAuthStatus.rejected, (state) => {
         state.isAuthenticated = false;
         state.user = null;
-        state.status = 'failed';
+        state.status = 'error';
       })
 
-      // Logout reducers
+      // LOGOUT
       .addCase(logoutUser.fulfilled, (state) => {
         state.isAuthenticated = false;
         state.user = null;

@@ -33,11 +33,12 @@ function App() {
               />}
           />
 
-          <Route element={<ProtectedURLs />}>
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/checkout/shipping" element={<ShippingPopup />} />
-            <Route path="/checkout/payment/:orderId" element={<PaymentPopup />} />
-          </Route>
+          {/* <Route element={<ProtectedURLs />}> */}
+          <Route
+            path="/profile"
+            element={<Profile />}
+          />
+          {/* </Route> */}
         </Route>
       </Routes>
     </>
