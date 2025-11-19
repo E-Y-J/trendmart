@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '@api/api';
+import api, { setAuthToken } from '@api/api';
 import { setStatus } from '../status/statusSlice';
 
 const initialState = {
@@ -9,12 +9,34 @@ const initialState = {
   error: null,
 };
 
+export const loginUser = createAsyncThunk(
+  'auth/login',
+  async ({ email, password }, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      // Attach token immediately
+      const token = response.data?.access_token;
+      if (token) setAuthToken(token);
+      dispatch(setStatus({ message: 'Login successful.', variant: 'success' }));
+      return response.data;
+    } catch (error) {
+      dispatch(
+        setStatus({
+          message:
+            error.response?.data?.message || 'Login failed. Check credentials.',
+          variant: 'error',
+        })
+      );
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+
 export const createUser = createAsyncThunk(
   'auth/register',
   async ({ email, password }, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.post('/auth/register', { email, password });
-
       dispatch(
         setStatus({
           message: 'Registration successful. You are now logged in.',
@@ -36,33 +58,12 @@ export const createUser = createAsyncThunk(
   }
 );
 
-export const loginUser = createAsyncThunk(
-  'auth/login',
-  async ({ email, password }, { rejectWithValue, dispatch }) => {
-    try {
-      const response = await api.post('/auth/login', { email, password });
-
-      dispatch(setStatus({ message: 'Login successful.', variant: 'success' }));
-
-      // Expect { user: {...} }
-      return response.data.user;
-    } catch (error) {
-      dispatch(
-        setStatus({
-          message:
-            error.response?.data?.message || 'Login failed. Check credentials.',
-          variant: 'error',
-        })
-      );
-      return rejectWithValue(error.response?.data);
-    }
-  }
-);
 
 export const checkAuthStatus = createAsyncThunk(
   'auth/check',
   async (_, { rejectWithValue }) => {
     try {
+      // If the page was refreshed, api.js bootstraps from localStorage already.
       const response = await api.get('/auth/protected');
 
       // Expect { user }

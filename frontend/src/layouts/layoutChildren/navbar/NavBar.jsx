@@ -6,6 +6,7 @@ import LoginRegister from '@children/popupLayoutChildren/loginRegister/LoginRegi
 import { useTheme } from '@styles/themeContext';
 import Logo from '../logo/Logo';
 import HoverLink from './HoverLink';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -28,7 +29,7 @@ function NavBar({ setPopup }) {
       className="d-flex w-100 h-100 m-0 p-0 px-2 d-flex align-items-center"
       style={{
         backgroundColor: theme.colors.darkBg,
-        borderRadius: `${Array(2).fill(theme.props.borderRadius).join(' ') } 0 0`,
+        borderRadius: `${Array(2).fill(theme.props.bR_more).join(' ')} 0 0`,
       }}
     >
       {/* LEFT: Logo + Brand */}
