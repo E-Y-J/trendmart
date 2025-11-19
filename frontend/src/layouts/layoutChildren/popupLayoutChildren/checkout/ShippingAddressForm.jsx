@@ -109,7 +109,6 @@ function ShippingAddressForm({ onNext, onBack }) {
                                     <Form.Control placeholder='City' value={newAddress.city} onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })} />
                                 </Col>
                                 <Col md={6}>
-                                    <Form.Label className='mb-1'></Form.Label>
                                     <Form.Select
                                         aria-label='Select state'
                                         value={newAddress.state}
