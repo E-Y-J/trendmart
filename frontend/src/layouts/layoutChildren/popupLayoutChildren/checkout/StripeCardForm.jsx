@@ -55,7 +55,17 @@ function StripeCardForm({ clientSecret, currency, amountCents, onBack, onComplet
                 <CardElement options={{ hidePostalCode: true }} />
             </div>
 
-            {errorMsg && <div className="text-danger">{errorMsg}</div>}
+            {errorMsg && (
+                <div className="d-flex flex-column gap-2">
+                    <div className="text-danger">{errorMsg}</div>
+                    <Button
+                        variant="outline-dark"
+                        type="submit"
+                        disabled={processing}
+                        style={{ ...theme.buttons.muted }}
+                    >Try Again</Button>
+                </div>
+            )}
         </form>
     );
 }
