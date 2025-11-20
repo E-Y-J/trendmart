@@ -19,19 +19,6 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // Debug: Log auth info whenever it changes
-  useEffect(() => {
-    console.log('🔐 Auth Info:', {
-      user,
-      isAuthenticated,
-      token: token ? 'Present' : 'Missing',
-      authStatus,
-      userEmail: user?.email,
-      userName: user?.name
-    });
-  }, [user, isAuthenticated, token, authStatus]);
-
-  
   const fetchCurrentUser = async () => {
     try {
       const user = await getCurrentUser();
@@ -48,11 +35,10 @@ const Profile = () => {
     const fetchUserProfile = async () => {
       try {
         setLoading(true);
-        dispatch(clearStatus()); // Clear any previous status messages
+        dispatch(clearStatus()); 
         
         const userProfile = await getProfile();
-        console.log('User data fetched:', userProfile);
-
+   
         // Update form with fetched data
         setContactInfo({
           first_name: userProfile.first_name || '',
@@ -137,6 +123,7 @@ const Profile = () => {
        <Col
       className="d-inline-flex flex-column flex-sm-grow-0 position-relative justify-content-between align-items-center gap-1  m-auto"
       style={{
+        minWidth: '100%',
         ...theme.schemes.darkText,
         borderRadius: theme.props.bR_less,
         filter: 'drop-shadow(.5rem .5rem 1rem #0a1f44e8)'
@@ -154,9 +141,8 @@ const Profile = () => {
   
   return (
     <Col
-      className="d-inline-flex flex-column flex-sm-grow-0 position-relative justify-content-between align-items-center gap-1 px-2 py-4 m-auto"
+      className="d-inline-flex flex-column flex-sm-grow-0 position-relative justify-content-between align-items-center gap-1 px-2 py-4 m-auto w-100"
       style={{
-        minWidth: '100%',
         ...theme.schemes.darkText,
         borderRadius: theme.props.bR_less,
         filter: 'drop-shadow(.5rem .5rem 1rem #0a1f44e8)'
@@ -166,25 +152,42 @@ const Profile = () => {
 
      
         <Tab.Container id="left-tabs-example" defaultActiveKey="contactInfo">
-          
-        
-          {/* Left Column - Tab Navigation */}
-          <Col xs={3} className="">
-            <Nav variant="tabs" className="flex-column flex-row-sm pt-3">
-              <Nav.Item>
-                <Nav.Link eventKey="contactInfo">Contact Information</Nav.Link>
+          {/* Tab Navigation - Responsive */}
+          <Col xs={12} md={3} className="mb-3 mb-md-0">
+            <Nav variant="pills" className="flex-row flex-md-column justify-content-center">
+              <Nav.Item className="flex-fill flex-md-grow-0">
+                <Nav.Link 
+                  eventKey="contactInfo"
+                  className="text-center text-md-start"
+                  style={{ fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}
+                >
+                  <span className="d-md-none">Contact</span>
+                  <span className="d-none d-md-inline">Contact Information</span>
+                </Nav.Link>
               </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="address">Address</Nav.Link>
+              <Nav.Item className="flex-fill flex-md-grow-0">
+                <Nav.Link 
+                  eventKey="address"
+                  className="text-center text-md-start"
+                  style={{ fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}
+                >
+                  Address
+                </Nav.Link>
               </Nav.Item>
-              <Nav.Item>
-                <Nav.Link eventKey="security">Security</Nav.Link>
+              <Nav.Item className="flex-fill flex-md-grow-0">
+                <Nav.Link 
+                  eventKey="security"
+                  className="text-center text-md-start"
+                  style={{ fontSize: 'clamp(0.8rem, 2vw, 1rem)' }}
+                >
+                  Security
+                </Nav.Link>
               </Nav.Item>
             </Nav>
           </Col>
 
-          {/* Right Column - Tab Content */}
-          <Col xs={9} className="p-4 bg-light">
+          {/* Tab Content */}
+          <Col xs={12} md={9} className="p-3 p-md-4 bg-light">
             <Tab.Content className="p-3 rounded">
               <Tab.Pane eventKey="contactInfo">
                 <h4>Contact Information</h4>

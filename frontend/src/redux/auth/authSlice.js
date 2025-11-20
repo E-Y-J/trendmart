@@ -1,21 +1,42 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '@api/api';
+import api, { setAuthToken } from '@api/api';
 import { setStatus } from '../status/statusSlice';
 
 const initialState = {
   user: null,
-  token: null,
   isAuthenticated: false,
   status: 'idle', // 'idle' | 'loading' | 'succeeded' | 'error'
   error: null,
 };
+
+export const loginUser = createAsyncThunk(
+  'auth/login',
+  async ({ email, password }, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      // Attach token immediately
+      const token = response.data?.access_token;
+      if (token) setAuthToken(token);
+      dispatch(setStatus({ message: 'Login successful.', variant: 'success' }));
+      return response.data;
+    } catch (error) {
+      dispatch(
+        setStatus({
+          message:
+            error.response?.data?.message || 'Login failed. Check credentials.',
+          variant: 'error',
+        })
+      );
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
 
 export const createUser = createAsyncThunk(
   'auth/register',
   async ({ email, password }, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.post('/auth/register', { email, password });
-
       dispatch(
         setStatus({
           message: 'Registration successful. You are now logged in.',
@@ -37,33 +58,12 @@ export const createUser = createAsyncThunk(
   }
 );
 
-export const loginUser = createAsyncThunk(
-  'auth/login',
-  async ({ email, password }, { rejectWithValue, dispatch }) => {
-    try {
-      const response = await api.post('/auth/login', { email, password });
-
-      dispatch(setStatus({ message: 'Login successful.', variant: 'success' }));
-
-      // Expect { user: {...} }
-      return response.data;
-    } catch (error) {
-      dispatch(
-        setStatus({
-          message:
-            error.response?.data?.message || 'Login failed. Check credentials.',
-          variant: 'error',
-        })
-      );
-      return rejectWithValue(error.response?.data);
-    }
-  }
-);
 
 export const checkAuthStatus = createAsyncThunk(
   'auth/check',
   async (_, { rejectWithValue }) => {
     try {
+      // If the page was refreshed, api.js bootstraps from localStorage already.
       const response = await api.get('/auth/protected');
 
       // Expect { user }
@@ -101,42 +101,19 @@ export const logoutUser = createAsyncThunk(
 const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {
-    initializeAuth: (state) => {
-      const token = localStorage.getItem('access_token');
-      if (token) {
-        state.token = token;
-        state.isAuthenticated = true;
-        state.status = 'succeeded';
-        // Note: user will be set when checkAuthStatus is called
-      }
-    },
-    clearAuth: (state) => {
-      state.user = null;
-      state.token = null;
-      state.isAuthenticated = false;
-      state.status = 'idle';
-      state.error = null;
-      localStorage.removeItem('access_token');
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
       // LOGIN
       .addCase(loginUser.fulfilled, (state, action) => {
-        console.log('🚀 loginUser.fulfilled action.payload:', action.payload);
         state.isAuthenticated = true;
-        state.user = action.payload.user;
-        state.token = action.payload.access_token;
+        state.user = action.payload;
         state.status = 'succeeded';
-        // Store token in localStorage
-        localStorage.setItem('access_token', action.payload.access_token);
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isAuthenticated = false;
         state.user = null;
         state.error = action.payload;
-        state.token = null;
         state.status = 'error';
       })
 
@@ -172,13 +149,9 @@ const authSlice = createSlice({
       .addCase(logoutUser.fulfilled, (state) => {
         state.isAuthenticated = false;
         state.user = null;
-        state.token = null;
         state.status = 'idle';
-        // Remove token from localStorage
-        localStorage.removeItem('access_token');
       });
   },
 });
 
-export const { initializeAuth, clearAuth } = authSlice.actions;
 export default authSlice.reducer;

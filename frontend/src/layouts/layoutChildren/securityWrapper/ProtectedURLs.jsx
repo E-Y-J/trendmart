@@ -1,38 +1,35 @@
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { checkAuthStatus, initializeAuth } from '@redux/auth/authSlice';
+import { checkAuthStatus } from '@redux/auth/authSlice';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { setStatus } from '@redux/status/statusSlice';
+import { setStatus, clearStatus } from '@redux/status/statusSlice';
 
 function ProtectedURLs() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { isAuthenticated, status, user } = useSelector((state) => state.auth);
 
-  const { isAuthenticated, status, token, user } = useSelector((state) => state.auth);
-
-  // Initialize auth from localStorage on component mount
+  // Kick off auth check once
   useEffect(() => {
-    dispatch(initializeAuth());
+    dispatch(checkAuthStatus());
   }, [dispatch]);
 
+  // Manage global status text outside of render
   useEffect(() => {
-    // Only check auth status if we have a token
-    if (token) {
-      dispatch(checkAuthStatus());
+    if (status === 'loading') {
+      dispatch(setStatus({ message: 'Checking session...', variant: 'info' }));
+    } else {
+      // clear after success or failure
+      dispatch(clearStatus());
     }
-  }, [dispatch, token]);
+  }, [status, dispatch]);
 
+  // Redirect only after check finishes
   useEffect(() => {
-    if (status === 'error' || (!isAuthenticated && status === 'succeeded' && !token)) {
+    if (status === 'failed' || (status === 'succeeded' && !isAuthenticated)) {
       navigate('/');
     }
-  }, [isAuthenticated, status, navigate, token]);
-  
-  // useEffect(() => {
-  //   if (status === 'loading') {
-  //     dispatch(setStatus({ message: 'Checking session...', variant: 'info' }));
-  //   }
-  // }, [status, dispatch]);
+  }, [isAuthenticated, status, navigate]);
 
   return <Outlet />;
 }

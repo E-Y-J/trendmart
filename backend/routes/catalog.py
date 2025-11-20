@@ -56,6 +56,16 @@ def get_product(product_id):
     product_schema = ProductSchema()
     return jsonify(product_schema.dump(product)), 200
 
+# Lookup by original source_id (sample dataset id) if present
+
+
+@products_bp.route('/source/<int:source_id>', methods=['GET'])
+def get_product_by_source(source_id):
+    product = Product.query.filter_by(source_id=source_id).first()
+    if not product:
+        return jsonify({"message": "Product not found"}), 404
+    return jsonify(ProductSchema().dump(product)), 200
+
 # Update a product
 
 

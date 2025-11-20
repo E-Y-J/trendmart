@@ -7,6 +7,8 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useState } from 'react';
 import StyleGuide from '@styles/StyleGuide';
+import ShippingPopup from '@children/popupLayoutChildren/checkout/ShippingPopup';
+import PaymentPopup from '@children/popupLayoutChildren/checkout/PaymentPopup';
 
 function App() {
   const [popup, setPopup] = useState(null);
@@ -14,11 +16,11 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path='/styleguide' element={<StyleGuide/>}/>
+        <Route path='/styleguide' element={<StyleGuide />} />
         <Route element={<ProtectedURLs />}>
         <Route
           path="/"
-          element={<MasterLayout state={{popup, setPopup}} />}
+          element={<MasterLayout state={{ popup, setPopup }} />}
         >
           <Route
             path="/product/:int"
@@ -29,16 +31,20 @@ function App() {
                 onWishlist={null}
                 onMoreLikeThis={null}
                 onClose={null}
-              /> }
+              />}
           />
           
           
             <Route
               path="/profile"
-              element={<Profile state={{popup, setPopup}}/>}
+              element={<Profile/>}
             />
+            
+            <Route path="/checkout/shipping" element={<ShippingPopup />} />
+            <Route path="/checkout/payment/:orderId" element={<PaymentPopup />} />
+            
+            </Route>
           </Route>
-        </Route>
       </Routes>
     </>
   );
