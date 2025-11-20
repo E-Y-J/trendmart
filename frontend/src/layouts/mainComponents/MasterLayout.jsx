@@ -10,7 +10,7 @@ import PopupLayout from './PopupLayout.jsx';
 import { useTheme } from '@styles/themeContext';
 
 function MasterLayout() {
-  const routedContent = useOutlet();
+  const routedPopup = useOutlet();
   const location = useLocation();
   const { theme } = useTheme();
   const [popup, setPopup] = useState(null);
@@ -18,10 +18,6 @@ function MasterLayout() {
   // Check if we're on a popup route (like /product/:id)
   const isPopupRoute = location.pathname.includes('/product/');
   
-  // Determine what to render in main content area
-  const mainContent = routedContent && !isPopupRoute ? routedContent : <MasterGrid />;
-  const popupContent = isPopupRoute ? routedContent : null;
-
   return (
     <Container
       id="superContainer"
@@ -50,15 +46,15 @@ function MasterLayout() {
             className="w-100 h-100 m-0 p-0"
             style={{ borderRadius: theme.props.bR_more, overflow: 'hidden' }}
           >
-            {/* Render either MasterGrid (home) or routed content (profile, etc.) */}
-            {mainContent}
+            
+            <MasterGrid />
           </Col>
 
           {/* State-based popup (NOT routed) */}
           {popup && <PopupLayout>{popup}</PopupLayout>}
 
-          {/* Route-based popup (via URL) - like products */}
-          {popupContent && <PopupLayout>{popupContent}</PopupLayout>}
+          {/* Route-based popup (via URL) */}
+          {routedPopup && <PopupLayout>{routedPopup}</PopupLayout>}
 
         </Row>
       </Container>
