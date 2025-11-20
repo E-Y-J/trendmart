@@ -2,16 +2,33 @@ import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
+import Dropdown from 'react-bootstrap/Dropdown';
+import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { logoutUser } from '@redux/auth/authSlice';
 import LoginRegister from '@children/popupLayoutChildren/loginRegister/LoginRegister';
 import { useTheme } from '@styles/themeContext';
 import Logo from '../logo/Logo';
 import HoverLink from './HoverLink';
-import { useNavigate } from 'react-router-dom';
 
 
 
 function NavBar({ setPopup }) {
   const { theme } = useTheme();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
+
+  const handleLogout = async () => {
+    try {
+      await dispatch(logoutUser()).unwrap();
+      navigate('/'); // Redirect to home page after successful logout
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Still redirect even if logout API call fails
+      navigate('/');
+    }
+  };
 
   const LogRegLinkBtn = () => (
     <Button
@@ -22,6 +39,33 @@ function NavBar({ setPopup }) {
       Login / Signup
     </Button>
   );
+
+  const UserWelcome = () => {
+    const userEmail = user?.email || 'User';
+
+    return (
+      <div className="d-flex align-items-center gap-3">
+        <span 
+          style={{ 
+            color: theme.colors.lightBg || 'white', 
+            fontSize: '.9rem'
+          }}
+          className="d-none d-sm-inline"
+        >
+          Welcome, <strong>{userEmail}</strong>
+        </span>
+        <Button
+          onClick={handleLogout}
+          variant="outline-light"
+          size="sm"
+          className="px-3"
+          style={{ fontSize: '.9rem' }}
+        >
+          Logout
+        </Button>
+      </div>
+    );
+  };
 
   return (
     <Navbar
@@ -54,12 +98,17 @@ function NavBar({ setPopup }) {
         <HoverLink linksTo="/" >
           Home
         </HoverLink >
-        <HoverLink linksTo="/profile">Profile</HoverLink>
+        {
+          isAuthenticated && (
+            <HoverLink linksTo="/profile">Profile</HoverLink>
+          )
+        }
+       
         <HoverLink linksTo="/contact">Contact</HoverLink>
       </Nav>
 
-      {/* RIGHT: Login Button */}
-      <LogRegLinkBtn />
+      {/* RIGHT: Authenticated or Login Button */}
+      {isAuthenticated ? <UserWelcome /> : <LogRegLinkBtn />}
     </Navbar>
   );
 }

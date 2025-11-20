@@ -7,7 +7,7 @@ import { setStatus, clearStatus } from '@redux/status/statusSlice';
 function ProtectedURLs() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isAuthenticated, status } = useSelector((state) => state.auth);
+  const { isAuthenticated, status, user } = useSelector((state) => state.auth);
 
   // Kick off auth check once
   useEffect(() => {

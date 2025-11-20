@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useOutlet } from 'react-router-dom';
+import { useOutlet, useLocation } from 'react-router-dom';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -10,9 +10,17 @@ import PopupLayout from './PopupLayout.jsx';
 import { useTheme } from '@styles/themeContext';
 
 function MasterLayout() {
-  const routedPopup = useOutlet();
+  const routedContent = useOutlet();
+  const location = useLocation();
   const { theme } = useTheme();
   const [popup, setPopup] = useState(null);
+
+  // Check if we're on a popup route (like /product/:id)
+  const isPopupRoute = location.pathname.includes('/product/');
+  
+  // Determine what to render in main content area
+  const mainContent = routedContent && !isPopupRoute ? routedContent : <MasterGrid />;
+  const popupContent = isPopupRoute ? routedContent : null;
 
   return (
     <Container
@@ -42,14 +50,15 @@ function MasterLayout() {
             className="w-100 h-100 m-0 p-0"
             style={{ borderRadius: theme.props.bR_more, overflow: 'hidden' }}
           >
-            <MasterGrid />
+            {/* Render either MasterGrid (home) or routed content (profile, etc.) */}
+            {mainContent}
           </Col>
 
           {/* State-based popup (NOT routed) */}
           {popup && <PopupLayout>{popup}</PopupLayout>}
 
-          {/* Route-based popup (via URL) */}
-          {routedPopup && <PopupLayout>{routedPopup}</PopupLayout>}
+          {/* Route-based popup (via URL) - like products */}
+          {popupContent && <PopupLayout>{popupContent}</PopupLayout>}
 
         </Row>
       </Container>
