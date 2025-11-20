@@ -168,10 +168,10 @@ const Address = () => {
     return (
         <>
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h4>My Addresses</h4>
+                <h4></h4>
                 {!showAddForm && (
                     <Button 
-                        variant="primary" 
+                        variant="success" 
                         onClick={handleShowAddForm}
                         className="d-flex align-items-center gap-2"
                     >
@@ -320,9 +320,6 @@ const Address = () => {
                                 )}
                                 
                                 <Card.Body>
-                                    <Card.Title className="fs-6 mb-3">
-                                        Address {index + 1}
-                                    </Card.Title>
                                     
                                     <Card.Text className="mb-2">
                                         <strong>{address.line1}</strong><br/>

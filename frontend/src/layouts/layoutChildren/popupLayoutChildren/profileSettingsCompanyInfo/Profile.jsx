@@ -116,32 +116,10 @@ const Profile = () => {
       setSaving(false);
     }
   };
-
-  // Show loading spinner while fetching data
-  if (loading) {
-    return (
-       <Col
-      className="d-inline-flex flex-column flex-sm-grow-0 position-relative justify-content-between align-items-center gap-1  m-auto"
-      style={{
-        minWidth: '100%',
-        ...theme.schemes.darkText,
-        borderRadius: theme.props.bR_less,
-        filter: 'drop-shadow(.5rem .5rem 1rem #0a1f44e8)'
-      }}
-    >
-        <div className="text-center">
-          <Spinner animation="border" role="status" style={{ marginBottom: '1rem' }}>
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
-          <p>Loading your profile...</p>
-        </div>
-      </Col>
-    );
-  } 
   
   return (
     <Col
-      className="d-inline-flex flex-column flex-sm-grow-0 position-relative justify-content-between align-items-center gap-1 px-2 py-4 m-auto w-100"
+      className="d-inline-flex flex-column position-relative justify-content-between align-items-center gap-1 px-2 py-4 m-auto w-100"
       style={{
         ...theme.schemes.darkText,
         borderRadius: theme.props.bR_less,
@@ -150,6 +128,7 @@ const Profile = () => {
     >
       <Row className="h-100 w-100 justify-content-center  my-auto">
 
+      <h3 className="mb-4">Profile</h3>
      
         <Tab.Container id="left-tabs-example" defaultActiveKey="contactInfo">
           {/* Tab Navigation - Responsive */}
