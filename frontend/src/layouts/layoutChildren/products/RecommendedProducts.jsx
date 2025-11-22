@@ -7,13 +7,9 @@ import {
   searchRecommendations,
   getSimilarById,
 } from '@api/recommendations';
-import {
-  logView,
-  logCartAdd,
-  sendRecommendationFeedback,
-} from '@api/events';
+import { logView, logCartAdd, sendRecommendationFeedback } from '@api/events';
 import PopupLayout from '@main/PopupLayout';
-import { useTheme } from '@styles/themeContext';
+import { useTheme } from '@resources/themes/themeContext';
 import { Button } from 'react-bootstrap';
 
 function RecommendedProducts() {
@@ -77,7 +73,10 @@ function RecommendedProducts() {
   }, []);
 
   return (
-    <Col className="d-flex flex-column w-100 p-0">
+    <Col
+      className="d-flex flex-column w-100 p-0"
+      style={{ borderTop: '${}' }}
+    >
       <SearchbarRow
         searchId="recommendedSearch"
         placeholder="Search..."

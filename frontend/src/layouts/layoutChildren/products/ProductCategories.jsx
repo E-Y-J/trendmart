@@ -1,9 +1,10 @@
-import Col from "react-bootstrap/Col";
-import Nav from "react-bootstrap/Nav";
-import Spinner from "react-bootstrap/Spinner";
-import { useCategoryCache } from "./productHooks/useCategoryCache";
-import SearchbarRow from "../sectionSearchbar/SearchbarRow";
-import { Row } from "react-bootstrap";
+import { useState, useEffect } from 'react';
+import Stack from 'react-bootstrap/Stack';
+import SearchbarRow from '../sectionSearchbar/SearchbarRow';
+import { Container } from 'react-bootstrap';
+// import { useTheme } from '@styles/themeContext';
+import { listCategories } from '@api/catalog';
+import HoverCategory from './productsChildren/HoverCategory';
 
 function ProductCategories() {
   // const { theme } = useTheme();
@@ -28,28 +29,28 @@ function ProductCategories() {
   const displayedCategories = categories?.length ? categories : placeholderCategories;
 
   return (
-    <Col>
-      <Row className="pe-4">
-      <SearchbarRow searchId="category" placeholder="Categories" />
-      </Row>
-      <Nav className="flex-column p-3 bg-light h-100">
+    <Container
+      fluid
+      className="p-0 m-0"
+      style={{ height: '100%' }}
+    >
+      <Stack
+        direction="vertical"
+        className="d-flex justify-content-start align-items-center gap-2 m-0 p-0 w-100"
+      >
+        <div className='d-flex flex-column ms-3 justify-content-center align-items-center align-self-start'>
+          <SearchbarRow searchId="subcategorySearch" placeholder="Category" />
+        </div>
 
-        {loading && <Spinner animation="border" size="sm" />}
-
-        {error && <div className="text-danger">Failed to load categories.</div>}
-
-        {!loading && !error && categories?.length > 0 && (
-          <>
-            {categories.map(cat => (
-              <Nav.Link key={cat.id} href={`/category/${cat.slug}`}>
-                {cat.name}
-              </Nav.Link>
-            ))}
-          </>
-        )}
-      </Nav>
-    </Col>
+        {displayedCategories.map((cat) => (
+          <HoverCategory key={cat.id} linksTo={`/catalog/${cat.slug}`}>
+            {cat.name}
+          </HoverCategory>
+        ))}
+      </Stack>
+    </Container>
   );
 }
 
 export default ProductCategories;
+
