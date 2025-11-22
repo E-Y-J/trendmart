@@ -2,6 +2,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { useTheme } from '@styles/themeContext';
 import PopupCloseButton from '@children/button/CloseButton';
+import Logo from '@children/logo/Logo';
 
 function ProductPopup({
     product,
@@ -107,13 +108,29 @@ function ProductPopup({
                     >
                         Buy Now
                     </Button>
-                    <Button
-                        variant="primary"
-                        style={{ ...theme.buttons.contrast }}
-                        onClick={() => onAddToCart?.(product)}
-                    >
-                        Add to Cart
-                    </Button>
+
+                    {/* Right: TrendMart logo as Add-to-Cart */}
+                    {onAddToCart && (
+                        <button
+                            type="button"
+                            onClick={() => onAddToCart(product)}
+                            aria-label="Add to cart"
+                            className="border-0 p-0 m-0"
+                            style={{
+                                width: 56,
+                                height: 56,
+                                borderRadius: '50%',
+                                overflow: 'hidden',
+                                backgroundColor: theme.colors.primaryBg || '#0a1f44',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            {/* You can pass details={false} or true depending on look you want */}
+                            <Logo details={false} />
+                        </button>
+                    )}
                     {onMoreLikeThis && (
                         <Button
                             variant="outline-secondary"
@@ -123,14 +140,8 @@ function ProductPopup({
                             More Like This
                         </Button>
                     )}
+
                 </div>
-                <PopupCloseButton
-                    variant="outline-secondary"
-                    style={{ ...theme.buttons.muted }}
-                    onClick={onClose}
-                >
-                    Close
-                </PopupCloseButton>
             </Modal.Footer>
         </Modal>
     );

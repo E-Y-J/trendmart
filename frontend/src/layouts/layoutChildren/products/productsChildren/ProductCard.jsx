@@ -8,6 +8,7 @@ function ProductCard({
     onView,
     onAddToCart,
     onMoreLikeThis,
+    minimal = false,
 }) {
     const { theme } = useTheme();
     if (!product) return null;
@@ -40,10 +41,10 @@ function ProductCard({
             </div>
 
             {/* name and short subtitle/specs */}
-            <div className='mt-2 fw-semibold' style={{ lineHeight: 1.2 }}>
+            <div className='mt-2 fw-semibold' style={{ lineHeight: 1.2, fontSize: '.75rem' }}>
                 {name}
             </div>
-            {description && (
+            {!minimal && description && (
                 <div className='text-muted' style={{ fontSize: '.7rem', lineheight: 1.2, maxHeight: '2.4rem', overflow: 'hidden', }}>
                     {description}
                 </div>
@@ -57,21 +58,25 @@ function ProductCard({
             )}
 
             {/* Price on bottom left . add to cart and buy now button on bottom right */}
-            <Button size='sm' variant='dark' style={{ ...theme.buttons.splash, fontSize: '.75rem' }}
-                onClick={(e) => {
-                    e.stopPropagation();
-                    onBuy?.(product);
-                }}>
-                Buy Now
-            </Button>
-            {onAddToCart && (
-                <Button size='sm' variant='outline-primary' style={{ fontSize: '.75rem' }}
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onAddToCart?.(product);
-                    }}>
-                    Cart
-                </Button>
+            {!minimal && (
+                <>
+                    <Button size='sm' variant='dark' style={{ ...theme.buttons.splash, fontSize: '.75rem' }}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onBuy?.(product);
+                        }}>
+                        Buy Now
+                    </Button>
+                    {onAddToCart && (
+                        <Button size='sm' variant='outline-primary' style={{ fontSize: '.75rem' }}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onAddToCart?.(product);
+                            }}>
+                            Cart
+                        </Button>
+                    )}
+                </>
             )}
         </Card>
     )
