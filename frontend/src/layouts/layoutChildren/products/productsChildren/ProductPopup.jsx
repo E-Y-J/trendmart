@@ -121,7 +121,7 @@ function ProductPopup({
                                 height: 56,
                                 borderRadius: '50%',
                                 overflow: 'hidden',
-                                backgroundColor: theme.colors.primaryBg || '#0a1f44',
+                                backgroundColor: theme.colors.primaryBg || '#0a1f45',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
