@@ -9,6 +9,7 @@ import { useState } from 'react';
 import StyleGuide from '@styles/StyleGuide';
 import ShippingPopup from '@children/popupLayoutChildren/checkout/ShippingPopup';
 import PaymentPopup from '@children/popupLayoutChildren/checkout/PaymentPopup';
+import OrderConfirmation from '@children/popupLayoutChildren/checkout/OrderConfirmation';
 
 function App() {
   const [popup, setPopup] = useState(null);
@@ -18,33 +19,34 @@ function App() {
       <Routes>
         <Route path='/styleguide' element={<StyleGuide />} />
         <Route element={<ProtectedURLs />}>
-        <Route
-          path="/"
-          element={<MasterLayout state={{ popup, setPopup }} />}
-        >
           <Route
-            path="/product/:int"
-            element={
-              <FocusedProduct
-                onAddToCart={null}
-                onBuyNow={null}
-                onWishlist={null}
-                onMoreLikeThis={null}
-                onClose={null}
-              />}
-          />
-          
-          
+            path="/"
+            element={<MasterLayout state={{ popup, setPopup }} />}
+          >
+            <Route
+              path="/product/:int"
+              element={
+                <FocusedProduct
+                  onAddToCart={null}
+                  onBuyNow={null}
+                  onWishlist={null}
+                  onMoreLikeThis={null}
+                  onClose={null}
+                />}
+            />
+
+
             <Route
               path="/profile"
-              element={<Profile/>}
+              element={<Profile />}
             />
-            
+
             <Route path="/checkout/shipping" element={<ShippingPopup />} />
             <Route path="/checkout/payment/:orderId" element={<PaymentPopup />} />
-            
-            </Route>
+            <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
+
           </Route>
+        </Route>
       </Routes>
     </>
   );

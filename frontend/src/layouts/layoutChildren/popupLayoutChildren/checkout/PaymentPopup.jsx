@@ -7,6 +7,7 @@ import PaymentResult from './PaymentResult';
 import { getOrder } from '@api/orders';
 import { getPaymentByOrder } from '@api/payments';
 import { useState, useEffect } from 'react';
+import { useNavigate as useNav } from 'react-router-dom';
 import OrderSummary from './OrderSummary';
 
 function PaymentPopup() {
@@ -57,6 +58,15 @@ function PaymentPopup() {
 
         return () => clearInterval(timer);
     }, [showResult, result, orderId]);
+
+    // Navigate to confirmation page when payment succeeded
+    useEffect(() => {
+        if (!result || !orderId) return;
+        const successStates = new Set(['succeeded', 'completed']);
+        if (successStates.has(result.status)) {
+            navigate(`/order-confirmation/${orderId}`);
+        }
+    }, [result, orderId, navigate]);
 
     return (
         <Card className='p-3 shadow position-relative m-auto'
