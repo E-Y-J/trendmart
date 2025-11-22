@@ -1,5 +1,5 @@
 // Orders API client
-// Endpoints: 
+// Endpoints:
 //   POST   /orders/                     -> createOrder
 //   GET    /orders/                     -> getMyOrders
 //   GET    /orders/:orderId             -> getOrder
@@ -11,24 +11,24 @@ import api from './api';
 
 // Create a new order from the current user's cart
 export async function createOrder() {
-    const { data } = await api.post('/orders/');
-    return data;
+  const { data } = await api.post('/orders/');
+  return data;
 }
 
 // Get all orders from the current user
 export async function getMyOrders(params = {}) {
-    const { data } = await api.get('/orders/', { params });
-    return data;
+  const { data } = await api.get('/orders/', { params });
+  return data;
 }
 
 // Get all orders for a specific user (must be the current user)
 export async function getOrder(orderId) {
-    const { data } = await api.get(`/orders/${orderId}`);
-    return data;
+  const { data } = await api.get(`/orders/${orderId}`);
+  return data;
 }
 
 // Get all orders for a specific user (admin or the user themselves)
 export async function getOrdersByUser(userId, params = {}) {
-    const { data } = await api.get(`/orders/users/${userId}`, { params });
-    return data;
+  const { data } = await api.get(`/orders/users/${userId}`, { params });
+  return data;
 }

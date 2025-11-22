@@ -44,29 +44,29 @@ function SearchbarRow({
           {sectionTitle}
         </Col>
       )}
-      {filterButton && (
-        <Col
+        {filterButton && (
+          <Col
           className="d-flex flex-grow-0 flex-column p-0 justify-content-center align-content-center"
           style={{ height: '2.5rem' }}
-        >
-          <Image
-            alt="filter"
-            src={filterIcon}
-            style={{ height: '2rem', width: 'auto', cursor: 'pointer', alignSelf: 'center' }}
-          />
+          >
+            <Image
+              alt="filter"
+              src={filterIcon}
+              style={{ height: '2rem', width: 'auto', cursor: 'pointer', alignSelf: 'center' }}
+              />
+          </Col>
+        )}
+        <Col className="d-flex justify-content-center align-items-center p-0">
+          <Form.Control
+            id={searchId}
+            type="text"
+            value={value}
+            placeholder={placeholder}
+            onChange={handleChange}
+            className="d-flex flex-row h-100 flex-grow-0"
+            style={{ boxSizing: 'border-box', fieldSizing: 'content', borderRadius: '.3rem', borderWidth: '.13rem', borderColor: '#e8e8e8e8' }}
+            />
         </Col>
-      )}
-      <Col className="d-flex justify-content-center align-items-center p-0">
-        <Form.Control
-          id={searchId}
-          type="text"
-          value={value}
-          placeholder={placeholder}
-          onChange={handleChange}
-          className="d-flex flex-row h-100 w-100"
-          style={{ boxSizing: 'border-box', fieldSizing: 'content', borderRadius: '.3rem', borderWidth: '.13rem', borderColor: '#e8e8e8e8' }}
-        />
-      </Col>
     </Row>
   );
 }

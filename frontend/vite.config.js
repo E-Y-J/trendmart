@@ -16,7 +16,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@styles': path.resolve(__dirname, './src/reusableStyles'),
+      '@resources': path.resolve(__dirname, './src/reusable'),
       '@redux': path.resolve(__dirname, './src/redux'),
       '@main': path.resolve(__dirname, './src/layouts/mainComponents'),
       '@children': path.resolve(__dirname, './src/layouts/layoutChildren'),

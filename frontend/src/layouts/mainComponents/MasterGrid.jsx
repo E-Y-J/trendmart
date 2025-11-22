@@ -23,6 +23,7 @@ function MasterGrid() {
       <Col
         id="rightCol"
         className="d-flex flex-column h-100 w-100 ps-5"
+        style={{ gap: '2.3rem' }}
       >
         <Row
           id="featuredRow"
