@@ -1,4 +1,4 @@
-import Table from '@components/common/Table';
+import Table from 'react-bootstrap/Table';
 
 function OrderSummary({ validation }) {
     const items = validation?.items || [];
