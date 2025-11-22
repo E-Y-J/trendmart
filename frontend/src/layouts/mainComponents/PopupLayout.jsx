@@ -9,7 +9,7 @@ function PopupLayout({ children }) {
       style={{
         backgroundColor: `${theme.colors.lightBg}80`,
         backdropFilter: 'blur(5px)',
-        width: '10vw',
+        width: '100vw',
         height: '78vh',
         zIndex: 500,
       }}
