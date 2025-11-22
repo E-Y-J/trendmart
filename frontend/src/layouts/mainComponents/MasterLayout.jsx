@@ -22,7 +22,7 @@ function MasterLayout() {
         className="m-0 justify-content-center align-items-center p-0 py-sm-3 px-sm-4"
         style={{
           height: '100vh',
-          backgroundImage: `radial-gradient('circle farthest-corner at bottom, ${theme.colors.details} 60%, ${theme.colors.lightBg}44 100%)`,
+          backgroundImage: `radial-gradient(circle farthest-corner at bottom, ${theme.colors.details} 60%, ${theme.colors.lightBg}44 100%)`,
           backgroundColor: theme.colors.lightBg,
         }}
       >

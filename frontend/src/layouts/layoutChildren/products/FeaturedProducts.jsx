@@ -5,7 +5,7 @@ import ProductGrid from './productsChildren/ProductGrid';
 import SearchbarRow from '../sectionSearchbar/SearchbarRow';
 import ProductPopup from './productsChildren/ProductPopup';
 import { listProducts } from '@api/catalog';
-import { normalizeProducts } from '@utils/helpers/normalizeProduct.js';
+import { normalizeProducts } from '@utils/helpers';
 import { useTheme } from '@resources/themes/themeContext';
 
 function FeaturedProducts() {

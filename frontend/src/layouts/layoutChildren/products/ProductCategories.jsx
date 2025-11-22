@@ -2,12 +2,10 @@ import { useState, useEffect } from 'react';
 import Stack from 'react-bootstrap/Stack';
 import SearchbarRow from '../sectionSearchbar/SearchbarRow';
 import { Container } from 'react-bootstrap';
-// import { useTheme } from '@styles/themeContext';
 import { listCategories } from '@api/catalog';
 import HoverCategory from './productsChildren/HoverCategory';
 
 function ProductCategories() {
-  // const { theme } = useTheme();
   const [categories, setCategories] = useState(null); // null = loading
 
   useEffect(() => {

@@ -18,7 +18,7 @@ import {
   deleteAddress,
   setDefaultAddress,
 } from '@api/customer';
-import { US_STATES } from '../../../../reusable/constants/constants';
+import { US_STATES } from '@utils/constants';
 
 const Address = () => {
   const dispatch = useDispatch();

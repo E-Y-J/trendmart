@@ -5,7 +5,7 @@ import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import { getAddresses, setDefaultAddress, addAddress } from '@api/customer';
 import { useTheme } from '@resources/themes/themeContext';
-import { US_STATES } from '@resources/constants/constants';
+import { US_STATES } from '@utils/constants';
 
 function ShippingAddressForm({ onNext, onBack }) {
   const { theme } = useTheme();
