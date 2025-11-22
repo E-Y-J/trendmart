@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react';
 import ProductCategories from '../layoutChildren/products/ProductCategories';
 import FeaturedProducts from '../layoutChildren/products/FeaturedProducts';
 import RecommendedProducts from '../layoutChildren/products/RecommendedProducts';
@@ -7,6 +8,19 @@ import { useTheme } from '@styles/themeContext';
 
 function MasterGrid() {
   const { theme } = useTheme();
+  const [activeCategoryId, setActiveCategoryId] = useState(null); // numeric id from API
+  const [activeCategoryName, setActiveCategoryName] = useState(null); // display name
+
+  const handleSelectCategory = useCallback((category) => {
+    // category expected shape: { id, name }
+    if (!category) {
+      setActiveCategoryId(null);
+      setActiveCategoryName(null);
+      return;
+    }
+    setActiveCategoryId(category.id);
+    setActiveCategoryName(category.name);
+  }, []);
 
   return (
     <Row className="w-100 d-flex flex-row m-0" style={{ backgroundColor: theme.colors.text, padding: '2.5rem' }}>
@@ -16,7 +30,8 @@ function MasterGrid() {
         style={{ maxWidth: '25%', borderRightStyle: 'solid', borderRightWidth: '.13rem', borderRightColor: '#e8e8e8e8' }}
       >
         <ProductCategories
-          categories={['Really long category', 'Short Cat...', 3, 4]}
+          onSelectCategory={handleSelectCategory}
+          activeCategoryId={activeCategoryId}
         />
       </Col>
       <Col
@@ -24,7 +39,7 @@ function MasterGrid() {
         className="d-flex flex-column w-100 ps-5 gap-4"
       >
         <section className="d-flex flex-column">
-          <FeaturedProducts />
+          <FeaturedProducts activeCategoryId={activeCategoryId} activeCategoryName={activeCategoryName} onClearCategory={() => handleSelectCategory(null)} />
         </section>
         <section className="d-flex flex-column">
           <RecommendedProducts />
