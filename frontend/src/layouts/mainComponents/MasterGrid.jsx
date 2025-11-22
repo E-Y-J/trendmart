@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react';
 import ProductCategories from '../layoutChildren/products/ProductCategories';
 import FeaturedProducts from '../layoutChildren/products/FeaturedProducts';
 import RecommendedProducts from '../layoutChildren/products/RecommendedProducts';
@@ -7,6 +8,19 @@ import { useTheme } from '@resources/themes/themeContext';
 
 function MasterGrid() {
   const { theme } = useTheme();
+  const [activeCategoryId, setActiveCategoryId] = useState(null); // numeric id from API
+  const [activeCategoryName, setActiveCategoryName] = useState(null); // display name
+
+  const handleSelectCategory = useCallback((category) => {
+    // category expected shape: { id, name }
+    if (!category) {
+      setActiveCategoryId(null);
+      setActiveCategoryName(null);
+      return;
+    }
+    setActiveCategoryId(category.id);
+    setActiveCategoryName(category.name);
+  }, []);
 
   return (
     <Row
@@ -22,7 +36,10 @@ function MasterGrid() {
           borderRight: `.13rem solid ${theme.colors.details}`,
         }}
       >
-        <ProductCategories />
+        <ProductCategories
+          onSelectCategory={handleSelectCategory}
+          activeCategoryId={activeCategoryId}
+        />
       </Col>
 
       <Col
@@ -38,7 +55,7 @@ function MasterGrid() {
             borderBottom: `.13rem solid ${theme.colors.details}`,
           }}
         >
-          <FeaturedProducts />
+          <FeaturedProducts activeCategoryId={activeCategoryId} activeCategoryName={activeCategoryName} onClearCategory={() => handleSelectCategory(null)} />
         </Row>
         <Row className="d-flex flex-column">
           <RecommendedProducts />

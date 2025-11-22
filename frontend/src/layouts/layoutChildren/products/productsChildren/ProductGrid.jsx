@@ -8,7 +8,7 @@ function ProductGrid({ products = [], onSelect, onAddToCart, loading, error }) {
     <div className="w-100" style={{ padding: '0.5rem 0' }}>
       {loading && <div className="text-muted small px-2">Loading...</div>}
       {error && !loading && <div className="text-danger small px-2">{error}</div>}
-      <Row className="g-3 m-0 w-100">
+      <Row className="gx-3 m-0 w-100">
         {products.map((p, idx) => (
           <Col
             key={p.id || idx}

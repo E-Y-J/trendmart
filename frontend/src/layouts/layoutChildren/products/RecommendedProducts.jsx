@@ -93,13 +93,13 @@ function RecommendedProducts() {
         onSearch={performSearch}
       />
 
-      <div className="d-flex flex-column w-100">
-        <div className="d-flex justify-content-between align-items-center mb-2 px-1">
+      <div className="d-flex flex-column w-100 m-0 p-0 pt-1">
+        <div className="d-flex justify-content-between align-items-center px-1">
           <Button
             type="button"
             onClick={handlePrevPage}
             disabled={pageIndex === 0}
-            className="btn btn-sm"
+            className="btn btn-sm px-1"
             style={{
               ...theme.buttons.emphasis
             }}
@@ -113,7 +113,7 @@ function RecommendedProducts() {
             type="button"
             onClick={handleNextPage}
             disabled={pageIndex >= totalPages - 1}
-            className="btn btn-sm"
+            className="btn btn-sm px-1"
             style={{
               ...theme.buttons.emphasis
             }}

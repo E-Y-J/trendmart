@@ -48,6 +48,7 @@ function ProductPopup({
                             alignItems: 'center',
                             justifyContent: 'center',
                             aspectRatio: '4 / 3',
+                            maxWidth: '100%'
                         }}
                     >
                         {imageUrl ? (
@@ -97,6 +98,13 @@ function ProductPopup({
                         </div>
                     </div>
                 </div>
+                {/* More Like This placeholder */}
+                <div className="mt-4" aria-label="More like this section">
+                    <h6 className="mb-2" style={{ fontSize: '.8rem', fontWeight: 600 }}>You may also like</h6>
+                    <div style={{ fontSize: '.65rem', color: '#555' }}>
+                        Similar product recommendations coming soon.
+                    </div>
+                </div>
             </Modal.Body>
 
             <Modal.Footer className="d-flex justify-content-between">
@@ -121,7 +129,7 @@ function ProductPopup({
                                 height: 56,
                                 borderRadius: '50%',
                                 overflow: 'hidden',
-                                backgroundColor: theme.colors.primaryBg || '#0a1f44',
+                                backgroundColor: theme.colors.primaryBg || '#0a1f45',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',

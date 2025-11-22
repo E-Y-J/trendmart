@@ -4,20 +4,22 @@ import Col from 'react-bootstrap/Col';
 import ProductGrid from './productsChildren/ProductGrid';
 import SearchbarRow from '../sectionSearchbar/SearchbarRow';
 import ProductPopup from './productsChildren/ProductPopup';
-import { listProducts } from '@api/catalog';
+import { listProducts, getProductsByCategory } from '@api/catalog';
 import { normalizeProducts } from '@utils/helpers';
 import { useTheme } from '@resources/themes/themeContext';
 
-function FeaturedProducts() {
+function FeaturedProducts({ activeCategoryId, activeCategoryName, onClearCategory }) {
   const { theme } = useTheme();
-  const [products, setProducts] = useState([]);
+  const [fullProducts, setFullProducts] = useState([]); // complete catalog cache
+  const [categoryProducts, setCategoryProducts] = useState(null); // scoped list for active category
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(null);
-  const [pageIndex, setPageIndex] = useState(0); // carousel page
+  const [pageIndex, setPageIndex] = useState(0);
   const pageSize = 4;
 
+  // Initial catalog load
   useEffect(() => {
     let ignore = false;
     async function run() {
@@ -25,7 +27,7 @@ function FeaturedProducts() {
       setError(null);
       try {
         const raw = await listProducts();
-        if (!ignore) setProducts(normalizeProducts(raw));
+        if (!ignore) setFullProducts(normalizeProducts(raw));
       } catch (e) {
         if (!ignore) setError(e.message || 'Failed to load products');
       } finally {
@@ -36,27 +38,58 @@ function FeaturedProducts() {
     return () => { ignore = true; };
   }, []);
 
+  // Load category-specific products when selection changes
+  useEffect(() => {
+    let ignore = false;
+    async function loadCategory(catId) {
+      if (!catId) {
+        setCategoryProducts(null);
+        return;
+      }
+      setLoading(true);
+      setError(null);
+      try {
+        // Prefer backend category endpoint
+        const raw = await getProductsByCategory(catId);
+        if (!ignore) setCategoryProducts(normalizeProducts(raw));
+      } catch (e) {
+        if (!ignore) {
+          setError(e.message || 'Failed to load category products');
+          setCategoryProducts(null);
+        }
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    }
+    loadCategory(activeCategoryId);
+    setPageIndex(0); // reset pagination on category change
+    return () => { ignore = true; };
+  }, [activeCategoryId]);
+
   const handleSearch = useCallback((value) => setSearch(value.trim().toLowerCase()), []);
   const handleView = useCallback((p) => setSelected(p), []);
   const handleClosePopup = useCallback(() => setSelected(null), []);
 
+  const sourceProducts = useMemo(() => (
+    categoryProducts ? categoryProducts : fullProducts
+  ), [categoryProducts, fullProducts]);
+
   // Featured selection: take top 10 (by score if present, otherwise original order)
   const featured = useMemo(() => {
-    if (!products.length) return [];
-    const withScore = [...products].sort((a, b) => (b.score || 0) - (a.score || 0));
+    if (!sourceProducts.length) return [];
+    const withScore = [...sourceProducts].sort((a, b) => (b.score || 0) - (a.score || 0));
     return withScore.slice(0, 10);
-  }, [products]);
+  }, [sourceProducts]);
 
-  // When searching, search across all products
+  // Global search across full catalog (ignores category scope by design)
   const searchResults = useMemo(() => {
     if (!search) return [];
-    return products.filter(p =>
+    return fullProducts.filter(p =>
       (p.name && p.name.toLowerCase().includes(search)) ||
       (p.description && p.description.toLowerCase().includes(search))
     );
-  }, [products, search]);
+  }, [fullProducts, search]);
 
-  // Active filtered set (search overrides featured)
   const filteredProducts = useMemo(() => (search ? searchResults : featured), [search, searchResults, featured]);
 
   // Pagination metrics
@@ -91,19 +124,26 @@ function FeaturedProducts() {
     <Col className="d-flex flex-column w-100 p-0">
       <SearchbarRow
         searchId="featuredSearch"
-        placeholder="Search Featured"
-        sectionTitle="Featured Products"
+        placeholder="Search All Products"
+        sectionTitle={activeCategoryName ? `Category: ${activeCategoryName}` : 'Featured Products'}
         filterButton
         onSearch={handleSearch}
       />
 
+      {activeCategoryId && !search && (
+        <div className="d-flex align-items-center gap-2 px-1">
+          <span className="badge bg-secondary" style={{ fontSize: '.65rem' }}>Filtering by category</span>
+          <button type="button" className="btn btn-sm btn-outline-secondary" onClick={onClearCategory}>Clear</button>
+        </div>
+      )}
+
       <div className="d-flex flex-column w-100">
-        <div className="d-flex justify-content-between align-items-center mb-2 px-1">
+        <div className="d-flex justify-content-between align-items-center px-1">
           <Button
             type="button"
             onClick={handlePrevPage}
             disabled={pageIndex === 0}
-            className="btn btn-sm"
+            className="btn btn-sm px-1"
             style={{
               ...theme.buttons.emphasis
             }}
@@ -117,7 +157,7 @@ function FeaturedProducts() {
             type="button"
             onClick={handleNextPage}
             disabled={pageIndex >= totalPages - 1}
-            className="btn btn-sm"
+            className="btn btn-sm px-1"
             style={{
               ...theme.buttons.emphasis
             }}
