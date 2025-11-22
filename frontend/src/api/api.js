@@ -11,7 +11,8 @@ const api = axios.create({
 
 // Bootstrap from localStorage on load
 const BOOT_KEY = 'tm_access_token';
-const bootToken = typeof window !== 'undefined' ? localStorage.getItem(BOOT_KEY) : null;
+const bootToken =
+  typeof window !== 'undefined' ? localStorage.getItem(BOOT_KEY) : null;
 if (bootToken) {
   api.defaults.headers.common.Authorization = `Bearer ${bootToken}`;
 }

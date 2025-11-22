@@ -4,7 +4,7 @@ import FeaturedProducts from '../layoutChildren/products/FeaturedProducts';
 import RecommendedProducts from '../layoutChildren/products/RecommendedProducts';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { useTheme } from '@styles/themeContext';
+import { useTheme } from '@resources/themes/themeContext';
 
 function MasterGrid() {
   const { theme } = useTheme();
@@ -23,85 +23,46 @@ function MasterGrid() {
   }, []);
 
   return (
-    <Row className="w-100 d-flex flex-row m-0" style={{ backgroundColor: theme.colors.text, padding: '2.5rem' }}>
+    <Row
+      className="w-100 h-100 d-flex flex-row m-0"
+      style={{ backgroundColor: theme.colors.whiteBg, padding: '2rem' }}
+    >
       <Col
         id="leftCol"
-        className="flex-column m-0 p-0 d-none d-sm-flex align-self-start"
-        style={{ maxWidth: '25%', borderRightStyle: 'solid', borderRightWidth: '.13rem', borderRightColor: '#e8e8e8e8' }}
+        className="flex-column m-0 p-0 d-none d-sm-flex flex-grow-0-ns align-self-center"
+        style={{
+          maxWidth: '20%',
+          height: '98%',
+          borderRight: `.13rem solid ${theme.colors.details}`,
+        }}
       >
         <ProductCategories
           onSelectCategory={handleSelectCategory}
           activeCategoryId={activeCategoryId}
         />
       </Col>
+
       <Col
         id="rightCol"
-        className="d-flex flex-column w-100 ps-5 gap-4"
+        className="d-flex flex-column h-100 w-100 ps-5"
+        style={{ gap: '2.3rem' }}
       >
-        <section className="d-flex flex-column">
+        <Row
+          id="featuredRow"
+          className="d-flex flex-row"
+          style={{
+            height: '55%',
+            borderBottom: `.13rem solid ${theme.colors.details}`,
+          }}
+        >
           <FeaturedProducts activeCategoryId={activeCategoryId} activeCategoryName={activeCategoryName} onClearCategory={() => handleSelectCategory(null)} />
-        </section>
-        <section className="d-flex flex-column">
+        </Row>
+        <Row className="d-flex flex-column">
           <RecommendedProducts />
-        </section>
+        </Row>
       </Col>
     </Row>
   );
 }
 
 export default MasterGrid;
-
-// function MasterGrid() {
-//   const { theme } = useTheme();
-
-//   return (
-//     <Row className="w-100 h-100 m-0 p-0 d-flex">
-//       {/* LEFT SIDEBAR */}
-//       <Col
-//         id="leftCol"
-//         className="d-none d-md-flex flex-column p-3"
-//         style={{
-//           maxWidth: '240px',
-//           borderRight: '1px solid rgba(0,0,0,0.08)',
-//           ...theme.schemes.highlight
-//         }}
-//       >
-//         <ProductCategories
-//           categories={[
-//             'All',
-//             'Nature',
-//             'Travel',
-//             'Food',
-//             'Technology',
-//             'Art'
-//           ]}
-//         />
-//       </Col>
-
-//       {/* RIGHT MAIN CONTENT */}
-//       <Col className="d-flex flex-column px-3 gap-4">
-        
-//         {/* FEATURED SECTION */}
-//         <div className="w-100">
-//           <h4 className="mb-3">Featured Galleries</h4>
-//           <div className="d-flex flex-row gap-3">
-//             <FeaturedProducts />
-//           </div>
-//         </div>
-
-//         {/* RECENT POSTS SECTION */}
-//         <div className="w-100">
-//           <h4 className="mb-3">Recent Posts</h4>
-//           <div className="d-flex flex-row gap-3 mb-3">
-//             <RecommendedProducts />
-//           </div>
-
-//           <div className="d-flex justify-content-end">
-//             <button className="btn btn-primary">Load More</button>
-//           </div>
-//         </div>
-
-//       </Col>
-//     </Row>
-//   );
-// }

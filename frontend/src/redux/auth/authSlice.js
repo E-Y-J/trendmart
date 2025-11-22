@@ -58,7 +58,6 @@ export const createUser = createAsyncThunk(
   }
 );
 
-
 export const checkAuthStatus = createAsyncThunk(
   'auth/check',
   async (_, { rejectWithValue }) => {

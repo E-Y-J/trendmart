@@ -4,7 +4,7 @@ import AlertSpace from './AlertSpace';
 function GlobalAlert() {
   const { message, variant } = useSelector((state) => state.status);
   console.log('GlobalAlert message:', message, 'variant:', variant);
-  if (!message?.length) return null
+  if (!message?.length) return null;
 
   return (
     <AlertSpace
