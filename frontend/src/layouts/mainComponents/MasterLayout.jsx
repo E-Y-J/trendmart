@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useOutlet } from 'react-router-dom';
+import { useOutlet, useLocation } from 'react-router-dom';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -11,8 +11,12 @@ import { useTheme } from '@styles/themeContext';
 
 function MasterLayout() {
   const routedPopup = useOutlet();
+  const location = useLocation();
   const { theme } = useTheme();
   const [popup, setPopup] = useState(null);
+
+  // Check if we're on a popup route (like /product/:id)
+  const isPopupRoute = location.pathname.includes('/product/');
 
   return (
     <Container

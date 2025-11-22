@@ -17,6 +17,7 @@ function App() {
     <>
       <Routes>
         <Route path='/styleguide' element={<StyleGuide />} />
+        <Route element={<ProtectedURLs />}>
         <Route
           path="/"
           element={<MasterLayout state={{ popup, setPopup }} />}
@@ -32,13 +33,18 @@ function App() {
                 onClose={null}
               />}
           />
-
-          {/*<Route element={<ProtectedURLs />}>*/}
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/checkout/shipping" element={<ShippingPopup />} />
-          <Route path="/checkout/payment/:orderId" element={<PaymentPopup />} />
-          {/*</Route>*/}
-        </Route>
+          
+          
+            <Route
+              path="/profile"
+              element={<Profile/>}
+            />
+            
+            <Route path="/checkout/shipping" element={<ShippingPopup />} />
+            <Route path="/checkout/payment/:orderId" element={<PaymentPopup />} />
+            
+            </Route>
+          </Route>
       </Routes>
     </>
   );
