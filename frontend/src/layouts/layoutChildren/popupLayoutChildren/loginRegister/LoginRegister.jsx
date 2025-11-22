@@ -4,13 +4,13 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import { useDispatch } from 'react-redux';
-import { Link,  } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { loginUser, createUser } from '@redux/auth/authSlice';
 import { setStatus, clearStatus } from '@redux/status/statusSlice';
 import TextInput from '@children/input/TextInput';
 import PasswordRequirements from './PasswordRequirements';
 import PopupCloseButton from '@children/button/CloseButton';
-import { useTheme } from '@styles/themeContext';
+import { useTheme } from '@resources/themes/themeContext';
 import PasswordVisibleButton from './PasswordVisibleButton';
 
 function LoginRegister({ setPopup }) {
@@ -90,11 +90,11 @@ function LoginRegister({ setPopup }) {
     <Col
       className="d-inline-flex flex-column flex-sm-grow-0 position-relative justify-content-between align-items-center gap-1 px-2 py-4 m-auto"
       style={{
-        minHeight: '50vh',
-        minWidth: '50vw',
+        minHeight: '394px',
+        minWidth: '288px',
         ...theme.schemes.darkText,
         borderRadius: theme.props.bR_less,
-        filter: 'drop-shadow(.5rem .5rem 1rem #0a1f44e8)'
+        filter: 'drop-shadow(.5rem .5rem 1rem #0a1f44e8)',
       }}
     >
       <PopupCloseButton onClick={() => setPopup(null)} />
@@ -112,7 +112,7 @@ function LoginRegister({ setPopup }) {
             style={{
               display: 'flex',
               flexDirection: 'column',
-              gap: '1rem'
+              gap: '1rem',
             }}
           >
             <TextInput
@@ -153,35 +153,51 @@ function LoginRegister({ setPopup }) {
                   textDecoration: 'none',
                 }}
               >
-                <PasswordVisibleButton show={ !passHidden } />
+                <PasswordVisibleButton show={!passHidden} />
               </Button>
             </TextInput>
 
-            { toggleForm === 'register' &&  <PasswordRequirements password={formData.password} /> }
-                <p className="mx-auto my-0 p-0" style={{ fontSize: '.8rem' }}>
-                  { toggleForm === 'register' ? 'Have an account? ' : 'New to TrendMart? ' }
-                  <Link onClick={() => setToggleForm(toggleForm === 'login' ? 'register' : 'login')} style={{ cursor: 'pointer' }}>
-                    { toggleForm === 'login' ? 'Register' : 'Login ' }
-                  </Link>
-                </p>
-            <div className="d-flex flex-grow-1 h-100" />
+            {toggleForm === 'register' && (
+              <PasswordRequirements password={formData.password} />
+            )}
           </Col>
         </Row>
+        <Row >
+
+            <p
+              className="mx-auto my-0 p-0"
+              style={{ fontSize: '.8rem' }}
+              >
+              {toggleForm === 'register'
+                ? 'Have an account? '
+                : 'New to TrendMart? '}
+              <Link
+                onClick={() =>
+                  setToggleForm(toggleForm === 'login' ? 'register' : 'login')
+                }
+                style={{ cursor: 'pointer' }}
+                >
+                {toggleForm === 'login' ? 'Register' : 'Login '}
+              </Link>
+            </p>
         <Button
           type="submit"
           className="w-50 align-self-center fw-bold border-1 align-self-end"
           style={{
-            ...(toggleForm === 'login' ? theme.buttons.contrast : theme.buttons.splash)
-          }}
-          disabled={
-            formData.email === '' ||
-            formData.password.length < 8 ||
-            (toggleForm === 'register' &&
-              formData.verification !== formData.email)
-            }
-            >
+            ...(toggleForm === 'login'
+              ? theme.buttons.contrast
+              : theme.buttons.splash),
+            }}
+            disabled={
+              formData.email === '' ||
+              formData.password.length < 8 ||
+              (toggleForm === 'register' &&
+                formData.verification !== formData.email)
+              }
+              >
           {toggleForm === 'login' ? 'Login' : 'Register'}
         </Button>
+        </Row>
       </Form>
     </Col>
   );

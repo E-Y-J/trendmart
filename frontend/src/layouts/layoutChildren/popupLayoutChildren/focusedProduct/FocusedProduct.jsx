@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import { useTheme } from '@styles/themeContext';
+import { useTheme } from '@resources/themes/themeContext';
 import logoUrl from '/logo.svg?url';
 import CloseButton from '../../button/CloseButton';
 
@@ -14,8 +14,7 @@ function FocusedProduct({
   onMoreLikeThis,
   onClose,
 }) {
-
-  const { theme } = useTheme()
+  const { theme } = useTheme();
   // Close on esc
   useEffect(() => {
     const handler = (e) => {
@@ -59,9 +58,7 @@ function FocusedProduct({
           fontWeight: 600,
         }}
       />
-      <Card.Body
-        className="h-100"
-      >
+      <Card.Body className="h-100">
         <Row className="h-100">
           {/* Left column: image/icon + title/description */}
           <Col
@@ -98,7 +95,7 @@ function FocusedProduct({
               )}
             </div>
 
-            <div className='d-none'>
+            <div className="d-none">
               <h2 style={{ margin: 0 }}>{name}</h2>
               <div style={{ fontWeight: 600, marginTop: '.25rem' }}>
                 Description:
@@ -132,14 +129,13 @@ function FocusedProduct({
                 More Like This
               </Button>
             </div>
-          </Col >
+          </Col>
 
           {/* Right column: recommendations grid */}
-          < Col
+          <Col
             md={7}
             className="overflow-auto"
-          >
-          </Col>
+          ></Col>
         </Row>
       </Card.Body>
     </Card>
