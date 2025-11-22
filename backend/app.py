@@ -70,19 +70,19 @@ def create_app():
         try:
             db.create_all()
             # Seed initial minimal catalog if empty
-            if Product.query.count() == 0:
-                cat = Category(name="Electronics", slug="electronics")
-                sub = Subcategory(name="Phones", slug="phones", category=cat)
-                prod = Product(
-                    sku="SKU-1",
-                    name="Sample Phone",
-                    description="Seed product for initial interactions",
-                    price=199.99,
-                    subcategory=sub,
-                )
-                db.session.add_all([cat, sub, prod])
-                db.session.commit()
-                print("Seeded initial catalog data (1 product).")
+            # if Product.query.count() == 0:
+            #     cat = Category(name="Electronics", slug="electronics")
+            #     sub = Subcategory(name="Phones", slug="phones", category=cat)
+            #     prod = Product(
+            #         sku="SKU-1",
+            #         name="Sample Phone",
+            #         description="Seed product for initial interactions",
+            #         price=199.99,
+            #         subcategory=sub,
+            #     )
+            #     db.session.add_all([cat, sub, prod])
+            #     db.session.commit()
+            #     print("Seeded initial catalog data (1 product).")
             print("Database tables created successfully!")
         except Exception as e:
             print(f"Database initialization error: {e}")

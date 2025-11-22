@@ -12,6 +12,17 @@ export async function listProducts(params = {}) {
   return data; // Array of products
 }
 
+// Client-side search helper (case-insensitive substring match on name/description)
+export function filterProductsByQuery(products, query) {
+  if (!query) return products;
+  const q = query.trim().toLowerCase();
+  if (!q) return products;
+  return products.filter(p => (
+    (p.name && p.name.toLowerCase().includes(q)) ||
+    (p.description && p.description.toLowerCase().includes(q))
+  ));
+}
+
 export async function getProduct(productId) {
   const { data } = await api.get(`/products/${productId}`);
   return data; // Single product

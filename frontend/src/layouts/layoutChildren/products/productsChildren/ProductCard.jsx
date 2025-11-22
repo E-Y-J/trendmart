@@ -40,11 +40,14 @@ function ProductCard({
                         {description}
                     </div>
                 )}
-                {score !== undefined && (
-                    <div className='mt-1' style={{ fontSize: '.65rem', color: '#555' }}>
-                        AI Recom Score: {(score * 100).toFixed(0)}%
-                    </div>
-                )}
+                <div className='mt-1 d-flex flex-column gap-1'>
+                    <div style={{ fontSize: '.65rem', color: '#222', fontWeight: 600 }}>{priceDisplay}</div>
+                    {score !== undefined && (
+                        <div style={{ fontSize: '.6rem', color: '#555' }}>
+                            AI Score: {(score * 100).toFixed(0)}%
+                        </div>
+                    )}
+                </div>
                 {!minimal && (
                     <div className="mt-2 d-flex gap-2">
                         <Button
