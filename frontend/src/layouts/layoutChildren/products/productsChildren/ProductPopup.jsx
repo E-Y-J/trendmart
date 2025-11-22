@@ -48,6 +48,7 @@ function ProductPopup({
                             alignItems: 'center',
                             justifyContent: 'center',
                             aspectRatio: '4 / 3',
+                            maxWidth: '100%'
                         }}
                     >
                         {imageUrl ? (
@@ -95,6 +96,13 @@ function ProductPopup({
                         <div style={{ fontSize: '.75rem', lineHeight: 1.3 }}>
                             {description || 'No description available.'}
                         </div>
+                    </div>
+                </div>
+                {/* More Like This placeholder */}
+                <div className="mt-4" aria-label="More like this section">
+                    <h6 className="mb-2" style={{ fontSize: '.8rem', fontWeight: 600 }}>You may also like</h6>
+                    <div style={{ fontSize: '.65rem', color: '#555' }}>
+                        Similar product recommendations coming soon.
                     </div>
                 </div>
             </Modal.Body>
