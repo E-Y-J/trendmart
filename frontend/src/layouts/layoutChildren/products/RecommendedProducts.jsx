@@ -78,7 +78,7 @@ function RecommendedProducts() {
 
   const handleView = useCallback(async (p) => {
     setSelected(p);
-    try { await logView(p, searching ? 'search' : 'cold_start'); } catch { }
+    try { await logView(p, searching ? 'search' : 'cold_start'); } catch { (e) => console.log(e) }
   }, [searching]);
 
   return (

@@ -21,6 +21,7 @@ export default defineConfig({
       '@main': path.resolve(__dirname, './src/layouts/mainComponents'),
       '@children': path.resolve(__dirname, './src/layouts/layoutChildren'),
       '@api': path.resolve(__dirname, './src/api'),
+      '@utils': path.resolve(__dirname, './src/utils'),
     },
   },
 });

@@ -1,12 +1,15 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import Button from 'react-bootstrap/Button'
 import Col from 'react-bootstrap/Col';
 import ProductGrid from './productsChildren/ProductGrid';
 import SearchbarRow from '../sectionSearchbar/SearchbarRow';
 import ProductPopup from './productsChildren/ProductPopup';
 import { listProducts } from '@api/catalog';
-import { normalizeProducts } from '../../../utils/normalizeProduct.js';
+import { normalizeProducts } from '@utils/helpers/normalizeProduct.js';
+import { useTheme } from '@resources/themes/themeContext';
 
 function FeaturedProducts() {
+  const { theme } = useTheme();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -96,25 +99,31 @@ function FeaturedProducts() {
 
       <div className="d-flex flex-column w-100">
         <div className="d-flex justify-content-between align-items-center mb-2 px-1">
-          <button
+          <Button
             type="button"
             onClick={handlePrevPage}
             disabled={pageIndex === 0}
-            className="btn btn-sm btn-outline-secondary"
+            className="btn btn-sm"
+            style={{
+              ...theme.buttons.emphasis
+            }}
           >
             Prev
-          </button>
+          </Button>
           <span className="small">
             Page {totalProducts === 0 ? 0 : pageIndex + 1} of {totalPages}
           </span>
-          <button
+          <Button
             type="button"
             onClick={handleNextPage}
             disabled={pageIndex >= totalPages - 1}
-            className="btn btn-sm btn-outline-secondary"
+            className="btn btn-sm"
+            style={{
+              ...theme.buttons.emphasis
+            }}
           >
             Next
-          </button>
+          </Button>
         </div>
 
         <ProductGrid
