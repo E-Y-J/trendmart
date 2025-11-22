@@ -3,25 +3,19 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { useDispatch } from 'react-redux';
 import { clearStatus } from '@redux/status/statusSlice';
-import { useTheme } from '@styles/themeContext';
+import { useTheme } from '@resources/themes/themeContext';
 
 function AlertCloseButton({ onClick }) {
   return (
     <CloseButton
-      className="position-absolute top-0 end-0"
-      style={{
-        zIndex: 999,
-        transform: 'translate(-50%, 80%)',
-      }}
       onClick={onClick}
     />
-  )
+  );
 }
 
 function AlertSpace({ alertMessage, variant }) {
   const { theme } = useTheme();
   const dispatch = useDispatch();
-  
 
   return (
     <Col
@@ -31,14 +25,22 @@ function AlertSpace({ alertMessage, variant }) {
         display: 'flex',
         color: theme.colors.contrast,
         backgroundColor: theme.alerts[variant],
-        borderRadius: `0 0 ${Array(2).fill(theme.props.bR_more).join(' ') }`,
+        borderRadius: `0 0 ${Array(2).fill(theme.props.bR_more).join(' ')}`,
       }}
     >
       <Row className="w-100 d-flex flex-row">
-        <Col className="flex-grow-1 justify-content-center align-items-center d-flex">
-          <div style={{ ...theme.schemes.darkText, borderRadius: theme.props.bR_less, padding: '.5rem' }}>
+        <Col className="justify-content-center align-items-center p-0 my-0 ps-4 d-flex">
+          <div
+            style={{
+              ...theme.schemes.darkText,
+              borderRadius: theme.props.bR_less,
+              padding: '.5rem',
+            }}
+          >
             {alertMessage}
           </div>
+        </Col>
+        <Col className='d-flex flex-column flex-grow-0 justify-content-center align-items-center p-0 pe-1'>
           <AlertCloseButton onClick={() => dispatch(clearStatus())} />
         </Col>
       </Row>

@@ -3,10 +3,11 @@
     "baseUrl": ".",
     "paths": {
       "@redux/*": ["src/redux/*"],
-      "@styles/*": ["src/reusableStyles/*"],
+      "@resources/*": ["src/reusable/*"],
       "@main/*": ["src/layouts/mainComponents"],
       "@children/*": ["src/layouts/layoutChildren"],
-      "@api/*": ["src/api"]
-    },
+      "@api/*": ["src/api"],
+      "@utils/*": ["src/utils"],
+    }
   }
 }

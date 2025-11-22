@@ -1,12 +1,15 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import Button from 'react-bootstrap/Button'
 import Col from 'react-bootstrap/Col';
 import ProductGrid from './productsChildren/ProductGrid';
 import SearchbarRow from '../sectionSearchbar/SearchbarRow';
 import ProductPopup from './productsChildren/ProductPopup';
 import { listProducts, getProductsByCategory } from '@api/catalog';
-import { normalizeProducts } from '../../../utils/normalizeProduct.js';
+import { normalizeProducts } from '@utils/helpers';
+import { useTheme } from '@resources/themes/themeContext';
 
 function FeaturedProducts({ activeCategoryId, activeCategoryName, onClearCategory }) {
+  const { theme } = useTheme();
   const [fullProducts, setFullProducts] = useState([]); // complete catalog cache
   const [categoryProducts, setCategoryProducts] = useState(null); // scoped list for active category
   const [loading, setLoading] = useState(false);
@@ -128,33 +131,39 @@ function FeaturedProducts({ activeCategoryId, activeCategoryName, onClearCategor
       />
 
       {activeCategoryId && !search && (
-        <div className="d-flex align-items-center gap-2 px-1 mb-2">
+        <div className="d-flex align-items-center gap-2 px-1">
           <span className="badge bg-secondary" style={{ fontSize: '.65rem' }}>Filtering by category</span>
           <button type="button" className="btn btn-sm btn-outline-secondary" onClick={onClearCategory}>Clear</button>
         </div>
       )}
 
       <div className="d-flex flex-column w-100">
-        <div className="d-flex justify-content-between align-items-center mb-2 px-1">
-          <button
+        <div className="d-flex justify-content-between align-items-center px-1">
+          <Button
             type="button"
             onClick={handlePrevPage}
             disabled={pageIndex === 0}
-            className="btn btn-sm btn-outline-secondary"
+            className="btn btn-sm px-1"
+            style={{
+              ...theme.buttons.emphasis
+            }}
           >
             Prev
-          </button>
+          </Button>
           <span className="small">
             Page {totalProducts === 0 ? 0 : pageIndex + 1} of {totalPages}
           </span>
-          <button
+          <Button
             type="button"
             onClick={handleNextPage}
             disabled={pageIndex >= totalPages - 1}
-            className="btn btn-sm btn-outline-secondary"
+            className="btn btn-sm px-1"
+            style={{
+              ...theme.buttons.emphasis
+            }}
           >
             Next
-          </button>
+          </Button>
         </div>
 
         <ProductGrid

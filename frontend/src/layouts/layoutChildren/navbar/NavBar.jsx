@@ -7,11 +7,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logoutUser } from '@redux/auth/authSlice';
 import LoginRegister from '@children/popupLayoutChildren/loginRegister/LoginRegister';
-import { useTheme } from '@styles/themeContext';
+import { useTheme } from '@resources/themes/themeContext';
 import Logo from '../logo/Logo';
 import HoverLink from './HoverLink';
-
-
 
 function NavBar({ setPopup }) {
   const { theme } = useTheme();
@@ -45,10 +43,10 @@ function NavBar({ setPopup }) {
 
     return (
       <div className="d-flex align-items-center gap-3">
-        <span 
-          style={{ 
-            color: theme.colors.lightBg || 'white', 
-            fontSize: '.9rem'
+        <span
+          style={{
+            color: theme.colors.lightBg || 'white',
+            fontSize: '.9rem',
           }}
           className="d-none d-sm-inline"
         >
@@ -80,14 +78,21 @@ function NavBar({ setPopup }) {
       <Col className="d-flex align-items-center flex-grow-1 gap-3">
         <Navbar.Brand
           className="d-flex align-items-center p-0 m-0"
-          style={{ height: '8vh' }}
+          style={{
+            height: '8vh',
+            cursor: 'pointer'
+          }}
+          onClick={() => navigate('/')}
         >
-          <Logo variant='white' />
+          <Logo variant="white" />
         </Navbar.Brand>
         <h1
           id="title"
           className="mb-0 fs-3"
-          style={{ fontWeight: 700, color: theme.colors.lightBg }}
+          style={{
+            fontWeight: 700,
+            color: theme.colors.lightBg
+          }}
         >
           TrendMart
         </h1>
@@ -95,15 +100,9 @@ function NavBar({ setPopup }) {
 
       {/* CENTER HoverLinkS */}
       <Nav className="d-none d-md-flex gap-4 ms-auto me-4">
-        <HoverLink linksTo="/" >
-          Home
-        </HoverLink >
-        {
-          isAuthenticated && (
-            <HoverLink linksTo="/profile">Profile</HoverLink>
-          )
-        }
-       
+        <HoverLink linksTo="/">Home</HoverLink>
+        {isAuthenticated && <HoverLink linksTo="/profile">Profile</HoverLink>}
+
         <HoverLink linksTo="/contact">Contact</HoverLink>
       </Nav>
 

@@ -1,6 +1,6 @@
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
-import { useTheme } from '@styles/themeContext';
+import { useTheme } from '@resources/themes/themeContext';
 
 function ProductCard({
     product,

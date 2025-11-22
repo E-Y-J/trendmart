@@ -1,12 +1,15 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import SearchbarRow from '../sectionSearchbar/SearchbarRow';
 import ProductGrid from './productsChildren/ProductGrid';
 import ProductPopup from './productsChildren/ProductPopup';
 import { getColdStart, searchRecommendations } from '@api/recommendations';
 import { logView } from '@api/events';
+import { useTheme } from '@resources/themes/themeContext';
 
 function RecommendedProducts() {
+  const { theme } = useTheme()
   const [state, setState] = useState({ loading: true, error: null, items: [] });
   const [searchState, setSearchState] = useState({ query: '', loading: false, error: null, items: [] });
   const searching = searchState.query.length > 0;
@@ -75,11 +78,14 @@ function RecommendedProducts() {
 
   const handleView = useCallback(async (p) => {
     setSelected(p);
-    try { await logView(p, searching ? 'search' : 'cold_start'); } catch { }
+    try { await logView(p, searching ? 'search' : 'cold_start'); } catch { (e) => console.log(e) }
   }, [searching]);
 
   return (
-    <Col className="d-flex flex-column w-100 p-0">
+    <Col
+      className="d-flex flex-column w-100 p-0"
+      style={{ borderTop: '${}' }}
+    >
       <SearchbarRow
         searchId="recommendedSearch"
         placeholder="Search..."
@@ -87,27 +93,33 @@ function RecommendedProducts() {
         onSearch={performSearch}
       />
 
-      <div className="d-flex flex-column w-100">
-        <div className="d-flex justify-content-between align-items-center mb-2 px-1">
-          <button
+      <div className="d-flex flex-column w-100 m-0 p-0 pt-1">
+        <div className="d-flex justify-content-between align-items-center px-1">
+          <Button
             type="button"
             onClick={handlePrevPage}
             disabled={pageIndex === 0}
-            className="btn btn-sm btn-outline-secondary"
+            className="btn btn-sm px-1"
+            style={{
+              ...theme.buttons.emphasis
+            }}
           >
             Prev
-          </button>
+          </Button>
           <span className="small">
             Page {totalProducts === 0 ? 0 : pageIndex + 1} of {totalPages}
           </span>
-          <button
+          <Button
             type="button"
             onClick={handleNextPage}
             disabled={pageIndex >= totalPages - 1}
-            className="btn btn-sm btn-outline-secondary"
+            className="btn btn-sm px-1"
+            style={{
+              ...theme.buttons.emphasis
+            }}
           >
             Next
-          </button>
+          </Button>
         </div>
 
         <ProductGrid

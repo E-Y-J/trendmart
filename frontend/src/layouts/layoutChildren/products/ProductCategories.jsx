@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import Stack from 'react-bootstrap/Stack';
 import SearchbarRow from '../sectionSearchbar/SearchbarRow';
 import { Container } from 'react-bootstrap';
-// import { useTheme } from '@styles/themeContext';
 import { listCategories } from '@api/catalog';
 import HoverCategory from './productsChildren/HoverCategory';
 
@@ -91,3 +90,4 @@ function ProductCategories({ onSelectCategory, activeCategoryId }) {
 }
 
 export default ProductCategories;
+
