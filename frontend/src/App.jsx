@@ -10,6 +10,7 @@ import { useState } from 'react';
 import StyleGuide from '@resources/themes/StyleGuide';
 import ShippingPopup from '@children/popupLayoutChildren/checkout/ShippingPopup';
 import PaymentPopup from '@children/popupLayoutChildren/checkout/PaymentPopup';
+import OrderConfirmation from '@children/popupLayoutChildren/checkout/OrderConfirmation';
 
 function App() {
   const [popup, setPopup] = useState(null);
@@ -26,49 +27,49 @@ function App() {
           element={<MasterLayout state={{ popup, setPopup }} />}
         >
           <Route element={<ProtectedURLs />}>
-          <Route
-            path="/product/:int"
-            element={
-              <FocusedProduct
-                onAddToCart={null}
-                onBuyNow={null}
-                onWishlist={null}
-                onMoreLikeThis={null}
-                onClose={null}
-              />
-            }
-          />
-
-          <Route
-            path="/profile"
-            element={<Profile />}
-          >
             <Route
-              index
-              element={<Address />}
+              path="/product/:int"
+              element={
+                <FocusedProduct
+                  onAddToCart={null}
+                  onBuyNow={null}
+                  onWishlist={null}
+                  onMoreLikeThis={null}
+                  onClose={null}
+                />
+              }
             />
-            {/* <Route
+
+            <Route
+              path="/profile"
+              element={<Profile />}
+            >
+              <Route
+                index
+                element={<Address />}
+              />
+              {/* <Route
                 path="profile/contact-info"
                 element={<ContactInfo />}
               /> */}
-            <Route
-              path="profile/address"
-              element={<Address />}
-            />
-            {/* <Route
+              <Route
+                path="profile/address"
+                element={<Address />}
+              />
+              {/* <Route
                 path="profile/security"
                 element={<Security />}
               /> */}
-          </Route>
+            </Route>
 
-          <Route
-            path="/checkout/shipping"
-            element={<ShippingPopup />}
-          />
-          <Route
-            path="/checkout/payment/:orderId"
-            element={<PaymentPopup />}
-          />
+            <Route
+              path="/checkout/shipping"
+              element={<ShippingPopup />}
+            />
+            <Route
+              path="/checkout/payment/:orderId"
+              element={<PaymentPopup />}
+            />
           </Route>
         </Route>
       </Routes>
