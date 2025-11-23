@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Card from 'react-bootstrap/Card';
 import PopupCloseButton from '@children/button/CloseButton';
-import { useTheme } from '@styles/themeContext';
+import { useTheme } from '@resources/themes/themeContext';
 import { getOrder } from '@api/orders';
 import { getPaymentByOrder } from '@api/payments';
 import OrderSummary from './OrderSummary';

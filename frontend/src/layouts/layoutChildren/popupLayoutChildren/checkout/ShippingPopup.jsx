@@ -9,15 +9,13 @@ import OrderSummary from './OrderSummary';
 import { useState } from 'react';
 
 function ShippingPopup() {
-<<<<<<< HEAD
     const { theme } = useTheme();
     const navigate = useNavigate();
-    const [step, setStep] = useState('address'); // address | reviewing | creating
+    const [step, setStep] = useState('address'); // address | reviewing
     const [validation, setValidation] = useState(null);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
     const [creatingOrder, setCreatingOrder] = useState(false);
-    const [orderId, setOrderId] = useState(null);
 
     const handleAddressComplete = async () => {
         setLoading(true);
@@ -26,7 +24,7 @@ function ShippingPopup() {
             const data = await validateCheckout();
             setValidation(data);
             setStep('reviewing');
-        } catch (e) {
+        } catch {
             setError('Unable to validate cart.');
         } finally {
             setLoading(false);
@@ -40,12 +38,11 @@ function ShippingPopup() {
             const res = await createOrder();
             const id = res?.order?.id || res?.order?._id || res?.id;
             if (id) {
-                setOrderId(id);
                 navigate(`/checkout/payment/${id}`);
             } else {
                 setError('Order creation failed.');
             }
-        } catch (e) {
+        } catch {
             setError('Order creation failed.');
         } finally {
             setCreatingOrder(false);
@@ -96,45 +93,6 @@ function ShippingPopup() {
             </Card.Body>
         </Card>
     );
-=======
-  const { theme } = useTheme();
-  const navigate = useNavigate();
-
-  return (
-    <Card
-      className="p-3 shadow position-relative m-auto"
-      style={{
-        width: 'min(92vw, 640px)',
-        maxHeight: '90vh',
-        backgroundColor: '#fffffb',
-        color: '#222',
-        borderRadius: 4,
-        ...theme.schemes.darkText,
-      }}
-    >
-      <PopupCloseButton onClick={() => navigate(-1)} />
-      <Card.Body
-        className="d-flex flex-column gap-3"
-        style={{ overflowY: 'auto' }}
-      >
-        <h3 className="m-0">Shipping Address</h3>
-        <ShippingAddressForm
-          onBack={() => navigate(-1)}
-          onNext={async () => {
-            try {
-              const res = await createOrder(); // { message, order }
-              const orderId = res?.order?.id || res?.order?._id;
-              if (orderId) navigate(`/checkout/payment/${orderId}`);
-              else navigate(-1);
-            } catch {
-              navigate(-1);
-            }
-          }}
-        />
-      </Card.Body>
-    </Card>
-  );
->>>>>>> 72a76bdd09feb5e0952a9e24deb9cf76c43e1351
 }
 
 export default ShippingPopup;
